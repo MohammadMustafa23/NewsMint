@@ -1,0 +1,423 @@
+/* ========================================
+   Hero Section - NewsMint
+   ======================================== */
+
+.hero-section {
+  background-color: #f8f9fc;
+  padding: 100px 24px;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  overflow: hidden;
+}
+
+.hero-section__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60px;
+}
+
+/* ========================================
+   Left Content
+   ======================================== */
+
+.hero-section__content {
+  flex: 1;
+  max-width: 520px;
+}
+
+.hero-section__title {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 52px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.15;
+  margin: 0 0 24px 0;
+  letter-spacing: -0.02em;
+}
+
+.hero-section__title--highlight {
+  color: #d4a017;
+}
+
+.hero-section__description {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #475569;
+  margin: 0 0 36px 0;
+  max-width: 420px;
+}
+
+.hero-section__buttons {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.hero-section__btn {
+  padding: 14px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: none;
+  outline: none;
+  white-space: nowrap;
+}
+
+.hero-section__btn--primary {
+  background-color: #e8b923;
+  color: #1e293b;
+  box-shadow: 0 4px 14px rgba(232, 185, 35, 0.35);
+}
+
+.hero-section__btn--primary:hover {
+  background-color: #d4a017;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(232, 185, 35, 0.45);
+}
+
+.hero-section__btn--secondary {
+  background-color: #ffffff;
+  color: #1e293b;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.hero-section__btn--secondary:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* ========================================
+   Right Content - Phone Mockup
+   ======================================== */
+
+.hero-section__phone-wrapper {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.phone-mockup {
+  width: 300px;
+  height: 580px;
+  background: #ffffff;
+  border-radius: 36px;
+  border: 8px solid #e2e8f0;
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.12),
+    0 10px 30px rgba(0, 0, 0, 0.08),
+    inset 0 0 0 2px #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Phone Header */
+.phone-mockup__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 10px;
+  background: #f0f3ff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.phone-mockup__back {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-mockup__avatar {
+  width: 36px;
+  height: 36px;
+  background: #e8b923;
+  color: #1e293b;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.phone-mockup__header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.phone-mockup__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.phone-mockup__status {
+  font-size: 11px;
+  color: #22c55e;
+  line-height: 1.2;
+}
+
+/* Phone Chat Area */
+.phone-mockup__chat {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #ffffff;
+  overflow-y: auto;
+}
+
+.phone-mockup__date-label {
+  text-align: center;
+  font-size: 11px;
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 10px;
+  align-self: center;
+  margin-bottom: 4px;
+}
+
+/* Digest Card */
+.phone-mockup__message--card {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.digest-card {
+  background: #1e293b;
+  border-radius: 14px;
+  padding: 16px 18px;
+  min-width: 180px;
+  max-width: 240px;
+  position: relative;
+}
+
+.digest-card__label {
+  color: #e8b923;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 24px;
+}
+
+.digest-card__time {
+  color: #64748b;
+  font-size: 10px;
+  text-align: right;
+}
+
+/* Voice Note */
+.phone-mockup__message--voice {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.voice-note {
+  background: #1e293b;
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+  max-width: 240px;
+}
+
+.voice-note__play {
+  width: 32px;
+  height: 32px;
+  background: #e8b923;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #1e293b;
+  flex-shrink: 0;
+  padding-left: 2px;
+}
+
+.voice-note__waveform {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+  height: 24px;
+}
+
+.voice-note__bar {
+  width: 3px;
+  background: #e8b923;
+  border-radius: 2px;
+  opacity: 0.85;
+}
+
+.voice-note__duration {
+  font-size: 11px;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+/* Phone Input Bar */
+.phone-mockup__input-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px 16px;
+  background: #f8f9fc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.phone-mockup__input-icon {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.phone-mockup__input-icon--mic {
+  background: #e8b923;
+  color: #1e293b;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
+.phone-mockup__input-field {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 9px 14px;
+  border: 1px solid #e2e8f0;
+}
+
+.phone-mockup__input-placeholder {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+
+/* Tablet: 768px - 1023px */
+@media (max-width: 1023px) {
+  .hero-section {
+    padding: 70px 24px;
+  }
+
+  .hero-section__container {
+    gap: 40px;
+  }
+
+  .hero-section__title {
+    font-size: 40px;
+  }
+
+  .phone-mockup {
+    width: 260px;
+    height: 500px;
+    border-radius: 32px;
+    border-width: 6px;
+  }
+}
+
+/* Mobile: below 768px */
+@media (max-width: 767px) {
+  .hero-section {
+    padding: 50px 20px 60px;
+  }
+
+  .hero-section__container {
+    flex-direction: column;
+    text-align: center;
+    gap: 48px;
+  }
+
+  .hero-section__content {
+    max-width: 100%;
+    order: 1;
+  }
+
+  .hero-section__title {
+    font-size: 36px;
+    margin-bottom: 20px;
+  }
+
+  .hero-section__description {
+    margin: 0 auto 32px auto;
+    font-size: 15px;
+  }
+
+  .hero-section__buttons {
+    justify-content: center;
+  }
+
+  .hero-section__phone-wrapper {
+    order: 2;
+  }
+
+  .phone-mockup {
+    width: 280px;
+    height: 520px;
+  }
+}
+
+/* Small Mobile: below 480px */
+@media (max-width: 479px) {
+  .hero-section {
+    padding: 40px 16px 50px;
+  }
+
+  .hero-section__title {
+    font-size: 30px;
+  }
+
+  .hero-section__description {
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .hero-section__buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .hero-section__btn {
+    width: 100%;
+    padding: 14px 20px;
+  }
+
+  .phone-mockup {
+    width: 260px;
+    height: 480px;
+    border-radius: 28px;
+  }
+}

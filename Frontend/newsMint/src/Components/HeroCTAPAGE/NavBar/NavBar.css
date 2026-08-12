@@ -1,0 +1,251 @@
+/* ========================================
+   Navbar - NewsMint
+   ======================================== */
+
+.navbar {
+  background-color: #f8f9fc;
+  padding: 0 24px;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid transparent;
+}
+
+.navbar__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+
+/* ========================================
+   Logo
+   ======================================== */
+
+.navbar__logo {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   Desktop Nav Links
+   ======================================== */
+
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar__link {
+  font-size: 15px;
+  font-weight: 500;
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.navbar__link:hover {
+  color: #0f172a;
+}
+
+.navbar__link::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #e8b923;
+  transition: width 0.25s ease;
+  border-radius: 1px;
+}
+
+.navbar__link:hover::after {
+  width: 100%;
+}
+
+/* ========================================
+   CTA Button
+   ======================================== */
+
+.navbar__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  background-color: #e8b923;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 10px rgba(232, 185, 35, 0.3);
+  flex-shrink: 0;
+}
+
+.navbar__cta:hover {
+  background-color: #d4a017;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(232, 185, 35, 0.4);
+}
+
+/* ========================================
+   Hamburger (Mobile)
+   ======================================== */
+
+.navbar__hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  gap: 5px;
+}
+
+.navbar__hamburger-line {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: #0f172a;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.navbar__hamburger--open .navbar__hamburger-line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.navbar__hamburger--open .navbar__hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar__hamburger--open .navbar__hamburger-line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ========================================
+   Mobile Menu
+   ======================================== */
+
+.navbar__mobile-menu {
+  display: none;
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.35s ease,
+    opacity 0.3s ease;
+  opacity: 0;
+}
+
+.navbar__mobile-menu--open {
+  max-height: 400px;
+  opacity: 1;
+}
+
+.navbar__mobile-links {
+  list-style: none;
+  margin: 0;
+  padding: 16px 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.navbar__mobile-link {
+  display: block;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #475569;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.navbar__mobile-link:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.navbar__mobile-cta {
+  display: block;
+  margin-top: 8px;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  background-color: #e8b923;
+  border-radius: 8px;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.25s ease;
+}
+
+.navbar__mobile-cta:hover {
+  background-color: #d4a017;
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+
+/* Tablet & Mobile: below 768px */
+@media (max-width: 767px) {
+  .navbar {
+    padding: 0 20px;
+  }
+
+  .navbar__container {
+    height: 64px;
+  }
+
+  .navbar__links,
+  .navbar__cta {
+    display: none;
+  }
+
+  .navbar__hamburger {
+    display: flex;
+  }
+
+  .navbar__mobile-menu {
+    display: block;
+  }
+}
+
+/* Small Mobile: below 480px */
+@media (max-width: 479px) {
+  .navbar {
+    padding: 0 16px;
+  }
+
+  .navbar__container {
+    height: 60px;
+  }
+
+  .navbar__logo {
+    font-size: 20px;
+  }
+}
