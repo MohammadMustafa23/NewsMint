@@ -1,0 +1,47 @@
+import express, { json } from "express";
+import AuthRouter from "./Feature/Auth/routes/auth.routes.js";
+
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import cors from "cors";
+
+const app = express();
+const allowedOrigins = process.env.FRONTEND_CLIENT_ID.split(",");
+
+// Trust Render's reverse proxy so req.ip / X-Forwarded-For
+app.set("trust proxy", 1);
+
+app.use(
+  helmet({
+    crossOriginOpenerPolicy: false,
+    crossOriginResourcePolicy: {
+      policy: "cross-origin",
+    },
+  }),
+);
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    exposedHeaders: ["Content-Disposition"],
+  }),
+);
+
+app.use(express.json());
+app.use(cookieParser());
+
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    status: "OK",
+    message: "UniFetch API is healthy",
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
+});
+
+app.use("/api", AuthRouter);
+
+export default app;
