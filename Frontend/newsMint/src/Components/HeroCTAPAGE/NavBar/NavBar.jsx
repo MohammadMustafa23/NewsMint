@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import './NavBar.css';
+import {Link } from 'react-router-dom';
 
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
   const navLinks = [
@@ -32,9 +32,9 @@ const NavBar = () => {
         </ul>
 
         {/* CTA Button */}
-        <a href="#get-started" className="navbar__cta">
+        <Link to="/authantication-page" className="navbar__cta">
           Get Started
-        </a>
+        </Link>
 
         {/* Hamburger Menu (Mobile) */}
         <button
@@ -59,9 +59,9 @@ const NavBar = () => {
             </li>
           ))}
           <li>
-            <a href="#get-started" className="navbar__mobile-cta" onClick={() => setMenuOpen(false)}>
+            <Link to="/authantication-page" className="navbar__mobile-cta" onClick={() => setMenuOpen(false)}>
               Get Started
-            </a>
+            </Link>
           </li>
         </ul>
       </div>

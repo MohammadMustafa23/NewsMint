@@ -1,7 +1,8 @@
 import React from "react";
 import "./HeroSection.css";
-
+import {useNavigate} from 'react-router-dom'
 const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <section className="hero-section">
       <div className="hero-section__container">
@@ -18,10 +19,10 @@ const HeroSection = () => {
             project.
           </p>
           <div className="hero-section__buttons">
-            <button className="hero-section__btn hero-section__btn--primary">
+            <button className="hero-section__btn hero-section__btn--primary" onClick={()=>{navigate('/authantication-page')}} > 
               Get Started for Free
             </button>
-            <button className="hero-section__btn hero-section__btn--secondary">
+            <button className="hero-section__btn hero-section__btn--secondary" onClick={()=>{navigate('/authantication-page')}} >
               View Sample Digest
             </button>
           </div>

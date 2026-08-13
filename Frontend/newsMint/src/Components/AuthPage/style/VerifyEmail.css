@@ -1,0 +1,234 @@
+/* ========================================
+   VerifyEmail - NewsMint (Light Theme)
+   ======================================== */
+
+.verify-email {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fc;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  padding: 40px 20px;
+}
+
+.verify-email__container {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ========================================
+   Brand
+   ======================================== */
+
+.verify-email__brand {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #8b6914;
+  margin: 0 0 32px 0;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+/* ========================================
+   Card
+   ======================================== */
+
+.verify-email__card {
+  width: 100%;
+  background-color: #eef1ff;
+  border-radius: 16px;
+  padding: 40px 36px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ========================================
+   Header
+   ======================================== */
+
+.verify-email__header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.verify-email__title {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #8b6914;
+  margin: 0 0 16px 0;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.verify-email__subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 4px 0;
+}
+
+.verify-email__email {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* ========================================
+   OTP Inputs
+   ======================================== */
+
+.verify-email__form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.verify-email__otp {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+}
+
+.verify-email__otp-input {
+  width: 48px;
+  height: 56px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: center;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  caret-color: #8b6914;
+}
+
+.verify-email__otp-input::placeholder {
+  color: #cbd5e1;
+}
+
+.verify-email__otp-input:focus {
+  border-color: #8b6914;
+  box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.08);
+}
+
+.verify-email__otp-input:valid {
+  border-color: #d1d5db;
+}
+
+/* ========================================
+   Verify Button
+   ======================================== */
+
+.verify-email__btn {
+  width: 100%;
+  padding: 13px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #8b6914;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  outline: none;
+}
+
+.verify-email__btn:hover {
+  background-color: #6b5210;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 105, 20, 0.3);
+}
+
+/* ========================================
+   Footer
+   ======================================== */
+
+.verify-email__footer {
+  margin-top: 24px;
+  font-size: 14px;
+  color: #64748b;
+  text-align: center;
+}
+
+.verify-email__resend {
+  font-size: 14px;
+  font-weight: 600;
+  color: #8b6914;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.verify-email__resend:hover {
+  color: #6b5210;
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+
+/* Mobile: below 480px */
+@media (max-width: 479px) {
+  .verify-email {
+    padding: 24px 16px;
+  }
+
+  .verify-email__brand {
+    font-size: 28px;
+    margin-bottom: 24px;
+  }
+
+  .verify-email__card {
+    padding: 32px 20px;
+    border-radius: 14px;
+  }
+
+  .verify-email__title {
+    font-size: 30px;
+  }
+
+  .verify-email__otp {
+    gap: 6px;
+  }
+
+  .verify-email__otp-input {
+    width: 42px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .verify-email__subtitle,
+  .verify-email__email {
+    font-size: 13px;
+  }
+
+  .verify-email__btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .verify-email__footer,
+  .verify-email__resend {
+    font-size: 13px;
+  }
+}
