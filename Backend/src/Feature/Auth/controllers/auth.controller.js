@@ -5,6 +5,7 @@ import { redisClient } from "../../../config/redis.js";
 import sendOTP from "../utils/sendOTPEmail.js";
 import jwt from "jsonwebtoken";
 import googleClient from "../utils/googleAuth.js";
+import Preference from "../../Prefrence/models/Preference.js";
 // import crypto from "crypto";
 
 async function RegisterUser(req, res) {
@@ -99,22 +100,6 @@ const LoginUser = async (req, res) => {
       success: true,
       message: "Login Successful",
       userName: user.userName,
-    });
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
-  }
-};
-
-const GetCurrentUser = async (req, res) => {
-  try {
-    return res.status(200).json({
-      success: true,
-      user: req.user,
     });
   } catch (error) {
     console.error(error);
@@ -446,6 +431,28 @@ const googleLogin = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: error.message || "Google authentication failed.",
+    });
+  }
+};
+
+const GetCurrentUser = async (req, res) => {
+  try {
+    const preference = await Preference.findOne({
+      userId: req.user._id,
+    }).select("isCompleted");
+
+    return res.status(200).json({
+      success: true,
+      user: req.user,
+      hasPreferences: Boolean(preference?.isCompleted),
+    });
+    
+  } catch (error) {
+    console.error("Get Current User Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
     });
   }
 };

@@ -1,0 +1,162 @@
+import Preference from "../models/Preference.js";
+
+const ALLOWED_CATEGORIES = [
+  "Tech",
+  "Rajasthan",
+  "India",
+  "Markets",
+  "Startups",
+];
+
+const ALLOWED_LANGUAGES = ["English", "Hindi"];
+
+export const savePreferences = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const { categories, language, deliveryTime, phoneNumber } = req.body;
+
+    // -----------------------------
+    // Basic validation
+    // -----------------------------
+
+    if (!Array.isArray(categories) || categories.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select at least one category.",
+      });
+    }
+
+    if (!language || !ALLOWED_LANGUAGES.includes(language)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select a valid language.",
+      });
+    }
+
+    if (!deliveryTime) {
+      return res.status(400).json({
+        success: false,
+        message: "Delivery time is required.",
+      });
+    }
+
+    if (!phoneNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "WhatsApp number is required.",
+      });
+    }
+
+    // -----------------------------
+    // Validate categories
+    // -----------------------------
+
+    const invalidCategories = categories.filter(
+      (category) => !ALLOWED_CATEGORIES.includes(category),
+    );
+
+    if (invalidCategories.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "One or more selected categories are invalid.",
+      });
+    }
+
+    // -----------------------------
+    // Validate phone number
+    // -----------------------------
+
+    const cleanPhoneNumber = String(phoneNumber).replace(/\D/g, "");
+
+    if (!/^[6-9]\d{9}$/.test(cleanPhoneNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid Indian WhatsApp number.",
+      });
+    }
+
+    // -----------------------------
+    // Create / Update Preference
+    // -----------------------------
+
+    const preference = await Preference.findOneAndUpdate(
+      { userId },
+      {
+        userId,
+        categories,
+        language,
+        deliveryTime,
+        phoneNumber: cleanPhoneNumber,
+        isCompleted: true,
+      },
+      {
+        new: true,
+        upsert: true,
+        runValidators: true,
+        setDefaultsOnInsert: true,
+      },
+    );
+
+    // -----------------------------
+    // Response
+    // -----------------------------
+
+    return res.status(200).json({
+      success: true,
+      message: "Preferences saved successfully.",
+      preference: {
+        id: preference._id,
+        categories: preference.categories,
+        language: preference.language,
+        deliveryTime: preference.deliveryTime,
+        phoneNumber: preference.phoneNumber,
+        isCompleted: preference.isCompleted,
+      },
+    });
+  } catch (error) {
+    console.error("Save Preferences Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
+};
+
+export const getMyPreferences = async (req, res) => {
+  try {
+    const preference = await Preference.findOne({
+      userId: req.user._id,
+    }).lean();
+
+    // User has never created preferences
+    if (!preference) {
+      return res.status(200).json({
+        success: true,
+        hasPreferences: false,
+        preference: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      hasPreferences: Boolean(preference.isCompleted),
+      preference: {
+        id: preference._id,
+        categories: preference.categories,
+        language: preference.language,
+        deliveryTime: preference.deliveryTime,
+        phoneNumber: preference.phoneNumber,
+        isCompleted: preference.isCompleted,
+      },
+    });
+  } catch (error) {
+    console.error("Get My Preferences Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
+};

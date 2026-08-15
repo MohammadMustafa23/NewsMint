@@ -1,7 +1,8 @@
 import express, { json } from "express";
 import AuthRouter from "./Feature/Auth/routes/auth.routes.js";
-
+import PreferenceRoute from "./Feature/Prefrence/routes/preference.route.js";
 import cookieParser from "cookie-parser";
+
 // import helmet from "helmet";
 import cors from "cors";
 
@@ -43,5 +44,6 @@ app.use(cookieParser());
 // });
 
 app.use("/api", AuthRouter);
+app.use("/api/preferences", PreferenceRoute);
 
 export default app;
