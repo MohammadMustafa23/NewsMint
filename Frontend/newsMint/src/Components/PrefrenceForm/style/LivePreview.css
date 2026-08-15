@@ -1,0 +1,510 @@
+/* ============================================ */
+/* LivePreview — Phone Mockup Styles            */
+/* ============================================ */
+
+.live-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* ---------- Label ---------- */
+.live-preview-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  background: #22c55e;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.live-preview-label span:last-child {
+  font-size: 10px;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* ---------- Phone Frame ---------- */
+.phone-frame {
+  width: 280px;
+  background: #fff;
+  border-radius: 36px;
+  padding: 8px;
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.12),
+    0 8px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8e4dc;
+  flex-shrink: 0;
+}
+
+.phone-notch {
+  width: 120px;
+  height: 24px;
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+  margin: 0 auto;
+  position: relative;
+  top: -1px;
+  z-index: 2;
+}
+
+/* ---------- Screen ---------- */
+.phone-screen {
+  background: #f0ebe6;
+  border-radius: 28px;
+  overflow: hidden;
+  margin-top: -12px;
+}
+
+/* ---------- WhatsApp Header ---------- */
+.wa-header {
+  background: #075e54;
+  padding: 12px 14px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wa-icon {
+  width: 18px;
+  height: 18px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.wa-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #c47f1e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.wa-chat-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.wa-chat-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.wa-chat-status {
+  font-size: 10px;
+  color: #a3c9c3;
+}
+
+/* ---------- Chat Body ---------- */
+.wa-body {
+  padding: 16px 12px;
+  min-height: 340px;
+}
+
+.wa-date {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.wa-date span {
+  font-size: 10px;
+  color: #888;
+  background: #e0dbd6;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* ---------- Bubbles ---------- */
+.wa-bubble {
+  background: #fff;
+  border-radius: 8px 8px 8px 0;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  max-width: 90%;
+}
+
+.wa-bubble--text p {
+  font-size: 12px;
+  color: #333;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Audio Bubble */
+.wa-bubble--audio {
+  padding: 8px 10px;
+}
+
+.audio-player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5f0e8;
+  border-radius: 20px;
+  padding: 6px 10px;
+}
+
+.audio-play-btn {
+  width: 28px;
+  height: 28px;
+  background: #075e54;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.audio-wave {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 20px;
+}
+
+.audio-bar {
+  width: 3px;
+  background: #ccc;
+  border-radius: 2px;
+  transition: background 0.2s;
+}
+
+.audio-bar--active {
+  background: #075e54;
+}
+
+.audio-time {
+  font-size: 10px;
+  color: #888;
+  flex-shrink: 0;
+}
+
+/* Card Bubble */
+.wa-bubble--card h4 {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+}
+
+.wa-bubble--card p {
+  font-size: 11px;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Timestamp */
+.wa-timestamp {
+  text-align: right;
+  padding-right: 8px;
+}
+
+.wa-timestamp span {
+  font-size: 9px;
+  color: #aaa;
+}
+
+/* ---------- Input Bar ---------- */
+.wa-input-bar {
+  background: #f0ebe6;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid #ddd8d2;
+}
+
+.wa-input-placeholder {
+  flex: 1;
+  background: #fff;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: #999;
+}
+
+.wa-mic-btn {
+  width: 32px;
+  height: 32px;
+  background: #075e54;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* ============================================ */
+/* Responsive                                   */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .phone-frame {
+    width: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  .phone-frame {
+    width: 240px;
+    border-radius: 28px;
+  }
+
+  .phone-notch {
+    width: 100px;
+    height: 20px;
+  }
+
+  .phone-screen {
+    border-radius: 22px;
+  }
+}
+
+/* =========================================
+   Live Preview Animations
+   ========================================= */
+
+/* =========================================
+   Dynamic Language Transition
+   ========================================= */
+
+.preview-content {
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.preview-content--changing {
+  animation: digestLanguageChange 0.45s ease;
+}
+
+@keyframes digestLanguageChange {
+  0% {
+    opacity: 0.35;
+    transform: translateY(8px);
+  }
+
+  55% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   Message Entrance
+   ========================================= */
+
+.preview-message {
+  animation: messageSlideIn 0.45s ease both;
+}
+
+.preview-message:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.preview-message:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.preview-message:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.preview-message:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   Changed Preference Value
+   ========================================= */
+
+.preview-value--changed {
+  display: inline-block;
+  animation: preferenceValueChange 0.4s ease;
+}
+
+@keyframes preferenceValueChange {
+  0% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateY(2px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   Preference Card
+   ========================================= */
+
+.preference-preview {
+  animation: preferenceCardIn 0.45s ease;
+}
+
+.preference-title {
+  margin-bottom: 7px;
+}
+
+.preference-row {
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.preference-row > span:first-child {
+  font-weight: 500;
+}
+
+@keyframes preferenceCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   Audio Wave
+   ========================================= */
+
+.audio-bar--active {
+  animation: audioWave 1s ease-in-out infinite alternate;
+}
+
+.audio-bar--active:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.audio-bar--active:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.audio-bar--active:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+.audio-bar--active:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+@keyframes audioWave {
+  from {
+    opacity: 0.55;
+    transform: scaleY(0.65);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+/* =========================================
+   Live Indicator
+   ========================================= */
+
+.live-dot {
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.45;
+    transform: scale(0.75);
+  }
+}
+
+/* =========================================
+   Phone Entrance
+   ========================================= */
+
+.phone-frame {
+  animation: phoneEntrance 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes phoneEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================================
+   Reduced Motion
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-content,
+  .preview-content--changing,
+  .preview-message,
+  .preview-value--changed,
+  .preference-preview,
+  .audio-bar--active,
+  .live-dot,
+  .phone-frame {
+    animation: none;
+    transition: none;
+  }
+}

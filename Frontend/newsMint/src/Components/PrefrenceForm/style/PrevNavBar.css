@@ -1,0 +1,142 @@
+/* ================================ */
+/* PrevNavBar — Complete Styles     */
+/* ================================ */
+
+.prev-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e8e4dc;
+  padding: 14px 48px;
+  width: 100%;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* ---------- Logo ---------- */
+.navbar-logo {
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #8b5e1a; /* Warm brown/gold */
+  letter-spacing: -0.5px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ---------- User Section ---------- */
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.navbar-user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.35;
+}
+
+.navbar-user-name {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.navbar-logout {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  font-size: 12px;
+  color: #888888;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.navbar-logout:hover {
+  color: #555555;
+  text-decoration: underline;
+}
+
+/* ---------- Avatar ---------- */
+.navbar-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #d4941e; /* Orange/gold circle */
+  color: #ffffff;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* ================================ */
+/* Responsive Breakpoints           */
+/* ================================ */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .prev-navbar {
+    padding: 12px 24px;
+  }
+
+  .navbar-logo {
+    font-size: 20px;
+  }
+
+  .navbar-avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 13px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .prev-navbar {
+    padding: 10px 16px;
+  }
+
+  .navbar-logo {
+    font-size: 18px;
+  }
+
+  .navbar-user-info {
+    display: none; /* Hide name/logout on very small screens */
+  }
+
+  .navbar-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+}

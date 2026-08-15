@@ -1,0 +1,60 @@
+/* ============================================ */
+/* DigestPage — Layout & Responsive Grid        */
+/* ============================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap");
+
+.digest-page {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  background: #faf8f4;
+  min-height: 80vh;
+  padding: 40px 24px;
+  box-sizing: border-box;
+}
+
+.digest-page__grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+/* ============================================ */
+/* Responsive Breakpoints                       */
+/* ============================================ */
+
+@media (max-width: 1024px) {
+  .digest-page__grid {
+    gap: 32px;
+  }
+}
+
+@media (max-width: 900px) {
+  .digest-page__grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .digest-page {
+    padding: 32px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .digest-page {
+    padding: 20px 16px;
+  }
+
+  .digest-page__grid {
+    gap: 32px;
+  }
+}

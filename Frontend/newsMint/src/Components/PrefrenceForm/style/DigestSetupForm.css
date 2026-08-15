@@ -1,0 +1,423 @@
+/* ============================================ */
+/* DigestSetupForm — Complete Styles            */
+/* ============================================ */
+
+.digest-setup-form {
+  width: 100%;
+}
+
+/* ---------- Typography ---------- */
+.form-heading {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.form-subheading {
+  font-size: 15px;
+  color: #666;
+  margin: 0 0 32px 0;
+  line-height: 1.5;
+  max-width: 420px;
+}
+
+/* ---------- Form Card ---------- */
+.form-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* ---------- Sections ---------- */
+.form-section {
+  margin-bottom: 28px;
+}
+
+.form-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+/* ---------- Pill Group (Categories) ---------- */
+.pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pill {
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #f5f0e8;
+  color: #555;
+  border: 1px solid #e8e2d8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.pill:hover {
+  background: #ede8df;
+}
+
+.pill--active {
+  background: #c47f1e;
+  color: #fff;
+  border-color: #c47f1e;
+}
+
+.pill--active:hover {
+  background: #b07018;
+}
+
+/* ---------- Two-Column Row ---------- */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ---------- Toggle Group (Language) ---------- */
+.toggle-group {
+  display: flex;
+  background: #f5f0e8;
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.toggle-btn {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #777;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.toggle-btn--active {
+  background: #fff;
+  color: #1a1a1a;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* ---------- Dropdown ---------- */
+.dropdown {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e8e2d8;
+  border-radius: 10px;
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.dropdown:hover {
+  border-color: #d0c8bc;
+}
+
+.dropdown span {
+  flex: 1;
+  font-size: 13px;
+  color: #333;
+}
+
+/* ---------- Phone Input ---------- */
+.phone-input {
+  display: flex;
+  background: #f5f0e8;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e8e2d8;
+}
+
+.phone-prefix {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #666;
+  background: #f0ebe3;
+  border-right: 1px solid #e0d9ce;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.phone-field {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  font-family: inherit;
+}
+
+.phone-hint {
+  font-size: 11px;
+  color: #aaa;
+  margin: 8px 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ---------- Save Button ---------- */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-save {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #8b5e1a;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s ease;
+}
+
+.btn-save:hover {
+  background: #6d4a14;
+}
+
+/* ---------- Recent Sends ---------- */
+.recent-sends-header {
+  margin-top: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.recent-sends-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.recent-sends-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8b5e1a;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.recent-sends-link:hover {
+  opacity: 0.7;
+}
+
+/* ============================================ */
+/* Responsive                                   */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .form-heading {
+    font-size: 26px;
+  }
+
+  .form-card {
+    padding: 24px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .form-section--half {
+    margin-bottom: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-heading {
+    font-size: 22px;
+  }
+
+  .form-subheading {
+    font-size: 14px;
+  }
+
+  .form-card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .pill {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  .btn-save {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* =========================================
+   Delivery Time
+   ========================================= */
+
+.form-section--half {
+  min-width: 0;
+}
+
+.dropdown {
+  position: relative;
+  width: 80%;
+  height: 25px;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  background: #fff;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.dropdown:hover {
+  border-color: #d5d5d5;
+}
+
+.dropdown:focus-within {
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.06);
+}
+
+/* Select */
+
+.time-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 0 42px 0 14px;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  color: #222;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+/* Placeholder */
+
+.time-select:invalid {
+  color: #999;
+}
+
+/* Custom Arrow */
+
+.dropdown-icon {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+
+  width: 14px;
+  height: 14px;
+
+  pointer-events: none;
+
+  transform: translateY(-50%);
+  transition: transform 0.2s ease;
+}
+
+.dropdown:focus-within .dropdown-icon {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Error */
+
+.dropdown--error {
+  border-color: #dc3545;
+  background: #fffafa;
+}
+
+.dropdown--error:focus-within {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.08);
+}
+
+/* Error Text */
+
+.form-error {
+  margin: 6px 0 0;
+
+  color: #dc3545;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Dropdown Options */
+
+.time-select option {
+  color: #222;
+  background: #fff;
+  font-size: 14px;
+}
+
+/* Disabled */
+
+.time-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
+  .dropdown {
+    height: 46px;
+  }
+
+  .time-select {
+    font-size: 13px;
+    padding-left: 12px;
+    padding-right: 38px;
+  }
+
+  .dropdown-icon {
+    right: 12px;
+  }
+}

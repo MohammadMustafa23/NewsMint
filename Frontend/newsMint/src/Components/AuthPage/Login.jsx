@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import GoogleAuthButton from './GoogleAuthButton.jsx'
+import GoogleAuthButton from "./GoogleAuthButton.jsx";
 import "./style/Login.css";
-
+import { getMyPreferences } from "../../services/prefrence.service.js";
 import SpinLoader from "../../common/SpinLoader.jsx";
 import { loginUser } from "../../services/auth.service.js";
 
@@ -74,6 +74,7 @@ const Login = ({ setPage }) => {
   // --------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (loading) return;
 
     if (!validateForm()) return;
@@ -88,19 +89,27 @@ const Login = ({ setPage }) => {
 
       const data = await loginUser(payload);
 
-      
       if (!data?.success) {
         toast.error(data?.message || "Unable to sign in. Please try again.");
         return;
       }
 
-      // Success
       toast.success(`Welcome Back ${data.userName}`);
 
-      navigate("/dashboard", {
-        replace: true,
-      });
+      // Check user's preferences
+      const preferenceData = await getMyPreferences();
 
+      if (preferenceData?.hasPreferences) {
+        // Existing user
+        navigate("/home-page", {
+          replace: true,
+        });
+      } else {
+        // First-time user
+        navigate("/preference", {
+          replace: true,
+        });
+      }
     } catch (error) {
       console.error("Login Error:", error);
 
@@ -214,8 +223,7 @@ const Login = ({ setPage }) => {
               <span className="login__divider-text">or</span>
             </div>
 
-            <GoogleAuthButton/>
-
+            <GoogleAuthButton />
           </form>
         </div>
 

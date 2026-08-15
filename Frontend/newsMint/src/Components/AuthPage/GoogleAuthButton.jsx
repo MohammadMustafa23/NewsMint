@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import SpinLoader from "../../common/SpinLoader";
 import { loginwithGoogle } from "../../services/auth.service";
+import { getMyPreferences } from "../../services/prefrence.service";
 
 import "./style/GoogleAuthButton.css";
 
@@ -26,6 +27,7 @@ const GoogleAuthButton = ({
 
     try {
       setLoading(true);
+
       const data = await loginwithGoogle({
         code: codeResponse.code,
       });
@@ -37,9 +39,20 @@ const GoogleAuthButton = ({
 
       toast.success(`Welcome ${data?.user?.name || data?.userName || ""}!`);
 
-      navigate("/dashboard", {
-        replace: true,
-      });
+      // Check user's preference status
+      const preferenceData = await getMyPreferences();
+
+      if (preferenceData?.hasPreferences) {
+        // Existing user
+        navigate("/home-page", {
+          replace: true,
+        });
+      } else {
+        // First-time Google user
+        navigate("/preference", {
+          replace: true,
+        });
+      }
     } catch (error) {
       console.error("Google Auth Error:", error);
 
