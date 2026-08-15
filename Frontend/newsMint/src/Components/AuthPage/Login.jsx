@@ -1,13 +1,118 @@
 import React, { useState } from "react";
-import "./style/Login.css"
-const Login = ({setPage}) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import GoogleAuthButton from './GoogleAuthButton.jsx'
+import "./style/Login.css";
 
-  const handleSubmit = (e) => {
+import SpinLoader from "../../common/SpinLoader.jsx";
+import { loginUser } from "../../services/auth.service.js";
+
+const Login = ({ setPage }) => {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  // --------------------------------
+  // Handle Input
+  // --------------------------------
+  const handleChange = ({ target }) => {
+    const { name, value } = target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Clear field error while typing
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+  };
+
+  // --------------------------------
+  // Validate Form
+  // --------------------------------
+  const validateForm = () => {
+    const newErrors = {};
+
+    const email = formData.email.trim();
+    const password = formData.password;
+
+    if (!email) {
+      newErrors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required.";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long.";
+    }
+
+    setErrors({
+      email: newErrors.email || "",
+      password: newErrors.password || "",
+    });
+
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // --------------------------------
+  // Login
+  // --------------------------------
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login submitted:", { email, password });
+    if (loading) return;
+
+    if (!validateForm()) return;
+
+    setLoading(true);
+
+    try {
+      const payload = {
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+      };
+
+      const data = await loginUser(payload);
+
+      
+      if (!data?.success) {
+        toast.error(data?.message || "Unable to sign in. Please try again.");
+        return;
+      }
+
+      // Success
+      toast.success(`Welcome Back ${data.userName}`);
+
+      navigate("/dashboard", {
+        replace: true,
+      });
+
+    } catch (error) {
+      console.error("Login Error:", error);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        "Something went wrong. Please try again.";
+
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -16,7 +121,9 @@ const Login = ({setPage}) => {
         {/* Header */}
         <div className="login__header">
           <h1 className="login__brand">NewsMint</h1>
+
           <h2 className="login__title">Welcome Back</h2>
+
           <p className="login__subtitle">
             Enter your details to access your account.
           </p>
@@ -24,47 +131,82 @@ const Login = ({setPage}) => {
 
         {/* Form Card */}
         <div className="login__card">
-          <form className="login__form" onSubmit={handleSubmit}>
-            {/* Email Field */}
+          <form className="login__form" onSubmit={handleSubmit} noValidate>
+            {/* Email */}
             <div className="login__field">
               <label htmlFor="email" className="login__label">
                 Email Address
               </label>
+
               <input
                 id="email"
                 type="email"
-                className="login__input"
+                name="email"
+                className={`login__input ${
+                  errors.email ? "login__input--error" : ""
+                }`}
                 placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                value={formData.email}
+                onChange={handleChange}
+                autoComplete="email"
+                disabled={loading}
               />
+
+              {errors.email && (
+                <span className="error-text">{errors.email}</span>
+              )}
             </div>
 
-            {/* Password Field */}
+            {/* Password */}
             <div className="login__field">
               <div className="login__label-row">
                 <label htmlFor="password" className="login__label">
                   Password
                 </label>
-                <a className="login__forgot"  onClick={()=>{setPage('forgot-password')}}>
+
+                <a
+                  type="button"
+                  className="login__forgot"
+                  onClick={() => setPage("forgot-password")}
+                  disabled={loading}
+                >
                   Forgot Password?
                 </a>
               </div>
+
               <input
                 id="password"
                 type="password"
-                className="login__input"
+                name="password"
+                className={`login__input ${
+                  errors.password ? "login__input--error" : ""
+                }`}
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete="current-password"
+                disabled={loading}
               />
+
+              {errors.password && (
+                <span className="error-text">{errors.password}</span>
+              )}
             </div>
 
             {/* Login Button */}
-            <button type="submit" className="login__btn login__btn--primary">
-              Login
+            <button
+              type="submit"
+              className="login__btn login__btn--primary"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <SpinLoader size="small" />
+                  <span>Signing In...</span>
+                </>
+              ) : (
+                "Sign In"
+              )}
             </button>
 
             {/* Divider */}
@@ -72,40 +214,20 @@ const Login = ({setPage}) => {
               <span className="login__divider-text">or</span>
             </div>
 
-            {/* Google Button */}
-            <button type="button" className="login__btn login__btn--google">
-              <svg
-                className="login__google-icon"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
-              Continue with Google
-            </button>
+            <GoogleAuthButton/>
+
           </form>
         </div>
 
         {/* Footer */}
         <p className="login__footer">
           Don&apos;t have an account?{" "}
-          <a className="login__link" onClick={()=>{setPage('register')}} >
+          <a
+            type="button"
+            className="login__link"
+            onClick={() => setPage("register")}
+            disabled={loading}
+          >
             Create an account
           </a>
         </p>

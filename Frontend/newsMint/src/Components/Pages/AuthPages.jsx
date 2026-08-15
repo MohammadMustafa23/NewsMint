@@ -2,7 +2,7 @@ import { useSearchParams } from "react-router-dom";
 
 import Login from "../AuthPage/Login";
 import Register from "../AuthPage/Register";
-import VerifyEmail from "../AuthPage/VerifyEmail";
+import OTPVerification from "../AuthPage/OTPVerification";
 import ForgotPassword from "../AuthPage/ForgotPassword";
 import ResetPassword from "../AuthPage/ResetPassword";
 
@@ -11,6 +11,7 @@ const VALID_PAGES = [
   "register",
   "verify-email",
   "forgot-password",
+  "verify-forgot-password",
   "reset-password",
 ];
 
@@ -26,7 +27,7 @@ const AuthPages = () => {
       setSearchParams({ mode: "login" });
       return;
     }
-    
+
     setSearchParams({ mode: nextPage });
   };
 
@@ -52,14 +53,15 @@ const AuthPages = () => {
       )}
 
       {page === "verify-email" && (
-        <VerifyEmail
+        <OTPVerification
+          type="email"
           setPage={setPage}
           email={getAuthEmail()}
           clearAuthSession={clearAuthSession}
         />
       )}
 
-       {page === "forgot-password" && (
+      {page === "forgot-password" && (
         <ForgotPassword setPage={setPage} setAuthEmail={setAuthEmail} />
       )}
 
@@ -69,7 +71,15 @@ const AuthPages = () => {
           email={getAuthEmail()}
           clearAuthSession={clearAuthSession}
         />
-      )} 
+      )}
+
+      {page === "verify-forgot-password" && (
+        <OTPVerification
+          type="forgot-password"
+          setPage={setPage}
+          email={getAuthEmail()}
+        />
+      )}
     </>
   );
 };

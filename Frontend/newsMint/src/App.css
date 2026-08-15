@@ -85,3 +85,68 @@
 
   --shadow-md: 0 8px 24px rgba(24, 33, 58, 0.08);
 }
+
+/* ================================
+   NewsMint Toast
+================================ */
+
+.news-toast {
+  width: 360px !important;
+  min-height: 58px !important;
+
+  padding: 13px 15px !important;
+
+  border-radius: 12px !important;
+
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04) !important;
+
+  font-family: inherit !important;
+}
+
+.news-toast__title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #111827 !important;
+}
+
+.news-toast__description {
+  margin-top: 3px !important;
+
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+
+  color: #6b7280 !important;
+}
+
+/* Success */
+
+.news-toast--success {
+  background: #f8fffa !important;
+  border-color: #bbf7d0 !important;
+}
+
+/* Error */
+
+.news-toast--error {
+  background: #fffafa !important;
+  border-color: #fecaca !important;
+}
+
+/* Warning */
+
+.news-toast--warning {
+  background: #fffdf5 !important;
+  border-color: #fde68a !important;
+}
+
+/* Info */
+
+.news-toast--info {
+  background: #f8fbff !important;
+  border-color: #bfdbfe !important;
+}
