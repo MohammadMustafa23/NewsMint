@@ -1,19 +1,11 @@
 const validateRegister = (req, res, next) => {
-  const { userName, email, password, confirmPassword,acceptTerms } = req.body;
+  const { userName, email, password, confirmPassword } = req.body;
   
   // Check required fields
-  if (!userName || !email || !password || !confirmPassword || !acceptTerms) {
+  if (!userName || !email || !password || !confirmPassword) {
     return res.status(400).json({
       success: false,
       message: "All fields are required.",
-    });
-  }
-
-  // Terms 
-  if(!acceptTerms) {
-    return res.status(400).json({
-      success : false,
-      message : "Please accept Terms ans Condition"
     });
   }
 
@@ -36,7 +28,7 @@ const validateRegister = (req, res, next) => {
   }
 
   // Password
-  if (password.length < 8) {
+  if (password.length < 6) {
     return res.status(400).json({
       success: false,
       message: "Password must be at least 8 characters.",
@@ -50,7 +42,6 @@ const validateRegister = (req, res, next) => {
       message: "Passwords do not match.",
     });
   }
-
 
   next();
 };

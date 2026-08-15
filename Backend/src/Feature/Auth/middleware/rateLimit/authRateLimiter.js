@@ -18,13 +18,13 @@ const createLimiter = (windowMs, max, message) =>
 
 export const registerLimiter = createLimiter(
   60 * 60 * 1000, // 1 Hour
-  5,
+  10,
   "Too many registration attempts. Please try again in 1 hour.",
 );
 
 export const loginLimiter = createLimiter(
   15 * 60 * 1000, // 15 Minutes
-  5,
+  10,
   "Too many login attempts. Please try again in 15 minutes.",
 );
 
@@ -36,7 +36,7 @@ export const otpLimiter = createLimiter(
 
 export const resendOtpLimiter = createLimiter(
   10 * 60 * 1000, // 10 Minutes
-  3,
+  10,
   "OTP resend limit reached. Please wait 10 minutes.",
 );
 

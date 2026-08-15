@@ -21,31 +21,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
-    },
-
-    cloudStorage: {
-      used: {
-        type: Number,
-        default: 0,
-      },
-
-      limit: {
-        type: Number,
-        default: 500 * 1024 * 1024, // 500 MB
-      },
-    },
-
-    downloadLimit: {
-      max: {
-        type: Number,
-        default: 3, // Free users can download 3 videos
-      },
-
-      used: {
-        type: Number,
-        default: 0,
-      },
-    },
+    }
   },
   {
     timestamps: true,
@@ -53,6 +29,6 @@ const userSchema = new mongoose.Schema(
   },
 );
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model("Users", userSchema);
 
 export default User;

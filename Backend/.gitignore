@@ -4,9 +4,6 @@ node_modules/
 # Environment Variables
 .env
 .env.*
-youtube_cookies.txt
-instagram_cookies.txt
-
 
 downloads/
 # Logs

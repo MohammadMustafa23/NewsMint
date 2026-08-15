@@ -25,17 +25,14 @@ async function ResendOTP(req, res) {
       });
     }
 
-    // Parse Redis Data
-    const userData = JSON.parse(cachedData);
-
     // Generate New OTP
     const otp = generateOTP();
 
     // Update OTP
-    userData.otp = otp;
+    cachedData.otp = otp;
 
     // Save Again (Reset 5 min expiry)
-    await redisClient.set(cacheKey, JSON.stringify(userData), {
+    await redisClient.set(cacheKey, JSON.stringify(cachedData), {
       EX: 300,
     });
 

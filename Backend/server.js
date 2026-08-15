@@ -4,7 +4,7 @@ dotenv.config();
 import app from "./src/app.js";
 import connectDB from "./src/db/db.connection.js";
 import { connectRedis } from "./src/config/redis.js";
-import { PORT } from './secrets/envConfig.js'
+import { PORT } from './src/config/env.js'
 
 
 // Mongo DB Connection Check

@@ -14,8 +14,8 @@ const validateLogin = [
     .notEmpty()
     .withMessage("Password is required.")
     .bail()
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters long."),
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long."),
 
   (req, res, next) => {
     const errors = validationResult(req);

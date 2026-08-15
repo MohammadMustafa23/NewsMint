@@ -1,13 +1,10 @@
-import User from "../../../models/user.model.js";
+import User from "../models/user.model.js";
 import { redisClient } from "../../../config/redis.js";
-import UserPreference from "../../Preferences/models/preferences.model.js";
-
 
 async function VerifyOTP(req, res) {
   try {
     const { email, otp } = req.body;
 
-    
     // 1. Get Redis Data
     const cacheKey = `register:${email}`;
 
@@ -43,19 +40,10 @@ async function VerifyOTP(req, res) {
     // 5. Delete Redis Data
     await redisClient.del(cacheKey);
 
-    await UserPreference.create({
-      userId: user._id,
-    });
-
     // 6. Success
     return res.status(201).json({
       success: true,
-      message: "Registration completed successfully.",
-      user: {
-        id: user._id,
-        userName: user.userName,
-        email: user.email,
-      },
+      message: "User Registration successfully."
     });
   } catch (error) {
     console.error(error);

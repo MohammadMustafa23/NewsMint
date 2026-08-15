@@ -2,7 +2,7 @@ import { Redis } from "@upstash/redis";
 import {
   UPSTASH_REDIS_REST_URL,
   UPSTASH_REDIS_REST_TOKEN,
-} from "../../secrets/envConfig.js";
+} from "./env.js";
 
 export const redisClient = new Redis({
   url: UPSTASH_REDIS_REST_URL,
@@ -13,6 +13,7 @@ export const connectRedis = async () => {
   try {
     // Test the connection
     await redisClient.ping();
+    console.log("Redis Connected Sucessfully 👁️");
     return true;
   } catch (error) {
     console.error(error.message);

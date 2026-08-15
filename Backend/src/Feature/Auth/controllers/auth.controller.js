@@ -1,13 +1,11 @@
-import User from "../../../models/user.model.js";
+import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import generateOTP from "../utils/generateOTP.js";
 import { redisClient } from "../../../config/redis.js";
 import sendOTP from "../utils/sendOTPEmail.js";
 import jwt from "jsonwebtoken";
 import googleClient from "../utils/googleAuth.js";
-import crypto from "crypto";
-import UserPreference from "../../Preferences/models/preferences.model.js";
-import { createNotification } from "../../notification/service/notification.service.js";
+// import crypto from "crypto";
 
 async function RegisterUser(req, res) {
   const { userName, email, password } = req.body;
@@ -27,6 +25,8 @@ async function RegisterUser(req, res) {
 
   //   3. Generate OTP
   const otp = generateOTP();
+
+  console.log(otp);
 
   // Redis Key
   const cacheKey = `register:${email}`;
@@ -83,7 +83,7 @@ const LoginUser = async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "7d",
+        expiresIn: "3d",
       },
     );
 
@@ -93,13 +93,6 @@ const LoginUser = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    await createNotification({
-      userId: user._id,
-      title: "Welcome Back 👋",
-      message: "You have successfully signed in to your UniFetch account.",
-      type: "info",
     });
 
     return res.status(200).json({
@@ -204,6 +197,7 @@ async function ForgotPassword(req, res) {
     );
 
     await sendOTP(email, otp);
+
     return res.status(200).json({
       success: true,
       message: "Password reset OTP sent successfully.",
@@ -240,6 +234,7 @@ async function VerifyResetOTP(req, res) {
     }
 
     const { otp: storedOTP } = cachedData;
+
     if (storedOTP !== otp) {
       return res.status(400).json({
         success: false,
@@ -249,18 +244,26 @@ async function VerifyResetOTP(req, res) {
 
     await redisClient.del(cacheKey);
 
-    const resetToken = jwt.sign({ email }, process.env.JWT_SECRET, {
+    const decoded = {
+      email: email,
+      purpose: "password-reset",
+    };
+
+    const resetToken = jwt.sign(decoded, process.env.JWT_SECRET, {
       expiresIn: "10m",
     });
 
-    /* ===========================
-       Response
-    =========================== */
+
+    res.cookie("resetToken", resetToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 10 * 60 * 1000,
+    });
 
     return res.status(200).json({
       success: true,
-      message: "OTP verified successfully.",
-      resetToken,
+      message: "OTP verified successfully."
     });
   } catch (error) {
     console.error("VerifyResetOTP Error:", error);
@@ -273,19 +276,28 @@ async function VerifyResetOTP(req, res) {
 
 async function ResetPassword(req, res) {
   try {
-    const { resetToken, password, confirmPassword } = req.body;
+    const { email, newPassword, confirmPassword } = req.body;
 
-    if (!resetToken || !password || !confirmPassword) {
+    if (!email || !newPassword || !confirmPassword) {
       return res.status(400).json({
         success: false,
         message: "All fields are required.",
       });
     }
 
-    if (password !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
       return res.status(400).json({
         success: false,
         message: "Passwords do not match.",
+      });
+    }
+
+    const resetToken = req.cookies.resetToken;
+    
+    if (!resetToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Password reset session expired. Please try again.",
       });
     }
 
@@ -311,7 +323,7 @@ async function ResetPassword(req, res) {
       });
     }
 
-    const isSamePassword = await bcrypt.compare(password, user.password);
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
 
     if (isSamePassword) {
       return res.status(400).json({
@@ -320,17 +332,18 @@ async function ResetPassword(req, res) {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
 
     await user.save();
 
+    res.clearCookie("resetToken");
     return res.status(200).json({
       success: true,
       message:
         "Password reset successfully. Please sign in with your new password.",
     });
+
   } catch (error) {
     console.error("ResetPassword Error:", error);
     return res.status(500).json({
@@ -414,29 +427,12 @@ const googleLogin = async (req, res) => {
       },
     );
 
-    const preference = await UserPreference.findOne({
-      userId: user._id,
-    });
-
-    if (!preference) {
-      await UserPreference.create({
-        userId: user._id,
-      });
-    }
-
     // Set Cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    await createNotification({
-      userId: user._id,
-      title: "Welcome Back 👋",
-      message: "Signed in successfully using your Google account.",
-      type: "info",
     });
 
     return res.status(200).json({
