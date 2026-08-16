@@ -1,0 +1,41 @@
+/* ============================================ */
+/* DashSourcesPage — Layout & Responsive        */
+/* ============================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap");
+
+.dash-sources-page {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  background: #faf8f4;
+  min-height: 100vh;
+  padding: 40px 32px;
+  box-sizing: border-box;
+}
+
+.dash-sources-page__container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ============================================ */
+/* Responsive                                   */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .dash-sources-page {
+    padding: 32px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dash-sources-page {
+    padding: 24px 16px;
+  }
+}

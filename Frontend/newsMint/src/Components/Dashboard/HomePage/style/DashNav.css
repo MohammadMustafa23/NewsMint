@@ -1,0 +1,332 @@
+/* ============================================ */
+/* DashNav — Complete Styles                    */
+/* ============================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap");
+
+.dash-nav {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  background: #faf8f4;
+  border-bottom: 1px solid #e8e4dc;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.dash-nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ---------- Left Side: Logo + Links ---------- */
+.dash-nav__left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Logo */
+.dash-nav__logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+}
+
+.dash-nav__logo-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.dash-nav__logo-text {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #8b5e1a;
+  letter-spacing: -0.3px;
+}
+
+/* Nav Links */
+.dash-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dash-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.dash-nav__link:hover {
+  color: #8b5e1a;
+  background: #f5efe4;
+}
+
+.dash-nav__link--active {
+  background: #f5efe4;
+  color: #8b5e1a;
+  font-weight: 600;
+}
+
+.dash-nav__link svg {
+  flex-shrink: 0;
+}
+
+/* ---------- Right Side: User + Logout ---------- */
+.dash-nav__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* User Badge */
+.dash-nav__user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5efe4;
+  border-radius: 20px;
+  padding: 4px 12px 4px 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.dash-nav__user:hover {
+  background: #ede6d8;
+}
+
+.dash-nav__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #c8902e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.dash-nav__user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+/* Logout Button */
+.dash-nav__logout {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #666;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.dash-nav__logout:hover {
+  color: #8b5e1a;
+  background: #f5efe4;
+}
+
+.dash-nav__logout svg {
+  flex-shrink: 0;
+}
+
+/* ---------- Mobile Menu Toggle ---------- */
+.dash-nav__menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.dash-nav__menu-toggle:hover {
+  background: #f5efe4;
+}
+
+.dash-nav__menu-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #8b5e1a;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.dash-nav__menu-toggle--open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.dash-nav__menu-toggle--open span:nth-child(2) {
+  opacity: 0;
+}
+
+.dash-nav__menu-toggle--open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ---------- Mobile Menu Dropdown ---------- */
+.dash-nav__mobile-menu {
+  display: none;
+  flex-direction: column;
+  padding: 8px 20px 16px;
+  gap: 4px;
+  border-top: 1px solid transparent;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.dash-nav__mobile-menu--open {
+  max-height: 300px;
+  opacity: 1;
+  border-top-color: #e8e4dc;
+}
+
+.dash-nav__mobile-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.dash-nav__mobile-link:hover {
+  color: #8b5e1a;
+  background: #f5efe4;
+}
+
+.dash-nav__mobile-link--active {
+  background: #f5efe4;
+  color: #8b5e1a;
+  font-weight: 600;
+}
+
+/* ============================================ */
+/* Responsive Breakpoints                       */
+/* ============================================ */
+
+/* Tablet: hide nav link text, show icons only */
+@media (max-width: 900px) {
+  .dash-nav__inner {
+    padding: 10px 24px;
+  }
+
+  .dash-nav__left {
+    gap: 20px;
+  }
+
+  .dash-nav__link span {
+    display: none;
+  }
+
+  .dash-nav__link {
+    padding: 8px;
+  }
+
+  .dash-nav__user-name {
+    display: none;
+  }
+
+  .dash-nav__user {
+    padding: 4px;
+  }
+}
+
+/* Mobile: hamburger menu */
+@media (max-width: 640px) {
+  .dash-nav__inner {
+    padding: 10px 16px;
+  }
+
+  .dash-nav__links {
+    display: none;
+  }
+
+  .dash-nav__logout span {
+    display: none;
+  }
+
+  .dash-nav__menu-toggle {
+    display: flex;
+  }
+
+  .dash-nav__mobile-menu {
+    display: flex;
+  }
+}
+
+@media (max-width: 380px) {
+  .dash-nav__logo-text {
+    font-size: 18px;
+  }
+
+  .dash-nav__logo-icon {
+    width: 20px;
+    height: 20px;
+  }
+}

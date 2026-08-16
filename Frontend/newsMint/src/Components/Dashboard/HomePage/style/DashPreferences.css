@@ -1,0 +1,302 @@
+/* ============================================ */
+/* DashPreferences — Complete Styles            */
+/* ============================================ */
+
+.dash-preferences {
+  background: #fff;
+  border: 1px solid #e8e4dc;
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ---------- Section ---------- */
+.dash-pref-section {
+  margin-bottom: 0;
+}
+
+.dash-pref-section__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  color: #999;
+}
+
+.dash-pref-section__header span {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.dash-pref-section__header svg {
+  flex-shrink: 0;
+}
+
+/* ---------- Pills ---------- */
+.dash-pref-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.dash-pref-pill {
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #fff;
+  color: #555;
+  border: 1px solid #ddd8d0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.dash-pref-pill:hover {
+  border-color: #c4b8a8;
+  background: #faf8f4;
+}
+
+.dash-pref-pill--active {
+  background: #8b5e1a;
+  color: #fff;
+  border-color: #8b5e1a;
+  font-weight: 600;
+}
+
+.dash-pref-pill--active:hover {
+  background: #6d4a14;
+  border-color: #6d4a14;
+}
+
+.dash-pref-pill--add {
+  background: #f5f0e8;
+  color: #666;
+  border-color: #e8e2d8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+}
+
+.dash-pref-pill--add span {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.dash-pref-pill--add:hover {
+  background: #ede8df;
+}
+
+/* Sources text */
+.dash-pref-sources {
+  font-size: 11px;
+  color: #aaa;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ---------- Divider ---------- */
+.dash-pref-divider {
+  border: none;
+  border-top: 1px solid #f0ebe3;
+  margin: 20px 0;
+}
+
+/* ---------- Two Column Row ---------- */
+.dash-pref-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/* ---------- Toggle (Language) ---------- */
+.dash-pref-toggle {
+  display: flex;
+  background: #f5f0e8;
+  border-radius: 10px;
+  padding: 4px;
+  border: 1px solid #e8e2d8;
+}
+
+.dash-pref-toggle__btn {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #777;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.dash-pref-toggle__btn--active {
+  background: #fff;
+  color: #1a1a1a;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* ---------- Dropdown ---------- */
+.dash-pref-dropdown {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e8e2d8;
+  border-radius: 10px;
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.dash-pref-dropdown:hover {
+  border-color: #d0c8bc;
+}
+
+.dash-pref-dropdown span {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.dash-pref-dropdown svg {
+  flex-shrink: 0;
+}
+
+.dash-pref-timezone {
+  font-size: 10px;
+  color: #bbb;
+  margin: 6px 0 0 0;
+}
+
+/* ---------- Phone Input ---------- */
+.dash-pref-phone {
+  display: flex;
+  background: #f5f0e8;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e8e2d8;
+}
+
+.dash-pref-phone__prefix {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #666;
+  background: #f0ebe3;
+  border-right: 1px solid #e0d9ce;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.dash-pref-phone__input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  font-family: inherit;
+}
+
+/* ---------- Actions ---------- */
+.dash-pref-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.dash-pref-btn {
+  background: #8b5e1a;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+  margin-top: 15px;
+}
+
+.dash-pref-btn:hover {
+  background: #6d4a14;
+}
+
+.dash-pref-saved {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #8b5e1a;
+  font-weight: 500;
+  margin-top: 15px;
+}
+
+.dash-pref-saved svg {
+  flex-shrink: 0;
+}
+
+/* ============================================ */
+/* Responsive                                   */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .dash-preferences {
+    padding: 22px;
+  }
+
+  .dash-pref-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .dash-pref-section--half {
+    margin-bottom: 20px;
+  }
+
+  .dash-pref-section--half:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .dash-preferences {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .dash-pref-pill {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  .dash-pref-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dash-pref-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .dash-pref-saved {
+    justify-content: center;
+  }
+}

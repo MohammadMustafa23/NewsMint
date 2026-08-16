@@ -1,0 +1,113 @@
+/* ============================================ */
+/* DashSourceHeader — Complete Styles           */
+/* ============================================ */
+
+.dash-source-header {
+  margin-bottom: 28px;
+}
+
+.dash-source-header__title {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 10px 0;
+  line-height: 1.2;
+}
+
+.dash-source-header__subtitle {
+  font-size: 15px;
+  color: #666;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+  max-width: 480px;
+}
+
+/* ---------- Meta Row ---------- */
+.dash-source-header__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Info Badge */
+.dash-source-header__info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f5efe4;
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: #8b5e1a;
+}
+
+.dash-source-header__info span {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.dash-source-header__info svg {
+  flex-shrink: 0;
+}
+
+/* Counter */
+.dash-source-header__counter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f5efe4;
+  border-radius: 20px;
+  padding: 6px 14px;
+}
+
+.dash-source-header__counter-current {
+  font-size: 11px;
+  font-weight: 700;
+  color: #c47f1e;
+}
+
+.dash-source-header__counter-sep {
+  font-size: 10px;
+  color: #aaa;
+}
+
+.dash-source-header__counter-total {
+  font-size: 11px;
+  font-weight: 700;
+  color: #999;
+}
+
+.dash-source-header__counter-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ============================================ */
+/* Responsive                                   */
+/* ============================================ */
+
+@media (max-width: 640px) {
+  .dash-source-header__title {
+    font-size: 28px;
+  }
+
+  .dash-source-header__subtitle {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dash-source-header__title {
+    font-size: 24px;
+  }
+
+  .dash-source-header__meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

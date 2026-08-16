@@ -5,6 +5,11 @@ import AuthPages from "./Components/Pages/AuthPages";
 import Prefrence from "./Components/Pages/Prefrence";
 import DashBoard from "./Components/Pages/Dashboard";
 import ProtectedRoute from "./security/ProtectedRoute";
+
+import HomeDash from './Components/Dashboard/HomePage/HomeDash'
+import HomeSource from './Components/Dashboard/Source/HomeSource'
+import HomeTopNews from './Components/Dashboard/TopNews/HomeTopNews'
+
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 
@@ -46,7 +51,6 @@ function App() {
           }
         />
 
-        {/* Dashboard */}
         <Route
           path="/home-page"
           element={
@@ -54,7 +58,11 @@ function App() {
               <DashBoard />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<HomeDash />} />
+          <Route path="source" element={<HomeSource />} />
+          <Route path="top-news" element={<HomeTopNews />} />
+        </Route>
       </Routes>
     </>
   );

@@ -1,0 +1,223 @@
+/* ============================================ */
+/* DashSourceGrid — Complete Styles             */
+/* ============================================ */
+
+.dash-source-grid {
+  width: 100%;
+}
+
+/* ---------- Section Label ---------- */
+.dash-source-grid__label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+}
+
+/* ---------- Cards Grid ---------- */
+.dash-source-grid__cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+/* ---------- Source Card ---------- */
+.dash-source-card {
+  background: #fff;
+  border: 1px solid #e8e4dc;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.dash-source-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: #ddd8d0;
+}
+
+/* Card Header */
+.dash-source-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.dash-source-card__logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f5f0e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8b5e1a;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.dash-source-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dash-source-card__name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dash-source-card__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-source-card__tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.dash-source-card__tag {
+  font-size: 10px;
+  color: #999;
+  font-weight: 500;
+}
+
+.dash-source-card__tag-sep {
+  font-size: 10px;
+  color: #ddd;
+}
+
+/* Description */
+.dash-source-card__desc {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.5;
+  margin: 0 0 14px 0;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Footer */
+.dash-source-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.dash-source-card__count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #aaa;
+}
+
+.dash-source-card__count svg {
+  flex-shrink: 0;
+}
+
+/* Add / Added Button */
+.dash-source-card__btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff;
+  color: #666;
+  border: 1px solid #e0dbd6;
+  border-radius: 16px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.dash-source-card__btn:hover {
+  border-color: #c4b8a8;
+  background: #faf8f4;
+}
+
+.dash-source-card__btn-plus {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.dash-source-card__btn--added {
+  background: #c47f1e;
+  color: #fff;
+  border-color: #c47f1e;
+}
+
+.dash-source-card__btn--added:hover {
+  background: #b07018;
+  border-color: #b07018;
+}
+
+/* ---------- Load More ---------- */
+.dash-source-grid__load-more {
+  text-align: center;
+}
+
+.dash-source-grid__load-btn {
+  background: transparent;
+  color: #8b5e1a;
+  border: 1px solid #e0dbd6;
+  border-radius: 20px;
+  padding: 10px 24px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.dash-source-grid__load-btn:hover {
+  background: #f5efe4;
+  border-color: #c4b8a8;
+}
+
+/* ============================================ */
+/* Responsive                                   */
+/* ============================================ */
+
+@media (max-width: 1024px) {
+  .dash-source-grid__cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-source-grid__cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .dash-source-card {
+    padding: 16px;
+  }
+}

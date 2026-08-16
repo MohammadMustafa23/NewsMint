@@ -1,0 +1,113 @@
+/* ============================================ */
+/* DashSourceToolbar — Complete Styles          */
+/* ============================================ */
+
+.dash-source-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Search Input ---------- */
+.dash-source-toolbar__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #e8e4dc;
+  border-radius: 10px;
+  padding: 9px 14px;
+  flex: 1;
+  min-width: 240px;
+  max-width: 320px;
+  transition: border-color 0.2s ease;
+}
+
+.dash-source-toolbar__search:focus-within {
+  border-color: #c4b8a8;
+}
+
+.dash-source-toolbar__search svg {
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+.dash-source-toolbar__input {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: #333;
+  outline: none;
+  flex: 1;
+  font-family: inherit;
+  width: 100%;
+}
+
+.dash-source-toolbar__input::placeholder {
+  color: #bbb;
+}
+
+/* ---------- Filter Pills ---------- */
+.dash-source-toolbar__filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dash-source-toolbar__pill {
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #fff;
+  color: #666;
+  border: 1px solid #e0dbd6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.dash-source-toolbar__pill:hover {
+  border-color: #c4b8a8;
+  background: #faf8f4;
+}
+
+.dash-source-toolbar__pill--active {
+  background: #c47f1e;
+  color: #fff;
+  border-color: #c47f1e;
+  font-weight: 600;
+}
+
+.dash-source-toolbar__pill--active:hover {
+  background: #b07018;
+  border-color: #b07018;
+}
+
+/* ============================================ */
+/* Responsive                                   */
+/* ============================================ */
+
+@media (max-width: 640px) {
+  .dash-source-toolbar__search {
+    max-width: 100%;
+    min-width: 100%;
+  }
+
+  .dash-source-toolbar__filters {
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .dash-source-toolbar__filters::-webkit-scrollbar {
+    display: none;
+  }
+}
