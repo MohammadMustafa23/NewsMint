@@ -1,0 +1,148 @@
+/* ============================================ */
+/* DashHeroArticle — Complete Styles            */
+/* ============================================ */
+
+.dash-hero-article {
+  width: 100%;
+}
+
+/* ---------- Label ---------- */
+.dash-hero-article__label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.dash-hero-article__label-line {
+  width: 24px;
+  height: 2px;
+  background: #c47f1e;
+  border-radius: 2px;
+}
+
+.dash-hero-article__label span {
+  font-size: 10px;
+  font-weight: 700;
+  color: #c47f1e;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* ---------- Image ---------- */
+.dash-hero-article__image-wrap {
+  width: 100%;
+  height: 280px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #2a1f1a 0%, #4a3f35 50%, #6b5d4f 100%);
+}
+
+.dash-hero-article__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.9;
+}
+
+/* ---------- Title ---------- */
+.dash-hero-article__title {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+}
+
+/* ---------- Description ---------- */
+.dash-hero-article__desc {
+  font-size: 14px;
+  color: #777;
+  line-height: 1.7;
+  margin: 0 0 24px 0;
+}
+
+/* ---------- Footer ---------- */
+.dash-hero-article__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dash-hero-article__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #999;
+}
+
+.dash-hero-article__meta strong {
+  color: #666;
+  font-weight: 600;
+}
+
+.dash-hero-article__dot {
+  color: #ddd;
+}
+
+.dash-hero-article__btn {
+  background: #c47f1e;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 22px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.dash-hero-article__btn:hover {
+  background: #b07018;
+}
+
+/* ============================================ */
+/* Responsive                                   */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .dash-hero-article__image-wrap {
+    height: 220px;
+  }
+
+  .dash-hero-article__title {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dash-hero-article__image-wrap {
+    height: 180px;
+    border-radius: 12px;
+  }
+
+  .dash-hero-article__title {
+    font-size: 22px;
+  }
+
+  .dash-hero-article__desc {
+    font-size: 13px;
+  }
+
+  .dash-hero-article__footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dash-hero-article__btn {
+    width: 100%;
+  }
+}

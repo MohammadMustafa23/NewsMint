@@ -1,0 +1,93 @@
+/* ============================================ */
+/* DashBriefingCard — Complete Styles           */
+/* ============================================ */
+
+.dash-briefing-card {
+  background: #fff;
+  border: 1px solid #e8e4dc;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.dash-briefing-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: #ddd8d0;
+}
+
+/* ---------- Header ---------- */
+.dash-briefing-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.dash-briefing-card__icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #f5f0e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.dash-briefing-card__category {
+  font-size: 9px;
+  font-weight: 700;
+  color: #8b5e1a;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* ---------- Title ---------- */
+.dash-briefing-card__title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 10px 0;
+  line-height: 1.3;
+}
+
+/* ---------- Description ---------- */
+.dash-briefing-card__desc {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.6;
+  margin: 0 0 18px 0;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------- Button ---------- */
+.dash-briefing-card__btn {
+  background: transparent;
+  color: #8b5e1a;
+  border: 1px solid #e0dbd6;
+  border-radius: 16px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  align-self: flex-start;
+  white-space: nowrap;
+}
+
+.dash-briefing-card__btn:hover {
+  background: #f5efe4;
+  border-color: #c4b8a8;
+}

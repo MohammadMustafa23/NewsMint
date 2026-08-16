@@ -1,0 +1,42 @@
+/* ============================================ */
+/* DashBriefingsGrid — Complete Styles          */
+/* ============================================ */
+
+.dash-briefings-grid {
+  width: 100%;
+}
+
+.dash-briefings-grid__heading {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 24px 0;
+}
+
+.dash-briefings-grid__cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* ============================================ */
+/* Responsive                                   */
+/* ============================================ */
+
+@media (max-width: 1024px) {
+  .dash-briefings-grid__cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-briefings-grid__cards {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .dash-briefings-grid__heading {
+    font-size: 20px;
+  }
+}

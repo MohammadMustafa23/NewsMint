@@ -1,0 +1,81 @@
+/* ============================================ */
+/* DashTrending — Complete Styles               */
+/* ============================================ */
+
+.dash-trending {
+  background: #fff;
+  border: 1px solid #e8e4dc;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+/* ---------- Header ---------- */
+.dash-trending__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  color: #c47f1e;
+}
+
+.dash-trending__header span {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.dash-trending__header svg {
+  flex-shrink: 0;
+}
+
+/* ---------- List ---------- */
+.dash-trending__list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dash-trending__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  transition: opacity 0.2s ease;
+}
+
+.dash-trending__item:hover {
+  opacity: 0.7;
+}
+
+.dash-trending__item-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dash-trending__category {
+  font-size: 10px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dash-trending__tag {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.dash-trending__mentions {
+  font-size: 11px;
+  color: #999;
+  font-weight: 500;
+  flex-shrink: 0;
+}
