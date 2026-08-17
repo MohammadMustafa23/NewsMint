@@ -21,7 +21,16 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
-    }
+    },
+    newsStreak: {
+      type: Number,
+      default: 0,
+    },
+
+    lastNewsReadAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

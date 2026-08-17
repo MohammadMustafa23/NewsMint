@@ -19,6 +19,20 @@ const preferenceSchema = new mongoose.Schema(
       },
     },
 
+    sources: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Source",
+        },
+      ],
+      default: [],
+      validate: {
+        validator: (value) => value.length <= 3,
+        message: "You can select a maximum of 3 sources.",
+      },
+    },
+
     language: {
       type: String,
       enum: ["English", "Hindi"],
@@ -28,6 +42,11 @@ const preferenceSchema = new mongoose.Schema(
     deliveryTime: {
       type: String,
       required: true,
+    },
+
+    timezone: {
+      type: String,
+      default: "Asia/Kolkata",
     },
 
     phoneNumber: {

@@ -1,5 +1,5 @@
 import Preference from "../models/Preference.js";
-
+import User from "../../Auth/models/user.model.js";
 const ALLOWED_CATEGORIES = [
   "Tech",
   "Rajasthan",
@@ -124,11 +124,74 @@ export const savePreferences = async (req, res) => {
   }
 };
 
+
+const getNextDigestTime = (deliveryTime, timezone) => {
+  if (!deliveryTime) {
+    return null;
+  }
+
+  try {
+    const match = deliveryTime.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+
+    if (!match) {
+      return null;
+    }
+
+    let hours = Number(match[1]);
+    let minutes = Number(match[2]);
+    const period = match[3].toUpperCase();
+
+    if (period === "PM" && hours !== 12) {
+      hours += 12;
+    }
+
+    if (period === "AM" && hours === 12) {
+      hours = 0;
+    }
+
+    const now = new Date();
+
+    const nextDigest = new Date(now);
+
+    nextDigest.setHours(hours, minutes, 0, 0);
+
+    // Today's digest has already passed.
+    if (nextDigest <= now) {
+      nextDigest.setDate(nextDigest.getDate() + 1);
+    }
+
+    const difference = nextDigest.getTime() - now.getTime();
+
+    const totalMinutes = Math.floor(difference / (1000 * 60));
+
+    const days = Math.floor(totalMinutes / (60 * 24));
+
+    const remainingMinutes = totalMinutes % (60 * 24);
+
+    const remainingHours = Math.floor(remainingMinutes / 60);
+
+    minutes = remainingMinutes % 60;
+
+    if (days > 0) {
+      return `in ${days}d ${remainingHours}h`;
+    }
+
+    return `in ${remainingHours}h ${minutes}m`;
+  } catch (error) {
+    console.error("Next Digest Time Error:", error);
+    return null;
+  }
+};
+
 export const getMyPreferences = async (req, res) => {
   try {
-    const preference = await Preference.findOne({
-      userId: req.user._id,
-    }).lean();
+    const [preference, user] = await Promise.all([
+      Preference.findOne({
+        userId: req.user._id,
+      }).lean(),
+
+      User.findById(req.user._id).select("newsStreak lastNewsReadAt").lean(),
+    ]);
 
     // User has never created preferences
     if (!preference) {
@@ -139,15 +202,40 @@ export const getMyPreferences = async (req, res) => {
       });
     }
 
+    const nextDigestTime = getNextDigestTime(
+      preference.deliveryTime,
+      preference.timezone,
+    );
+
     return res.status(200).json({
       success: true,
+
       hasPreferences: Boolean(preference.isCompleted),
+
       preference: {
         id: preference._id,
+
+        // News preferences
         categories: preference.categories,
+        sources: preference.sources,
+
+        // Language
         language: preference.language,
+
+        // Delivery
         deliveryTime: preference.deliveryTime,
+        timezone: preference.timezone,
+
+        // WhatsApp
         phoneNumber: preference.phoneNumber,
+
+        // User activity
+        readStreak: user?.newsStreak || 0,
+
+        // Calculated by backend
+        nextDigestTime,
+
+        // Setup status
         isCompleted: preference.isCompleted,
       },
     });
@@ -160,3 +248,29 @@ export const getMyPreferences = async (req, res) => {
     });
   }
 };
+
+export const checkMyPreferences = async (req, res) => {
+  try {
+    const preference = await Preference.findOne({
+      userId: req.user._id,
+      isCompleted: true,
+    })
+      .select("_id")
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      hasPreferences: Boolean(preference),
+    });
+  } catch (error) {
+    console.error("Check My Preferences Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
+};
+
+
+
