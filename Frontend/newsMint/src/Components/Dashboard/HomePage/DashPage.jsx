@@ -1,10 +1,72 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+
 import DashStatusBar from "./DashStatusBar";
 import DashPreferences from "./DashPreferences";
 import DashLivePreview from "./DashLivePreview";
+
+import { getMyPreferences } from "../../../services/prefrence.service";
+
 import "./style/DashPage.css";
 
 const DashPage = () => {
+  const [preferences, setPreferences] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const data = await getMyPreferences();
+
+        console.log("My Preferences:", data);
+
+        if (!data?.success || !data?.preference) {
+          setError("Unable to load your preferences.");
+          return;
+        }
+
+        setPreferences(data.preference);
+      } catch (error) {
+        console.error("Get Preferences Error:", error);
+
+        setError(
+          error?.response?.data?.message || "Failed to load your preferences.",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPreferences();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="dash-page">
+        <div className="dash-page__container">
+          <p>Loading your preferences...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dash-page">
+        <div className="dash-page__container">
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!preferences) {
+    return null;
+  }
+
   const handlePauseToggle = (paused) => {
     console.log("Digest paused:", paused);
   };
@@ -21,8 +83,8 @@ const DashPage = () => {
     console.log("Open time picker");
   };
 
-  const handleUpdate = () => {
-    console.log("Preferences updated!");
+  const handleUpdate = (updatedPreferences) => {
+    console.log("Preferences updated:", updatedPreferences);
   };
 
   return (
@@ -30,23 +92,29 @@ const DashPage = () => {
       <div className="dash-page__container">
         {/* Status Bar */}
         <DashStatusBar
-          nextDigestTime="in 4h 12m"
-          isDeliveryActive={true}
-          readStreak={12}
-          isPaused={false}
+          nextDigestTime={preferences.nextDigestTime}
+          isDeliveryActive={preferences.isDeliveryActive}
+          readStreak={preferences.readStreak}
+          isPaused={preferences.isDigestPaused}
           onPauseToggle={handlePauseToggle}
         />
 
         {/* Main Grid */}
         <div className="dash-page__grid">
           <DashPreferences
-            selectedTopics={["Tech", "Rajasthan"]}
-            selectedLanguage="Hindi"
-            deliveryTime="7:30 AM"
-            phoneNumber="98765 43210"
-            sourcesText="via TechCrunch, Economic Times"
-            timeZoneText="All times shown in IST (Asia/Kolkata)"
-            savedMessage="Saved — first digest at 7:30 AM"
+            selectedTopics={preferences.categories}
+            selectedLanguage={preferences.language}
+            deliveryTime={preferences.deliveryTime}
+            phoneNumber={preferences.phoneNumber}
+            sourcesText={
+              preferences.sources?.length
+                ? `via ${preferences.sources.join(", ")}`
+                : "No sources selected"
+            }
+            timeZoneText={`All times shown in ${
+              preferences.timezone || "Asia/Kolkata"
+            }`}
+            savedMessage={`Saved — first digest at ${preferences.deliveryTime}`}
             onUpdate={handleUpdate}
             onTopicToggle={handleTopicToggle}
             onLanguageChange={handleLanguageChange}
@@ -54,15 +122,15 @@ const DashPage = () => {
           />
 
           <DashLivePreview
-            time="7:30"
-            tags={["Tech", "Rajasthan"]}
-            heading="नमस्कार जयेश। आज की मुख्य खबरें:"
+            time={preferences.deliveryTime}
+            tags={preferences.categories}
+            heading="नमस्कार। आज की मुख्य खबरें:"
             bulletPoints={[
-              "राजस्थान का नया एआई रिसर्च पार्क: जयपुर में 500 करोड़ रुपये की लागत से नया तकनीकी केंद्र स्थापित किया जाएगा।",
-              "डेटा प्राइवेसी पर नया बिल: टेक कंपनियों के लिए नए नियम अगले महीने से लागू होंगे।",
+              "Your personalized news will appear here.",
+              "News will be generated according to your selected preferences.",
             ]}
             audioDuration="0:20"
-            timestamp="7:30 AM"
+            timestamp={preferences.deliveryTime}
           />
         </div>
       </div>

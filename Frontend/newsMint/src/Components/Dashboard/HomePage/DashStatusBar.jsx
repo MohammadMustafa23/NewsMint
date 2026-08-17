@@ -4,18 +4,8 @@ import "./style/DashStatusBar.css";
 const DashStatusBar = ({
   nextDigestTime = "in 4h 12m",
   isDeliveryActive = true,
-  readStreak = 12,
-  isPaused = false,
-  onPauseToggle,
+  readStreak = 12
 }) => {
-  const [paused, setPaused] = useState(isPaused);
-
-  const handleToggle = () => {
-    const next = !paused;
-    setPaused(next);
-    onPauseToggle?.(next);
-  };
-
   return (
     <div className="dash-status-bar">
       <div className="dash-status-bar__left">
@@ -36,19 +26,6 @@ const DashStatusBar = ({
           <span className="dash-status-bar__fire">🔥</span>
           <span>{readStreak}-day read streak</span>
         </div>
-      </div>
-
-      {/* Pause Toggle */}
-      <div className="dash-status-bar__right">
-        <span className="dash-status-bar__pause-label">Pause digest</span>
-        <button
-          type="button"
-          className={`dash-status-bar__toggle ${paused ? "dash-status-bar__toggle--paused" : ""}`}
-          onClick={handleToggle}
-          aria-label={paused ? "Resume digest" : "Pause digest"}
-        >
-          <span className="dash-status-bar__toggle-knob" />
-        </button>
       </div>
     </div>
   );

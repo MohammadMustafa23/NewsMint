@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 import { getCurrentUser } from "../services/auth.service.js";
-import { getMyPreferences } from "../services/prefrence.service.js";
+import { checkMyPreferences } from "../services/prefrence.service.js";
 import SpinLoader from "../common/SpinLoader";
 
 const ProtectedRoute = ({
@@ -33,7 +33,7 @@ const ProtectedRoute = ({
 
         setIsAuthenticated(true);
 
-        const preferenceResponse = await getMyPreferences();
+        const preferenceResponse = await checkMyPreferences();
 
         console.log("ProtectedRoute Preferences:", preferenceResponse);
 
