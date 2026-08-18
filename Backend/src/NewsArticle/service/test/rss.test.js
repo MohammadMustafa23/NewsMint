@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
-import Source from "../../Feature/NewsSource/models/source.models.js";
-import { fetchRSSSource } from "../service/news/rss.service.js";
+import Source from "../../../Feature/NewsSource/models/source.models.js";
+import { fetchRSSSource } from "../news/rss.service.js";
 import dotenv from 'dotenv'
 dotenv.config()
 
 const run = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONOGO_URI);
 
     console.log("MongoDB connected");
 

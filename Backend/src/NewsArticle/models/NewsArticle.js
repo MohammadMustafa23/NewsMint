@@ -35,6 +35,7 @@ const newsArticleSchema = new mongoose.Schema(
     author: {
       type: String,
       default: "",
+      trim: true,
     },
 
     publishedAt: {
@@ -47,6 +48,7 @@ const newsArticleSchema = new mongoose.Schema(
       type: String,
       default: "General",
       index: true,
+      trim: true,
     },
 
     tags: {
@@ -54,19 +56,12 @@ const newsArticleSchema = new mongoose.Schema(
       default: [],
     },
 
-    // RSS/API
     fetchMethod: {
       type: String,
       enum: ["rss", "api"],
       required: true,
     },
 
-    fetchedAt: {
-      type: Date,
-      default: Date.now,
-    },
-
-    // Used to identify duplicate articles
     contentHash: {
       type: String,
       required: true,
@@ -74,14 +69,12 @@ const newsArticleSchema = new mongoose.Schema(
       index: true,
     },
 
-    // Which daily batch this article belongs to
     newsDate: {
       type: Date,
       required: true,
       index: true,
     },
 
-    // Later we'll use these
     ai: {
       processed: {
         type: Boolean,
@@ -110,11 +103,6 @@ const newsArticleSchema = new mongoose.Schema(
           type: [String],
           default: [],
         },
-      },
-
-      importanceScore: {
-        type: Number,
-        default: 0,
       },
     },
   },

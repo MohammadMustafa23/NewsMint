@@ -7,10 +7,13 @@ const parser = new Parser({
   timeout: 15000,
 });
 
-const createContentHash = (sourceId, title, url) => {
-  const value = `${sourceId}-${title}-${url}`.trim().toLowerCase();
+const MAX_ARTICLES_PER_CATEGORY = 5;
 
-  return crypto.createHash("sha256").update(value).digest("hex");
+const createContentHash = (url) => {
+  return crypto
+    .createHash("sha256")
+    .update(url.trim().toLowerCase())
+    .digest("hex");
 };
 
 const cleanText = (text = "") => {
@@ -22,6 +25,168 @@ const cleanText = (text = "") => {
     .replace(/&#39;/g, "'")
     .replace(/\s+/g, " ")
     .trim();
+};
+
+/*
+ * TEMPORARY CATEGORY DETECTION
+ *
+ * Later we will replace this with real
+ * category information from the source/API.
+ */
+const CATEGORY_KEYWORDS = {
+  India: [
+    "india",
+    "indian",
+    "delhi",
+    "mumbai",
+    "jaipur",
+    "rajasthan",
+    "uttar pradesh",
+    "bihar",
+    "maharashtra",
+    "government",
+    "supreme court",
+    "parliament",
+    "lok sabha",
+    "rajya sabha",
+  ],
+
+  World: [
+    "world",
+    "usa",
+    "america",
+    "united states",
+    "uk",
+    "britain",
+    "china",
+    "russia",
+    "ukraine",
+    "israel",
+    "iran",
+    "pakistan",
+    "europe",
+    "international",
+  ],
+
+  Business: [
+    "business",
+    "economy",
+    "economic",
+    "market",
+    "stock",
+    "stocks",
+    "share",
+    "shares",
+    "company",
+    "companies",
+    "startup",
+    "investment",
+    "investor",
+    "bank",
+    "banking",
+    "finance",
+    "financial",
+    "rupee",
+    "dollar",
+    "gdp",
+  ],
+
+  Technology: [
+    "technology",
+    "tech",
+    "artificial intelligence",
+    "ai",
+    "software",
+    "google",
+    "microsoft",
+    "apple",
+    "openai",
+    "meta",
+    "amazon",
+    "iphone",
+    "android",
+    "cyber",
+    "robot",
+    "robotics",
+    "startup",
+  ],
+
+  Sports: [
+    "sport",
+    "sports",
+    "cricket",
+    "football",
+    "soccer",
+    "tennis",
+    "hockey",
+    "basketball",
+    "ipl",
+    "match",
+    "player",
+    "team",
+    "world cup",
+    "olympics",
+  ],
+
+  Entertainment: [
+    "entertainment",
+    "bollywood",
+    "hollywood",
+    "movie",
+    "movies",
+    "film",
+    "actor",
+    "actress",
+    "celebrity",
+    "music",
+    "singer",
+    "concert",
+    "web series",
+    "ott",
+    "television",
+  ],
+};
+
+const detectCategory = (item, source) => {
+  const allowedCategories = source.categories || [];
+
+  if (!allowedCategories.length) {
+    return "General";
+  }
+
+  const text = `
+    ${item.title || ""}
+    ${item.contentSnippet || ""}
+    ${item.description || ""}
+  `.toLowerCase();
+
+  /*
+   * Only detect categories that this source
+   * actually supports.
+   */
+  for (const category of allowedCategories) {
+    const keywords = CATEGORY_KEYWORDS[category] || [];
+
+    const matched = keywords.some((keyword) =>
+      text.includes(keyword.toLowerCase()),
+    );
+
+    if (matched) {
+      return category;
+    }
+  }
+
+  /*
+   * TEMPORARY FALLBACK
+   *
+   * If we cannot identify the category from
+   * the RSS item, use the first category
+   * configured for the source.
+   *
+   * This will be replaced later with genuine
+   * source/feed category information.
+   */
+  return allowedCategories[0];
 };
 
 const extractImage = (item) => {
@@ -52,16 +217,18 @@ export const fetchRSSSource = async (source) => {
 
     console.log(`${source.name}: ${feed.items.length} articles found`);
 
-    // TEMPORARY: Inspect the raw RSS article
-    console.log("=================================");
-    console.log("FIRST RSS ITEM");
-    console.dir(feed.items[0], {
-      depth: null,
-    });
-    console.log("=================================");
-
     let saved = 0;
     let skipped = 0;
+
+    /*
+     * Track how many articles we have stored
+     * for each category during this fetch.
+     */
+    const categoryCounts = {};
+
+    for (const category of source.categories || []) {
+      categoryCounts[category] = 0;
+    }
 
     for (const item of feed.items) {
       try {
@@ -78,7 +245,36 @@ export const fetchRSSSource = async (source) => {
 
         const url = item.link.trim();
 
-        const contentHash = createContentHash(source._id, title, url);
+        /*
+         * Determine category.
+         */
+        const category = detectCategory(item, source);
+
+        /*
+         * Only allow categories configured
+         * on this source.
+         */
+        if (!source.categories?.includes(category)) {
+          skipped++;
+          continue;
+        }
+
+        /*
+         * Maximum 5 articles per category
+         * for this source during this fetch.
+         */
+        if (categoryCounts[category] >= MAX_ARTICLES_PER_CATEGORY) {
+          skipped++;
+          continue;
+        }
+
+        /*
+         * URL-based hash.
+         *
+         * This allows RSS/API providers to
+         * detect the same article later.
+         */
+        const contentHash = createContentHash(url);
 
         const exists = await NewsArticle.exists({
           contentHash,
@@ -114,18 +310,22 @@ export const fetchRSSSource = async (source) => {
 
           publishedAt,
 
-          category: source.categories?.[0] || "General",
+          category,
 
+          /*
+           * Store only the source's allowed
+           * categories as tags for now.
+           */
           tags: source.categories || [],
 
           fetchMethod: "rss",
-
-          fetchedAt: new Date(),
 
           contentHash,
 
           newsDate: new Date(),
         });
+
+        categoryCounts[category]++;
 
         saved++;
       } catch (articleError) {
@@ -133,12 +333,15 @@ export const fetchRSSSource = async (source) => {
       }
     }
 
+    console.log(`${source.name} category counts:`, categoryCounts);
+
     return {
       success: true,
       source: source.name,
       total: feed.items.length,
       saved,
       skipped,
+      categoryCounts,
     };
   } catch (error) {
     console.error(`RSS Error - ${source.name}:`, error.message);

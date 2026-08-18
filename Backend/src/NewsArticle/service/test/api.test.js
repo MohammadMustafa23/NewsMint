@@ -1,4 +1,8 @@
+import mongoose from "mongoose";
 import dotenv from "dotenv";
+
+import Source from "../../../Feature/NewsSource/models/source.models.js";
+import { MONGO_URI } from '../../../config/env.js'
 
 import { fetchNewsData } from "../news/newsdata.service.js";
 import { fetchGuardianNews } from "../news/guardian.service.js";
@@ -7,79 +11,117 @@ import { fetchGNews } from "../news/gnews.service.js";
 dotenv.config();
 
 const run = async () => {
-  console.log("\n=================================");
-  console.log("NEWS API TEST START");
-  console.log("=================================\n");
+  try {
+    console.log("\n=================================");
+    console.log("NEWS API INGESTION TEST START");
+    console.log("=================================\n");
 
-  // -----------------------------
-  // NewsData.io
-  // -----------------------------
+    await mongoose.connect("mongodb+srv://mohammd_mustafa:kKBD%40dy4.rK3rT6@project01.m1alapz.mongodb.net/NewsMint");
 
-  console.log("Fetching NewsData.io...");
+    console.log("MongoDB connected\n");
 
-  const newsDataResult = await fetchNewsData();
+    // =================================
+    // NewsData.io
+    // =================================
 
-  console.log({
-    provider: newsDataResult.provider,
-    success: newsDataResult.success,
-    total: newsDataResult.total,
-  });
-
-  if (newsDataResult.articles.length > 0) {
-    console.log("\nNewsData First Article:");
-
-    console.dir(newsDataResult.articles[0], {
-      depth: null,
+    const newsDataSource = await Source.findOne({
+      name: "NewsData.io",
+      fetchMethod: "api",
+      isActive: true,
     });
-  }
 
-  // -----------------------------
-  // Guardian
-  // -----------------------------
+    if (!newsDataSource) {
+      throw new Error("NewsData.io source not found");
+    }
 
-  console.log("\nFetching The Guardian...");
+    console.log("Fetching NewsData.io...");
 
-  const guardianResult = await fetchGuardianNews();
+    const newsDataResult = await fetchNewsData(newsDataSource);
 
-  console.log({
-    provider: guardianResult.provider,
-    success: guardianResult.success,
-    total: guardianResult.total,
-  });
+    console.log("NewsData.io Result:");
+    console.log(newsDataResult);
 
-  if (guardianResult.articles.length > 0) {
-    console.log("\nGuardian First Article:");
+    // =================================
+    // Guardian
+    // =================================
 
-    console.dir(guardianResult.articles[0], {
-      depth: null,
+    const guardianSource = await Source.findOne({
+      name: "The Guardian",
+      fetchMethod: "api",
+      isActive: true,
     });
-  }
 
-  // -----------------------------
-  // GNews
-  // -----------------------------
+    if (!guardianSource) {
+      throw new Error("The Guardian source not found");
+    }
 
-  console.log("\nFetching GNews...");
+    console.log("\nFetching The Guardian...");
 
-  const gnewsResult = await fetchGNews();
+    const guardianResult = await fetchGuardianNews(guardianSource);
 
-  console.log({
-    provider: gnewsResult.provider,
-    success: gnewsResult.success,
-    total: gnewsResult.total,
-  });
+    console.log("Guardian Result:");
+    console.log(guardianResult);
 
-  if (gnewsResult.articles.length > 0) {
-    console.log("\nGNews First Article:");
+    // =================================
+    // GNews
+    // =================================
 
-    console.dir(gnewsResult.articles[0], {
-      depth: null,
+    const gnewsSource = await Source.findOne({
+      name: "GNews",
+      fetchMethod: "api",
+      isActive: true,
     });
-  }
 
-  console.log("\n=================================");
-  console.log("NEWS API TEST COMPLETE");
-  console.log("=================================");
+    if (!gnewsSource) {
+      throw new Error("GNews source not found");
+    }
+
+    console.log("\nFetching GNews...");
+
+    const gnewsResult = await fetchGNews(gnewsSource);
+
+    console.log("GNews Result:");
+    console.log(gnewsResult);
+
+    // =================================
+    // FINAL SUMMARY
+    // =================================
+
+    console.log("\n=================================");
+    console.log("NEWS API INGESTION SUMMARY");
+    console.log("=================================");
+
+    console.table([
+      {
+        provider: "NewsData.io",
+        success: newsDataResult.success,
+        total: newsDataResult.total,
+        saved: newsDataResult.saved,
+        skipped: newsDataResult.skipped,
+      },
+      {
+        provider: "The Guardian",
+        success: guardianResult.success,
+        total: guardianResult.total,
+        saved: guardianResult.saved,
+        skipped: guardianResult.skipped,
+      },
+      {
+        provider: "GNews",
+        success: gnewsResult.success,
+        total: gnewsResult.total,
+        saved: gnewsResult.saved,
+        skipped: gnewsResult.skipped,
+      },
+    ]);
+  } catch (error) {
+    console.error("\nNEWS API TEST ERROR:", error.message);
+  } finally {
+    await mongoose.disconnect();
+
+    console.log("\nMongoDB disconnected");
+    console.log("NEWS API INGESTION TEST END");
+  }
 };
 
 run();
