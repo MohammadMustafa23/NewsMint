@@ -1,5 +1,6 @@
 import Preference from "../models/Preference.js";
 import User from "../../Auth/models/user.model.js";
+import { redisClient } from "../../../config/redis.js";
 const ALLOWED_CATEGORIES = [
   "Tech",
   "Rajasthan",
@@ -14,8 +15,7 @@ export const savePreferences = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const { categories, language, deliveryTime, phoneNumber, telegram } =
-      req.body;
+    const { categories, language, deliveryTime, phoneNumber } = req.body;
 
     // -----------------------------
     // Basic validation
@@ -78,6 +78,40 @@ export const savePreferences = async (req, res) => {
     }
 
     // -----------------------------
+    // Get Telegram data from Redis
+    // -----------------------------
+
+    const telegramKey = `telegram:pending:${userId}`;
+
+    const telegramRedisData = await redisClient.get(telegramKey);
+
+    let telegramData = {
+      chatId: null,
+      telegramUserId: null,
+      username: null,
+      firstName: null,
+      lastName: null,
+      connected: false,
+    };
+
+    if (telegramRedisData) {
+      try {
+        const parsedTelegramData = telegramRedisData;
+
+        telegramData = {
+          chatId: parsedTelegramData.chatId || null,
+          telegramUserId: parsedTelegramData.telegramUserId || null,
+          username: parsedTelegramData.username || null,
+          firstName: parsedTelegramData.firstName || null,
+          lastName: parsedTelegramData.lastName || null,
+          connected: true,
+        };
+      } catch (error) {
+        console.error("Invalid Telegram Redis data:", error);
+      }
+    }
+
+    // -----------------------------
     // Create / Update Preference
     // -----------------------------
 
@@ -90,10 +124,7 @@ export const savePreferences = async (req, res) => {
         deliveryTime,
         phoneNumber: cleanPhoneNumber,
 
-        telegram: {
-          chatId: telegram?.chatId || null,
-          connected: telegram?.connected || false,
-        },
+        telegram: telegramData,
 
         isCompleted: true,
       },
@@ -104,6 +135,14 @@ export const savePreferences = async (req, res) => {
         setDefaultsOnInsert: true,
       },
     );
+
+    // -----------------------------
+    // Delete temporary Telegram data
+    // -----------------------------
+
+    if (telegramRedisData) {
+      await redisClient.del(telegramKey);
+    }
 
     // -----------------------------
     // Response
@@ -118,10 +157,12 @@ export const savePreferences = async (req, res) => {
         language: preference.language,
         deliveryTime: preference.deliveryTime,
         phoneNumber: preference.phoneNumber,
+
         telegram: {
           chatId: preference.telegram?.chatId || null,
           connected: preference.telegram?.connected || false,
         },
+
         isCompleted: preference.isCompleted,
       },
     });
@@ -241,10 +282,9 @@ export const getMyPreferences = async (req, res) => {
 
         // Telegram
         telegram: {
-          chatId: preference.telegram?.chatId || null,
           connected: preference.telegram?.connected || false,
         },
-        
+
         // User activity
         readStreak: user?.newsStreak || 0,
 
