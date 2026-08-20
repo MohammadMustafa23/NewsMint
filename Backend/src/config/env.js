@@ -3,6 +3,8 @@ dotenv.config();
 
 export const PORT = process.env.PORT;
 export const MONGO_URI = process.env.MONGO_URI;
+export const BACKEND_URL = process.env.BACKEND_URL;
+
 
 export const UPSTASH_REDIS_REST_URL = process.env.UPSTASH_REDIS_REST_URL;
 export const UPSTASH_REDIS_REST_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -23,6 +25,11 @@ export const GNEWS_API_KEY=process.env.GNEWS_API_KEY;
 
 // LLM Api
 export const GEMINI_API_KEY=process.env.GEMINI_API_KEY;
+
+
+// Telegram BOT 
+export const TELEGRAM_BOT_TOKEN=process.env.TELEGRAM_BOT_TOKEN;
+export const TELEGRAM_BOT_USERNAME = process.env.TELEGRAM_BOT_USERNAME;
 
 // export const REDIS_URL = process.env.REDIS_URL;
 

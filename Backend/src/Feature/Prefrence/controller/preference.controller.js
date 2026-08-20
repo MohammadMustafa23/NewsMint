@@ -14,7 +14,8 @@ export const savePreferences = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const { categories, language, deliveryTime, phoneNumber } = req.body;
+    const { categories, language, deliveryTime, phoneNumber, telegram } =
+      req.body;
 
     // -----------------------------
     // Basic validation
@@ -88,6 +89,12 @@ export const savePreferences = async (req, res) => {
         language,
         deliveryTime,
         phoneNumber: cleanPhoneNumber,
+
+        telegram: {
+          chatId: telegram?.chatId || null,
+          connected: telegram?.connected || false,
+        },
+
         isCompleted: true,
       },
       {
@@ -111,6 +118,10 @@ export const savePreferences = async (req, res) => {
         language: preference.language,
         deliveryTime: preference.deliveryTime,
         phoneNumber: preference.phoneNumber,
+        telegram: {
+          chatId: preference.telegram?.chatId || null,
+          connected: preference.telegram?.connected || false,
+        },
         isCompleted: preference.isCompleted,
       },
     });
@@ -123,7 +134,6 @@ export const savePreferences = async (req, res) => {
     });
   }
 };
-
 
 const getNextDigestTime = (deliveryTime, timezone) => {
   if (!deliveryTime) {
@@ -229,6 +239,12 @@ export const getMyPreferences = async (req, res) => {
         // WhatsApp
         phoneNumber: preference.phoneNumber,
 
+        // Telegram
+        telegram: {
+          chatId: preference.telegram?.chatId || null,
+          connected: preference.telegram?.connected || false,
+        },
+        
         // User activity
         readStreak: user?.newsStreak || 0,
 
@@ -271,6 +287,3 @@ export const checkMyPreferences = async (req, res) => {
     });
   }
 };
-
-
-

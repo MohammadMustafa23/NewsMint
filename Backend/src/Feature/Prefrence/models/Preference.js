@@ -59,6 +59,17 @@ const preferenceSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    telegram: {
+      chatId: {
+        type: String,
+        default: null,
+      },
+
+      connected: {
+        type: Boolean,
+        default: false,
+      },
+    },
   },
   {
     timestamps: true,
