@@ -11,11 +11,11 @@ export default function LandingPage() {
 
         <main>
           <HeroSection />
-          <FeaturesShow/>
-          <HowWork/>
+          <FeaturesShow />
+          <HowWork />
         </main>
 
-        <Footer/>
+        <Footer />
       </div>
     </>
   );

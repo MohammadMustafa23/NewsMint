@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import "./style/DigestSetupForm.css";
-import SpinLoader from '../../common/SpinLoader'
-
-
+import SpinLoader from "../../common/SpinLoader";
+import api from '../../services/axois.js'
 const CATEGORIES = ["Tech", "Rajasthan", "India", "Markets", "Startups"];
-
 const DELIVERY_TIMES = [
   "06:00 AM (IST)",
   "06:30 AM (IST)",
@@ -23,12 +21,17 @@ const DigestSetupForm = ({
   selectedCategories = [],
   selectedLanguage = "English",
   deliveryTime = "07:30 AM (IST)",
+  telegram = {
+    chatId: null,
+    connected: false,
+  },
 
   onSave,
   onCategoryToggle,
   onLanguageChange,
   onTimeChange,
   onPhoneChange,
+  onTelegramConnect,
 }) => {
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
@@ -189,6 +192,11 @@ const DigestSetupForm = ({
         language: selectedLanguage,
         deliveryTime,
         phoneNumber: phoneNumber.replace(/\D/g, ""),
+
+        telegram: {
+          chatId: telegram?.chatId || null,
+          connected: telegram?.connected || false,
+        },
       });
 
       setSubmitSuccess(true);
@@ -205,6 +213,19 @@ const DigestSetupForm = ({
       setIsSubmitting(false);
     }
   };
+
+  const handleTelegramConnect = async () => {
+    try {
+      const response = await api.get("/telegram/connect", {
+        withCredentials: true,
+      });
+
+      window.open(response.data.telegramUrl, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.error("Telegram connection failed:", error);
+    }
+  };
+
   return (
     <div className="digest-setup-form">
       {/* Heading */}
@@ -377,6 +398,69 @@ const DigestSetupForm = ({
 
         {/* Server Error */}
         {submitError && <div className="form-submit-error">{submitError}</div>}
+
+        {/* Telegram */}
+        <div className="form-section telegram-section">
+          <label className="form-label">Telegram</label>
+
+          <div className="telegram-connect-card">
+            <div className="telegram-info">
+              <div className="telegram-icon">✈</div>
+
+              <div>
+                <h3>Get your digest on Telegram</h3>
+
+                <p>
+                  Connect your Telegram account to receive your daily NewsMint
+                  digest.
+                </p>
+              </div>
+            </div>
+
+            {telegram?.connected ? (
+              <div className="telegram-connected">
+                <span className="telegram-status-dot" />
+
+                <span>Telegram Connected</span>
+
+                <button
+                  type="button"
+                  className="telegram-change-btn"
+                  onClick={() =>
+                    onTelegramConnect?.({
+                      chatId: null,
+                      connected: false,
+                    })
+                  }
+                >
+                  Disconnect
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="telegram-connect-btn"
+                onClick={handleTelegramConnect}
+              >
+                <span>Connect Telegram</span>
+
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Success */}
         {submitSuccess && (

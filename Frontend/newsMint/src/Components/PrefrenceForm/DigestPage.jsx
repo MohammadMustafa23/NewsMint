@@ -17,6 +17,11 @@ const DigestPage = () => {
     language: "English",
     deliveryTime: "07:30 AM (IST)",
     phoneNumber: "9876543210",
+
+    telegram: {
+      chatId: null,
+      connected: false,
+    },
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -110,6 +115,22 @@ const DigestPage = () => {
     }));
   };
 
+  /*
+   * -----------------------------------------
+   * Telegram
+   * -----------------------------------------
+   */
+
+  const handleTelegramConnect = (telegramData) => {
+    setPreferences((prev) => ({
+      ...prev,
+      telegram: {
+        chatId: telegramData.chatId,
+        connected: true,
+      },
+    }));
+  };
+
   return (
     <div className="digest-page">
       <div className="digest-page__grid">
@@ -125,6 +146,8 @@ const DigestPage = () => {
           onLanguageChange={handleLanguageChange}
           onTimeChange={handleTimeChange}
           onPhoneChange={handlePhoneChange}
+          telegram={preferences.telegram}
+          onTelegramConnect={handleTelegramConnect}
         />
 
         {/* Live Preview */}
