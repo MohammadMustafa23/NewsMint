@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import api from "../../../services/axois.js";
+import SpinLoader from "../../../common/SpinLoader.jsx";
 import "./style/DashPreferences.css";
-
+import { connectTelegram } from "../../../services/telegram.service.js";
 const TOPICS = ["Tech", "Business", "Rajasthan", "Politics", "Sports"];
 const LANGUAGES = ["English", "Hindi"];
 
@@ -9,6 +11,7 @@ const DashPreferences = ({
   selectedLanguage = "English",
   deliveryTime = "",
   phoneNumber = "",
+  isTelegramConnected = false,
   sourcesText = "",
   timeZoneText = "All times shown in IST (Asia/Kolkata)",
   savedMessage = "",
@@ -18,7 +21,7 @@ const DashPreferences = ({
   onTimeChange,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-
+  const [isTelegramConnecting, setIsTelegramConnecting] = useState(false);
   const [topics, setTopics] = useState(selectedTopics);
   const [language, setLanguage] = useState(selectedLanguage);
   const [phone, setPhone] = useState(phoneNumber);
@@ -59,6 +62,32 @@ const DashPreferences = ({
     setIsEditing(false);
   };
 
+  const handleTelegramConnect = async () => {
+    if (isTelegramConnecting) return;
+
+    try {
+      setIsTelegramConnecting(true);
+
+      await connectTelegram({
+        onConnected: () => {
+          setIsTelegramConnecting(false);
+          // Parent should refresh preferences here
+          onUpdate?.({
+            refreshTelegram: true,
+          });
+        },
+
+        onTimeout: () => {
+          setIsTelegramConnecting(false);
+          console.log("Telegram connection timed out.");
+        },
+      });
+    } catch (error) {
+      console.error("Telegram connection failed:", error);
+
+      setIsTelegramConnecting(false);
+    }
+  };
   return (
     <div className="dash-preferences">
       {/* Topics */}
@@ -229,6 +258,60 @@ const DashPreferences = ({
           />
         </div>
       </div>
+
+      {/* Telegram */}
+      <div className="dash-pref-section">
+        <div className="dash-pref-section__header">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M22 2 11 13" />
+            <path d="m22 2-7 20-4-9-9-4Z" />
+          </svg>
+
+          <span>Telegram</span>
+        </div>
+
+        <div className="dash-pref-telegram">
+          {isTelegramConnected ? (
+            <>
+              <div className="dash-pref-telegram__status dash-pref-telegram__status--connected">
+                <span className="dash-pref-telegram__dot" />
+                <span>Telegram Connected</span>
+              </div>
+
+              <span className="dash-pref-telegram__badge">Connected</span>
+            </>
+          ) : (
+            <>
+              <div className="dash-pref-telegram__status dash-pref-telegram__status--disconnected">
+                <span className="dash-pref-telegram__dot" />
+                <span>Telegram Not Connected</span>
+              </div>
+
+              <button
+                type="button"
+                className="dash-pref-telegram__connect-btn"
+                onClick={handleTelegramConnect}
+                disabled={isTelegramConnecting}
+              >
+                {isTelegramConnecting
+                  ? "Waiting for Telegram..."
+                  : "Connect Telegram"}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      <hr className="dash-pref-divider" />
 
       {/* Actions */}
       <div className="dash-pref-actions">

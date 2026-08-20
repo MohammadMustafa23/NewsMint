@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./style/DigestSetupForm.css";
 import SpinLoader from "../../common/SpinLoader";
-import api from '../../services/axois.js'
+import { connectTelegram } from "../../services/telegram.service";
 const CATEGORIES = ["Tech", "Rajasthan", "India", "Markets", "Startups"];
 const DELIVERY_TIMES = [
   "06:00 AM (IST)",
@@ -36,6 +36,8 @@ const DigestSetupForm = ({
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTelegramConnecting, setIsTelegramConnecting] = useState(false);
+  const telegramPollTimeoutRef = useRef(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   /*
@@ -172,7 +174,6 @@ const DigestSetupForm = ({
    */
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     if (isSubmitting) return;
 
     setSubmitError("");
@@ -214,18 +215,47 @@ const DigestSetupForm = ({
     }
   };
 
-  const handleTelegramConnect = async () => {
-    try {
-      const response = await api.get("/telegram/connect", {
-        withCredentials: true,
-      });
+  useEffect(() => {
+    return () => {
+      if (telegramPollTimeoutRef.current) {
+        clearTimeout(telegramPollTimeoutRef.current);
+      }
+    };
+  }, []);
 
-      window.open(response.data.telegramUrl, "_blank", "noopener,noreferrer");
+  const handleTelegramConnect = async () => {
+    if (isTelegramConnecting) return;
+
+    setIsTelegramConnecting(true);
+    setSubmitError("");
+
+    try {
+      await connectTelegram({
+        onConnected: (status) => {
+          onTelegramConnect?.({
+            chatId: status?.telegram?.chatId || null,
+            connected: true,
+          });
+          setIsTelegramConnecting(false);
+        },
+
+        onTimeout: () => {
+          setIsTelegramConnecting(false);
+          setSubmitError("Telegram connection timed out. Please try again.");
+        },
+      });
     } catch (error) {
       console.error("Telegram connection failed:", error);
+
+      setIsTelegramConnecting(false);
+
+      setSubmitError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Unable to connect Telegram.",
+      );
     }
   };
-
   return (
     <div className="digest-setup-form">
       {/* Heading */}
@@ -441,22 +471,33 @@ const DigestSetupForm = ({
                 type="button"
                 className="telegram-connect-btn"
                 onClick={handleTelegramConnect}
+                disabled={isTelegramConnecting}
+                aria-busy={isTelegramConnecting}
               >
-                <span>Connect Telegram</span>
+                {isTelegramConnecting ? (
+                  <>
+                    <SpinLoader />
+                    <span>Waiting for Telegram...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Connect Telegram</span>
 
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  </>
+                )}
               </button>
             )}
           </div>

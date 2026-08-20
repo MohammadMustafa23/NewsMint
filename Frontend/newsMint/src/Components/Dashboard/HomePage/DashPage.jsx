@@ -106,6 +106,7 @@ const DashPage = () => {
             selectedLanguage={preferences.language}
             deliveryTime={preferences.deliveryTime}
             phoneNumber={preferences.phoneNumber}
+            isTelegramConnected={preferences.telegram?.connected || false}
             sourcesText={
               preferences.sources?.length
                 ? `via ${preferences.sources.join(", ")}`
