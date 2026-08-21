@@ -2,12 +2,14 @@ import Preference from "../models/Preference.js";
 import User from "../../Auth/models/user.model.js";
 import { redisClient } from "../../../config/redis.js";
 import { getNextDeliveryAt } from "../../../Scheduler/util/digestTime.util.js";
+
 const ALLOWED_CATEGORIES = [
-  "Tech",
-  "Rajasthan",
   "India",
-  "Markets",
-  "Startups",
+  "Technology",
+  "Sports",
+  "World",
+  "Entertainment",
+  "General",
 ];
 
 const ALLOWED_LANGUAGES = ["English", "Hindi"];

@@ -9,6 +9,11 @@ const parser = new Parser({
 
 const MAX_ARTICLES_PER_CATEGORY = 5;
 
+// NewsMint scheduler runs twice a day.
+// Keep a 24-hour window so delayed RSS feeds
+// don't cause valid news to be missed.
+const NEWS_LOOKBACK_HOURS = 24;
+
 const createContentHash = (url) => {
   return crypto
     .createHash("sha256")
@@ -17,7 +22,9 @@ const createContentHash = (url) => {
 };
 
 const cleanText = (text = "") => {
-  return text
+  if (!text) return "";
+
+  return String(text)
     .replace(/<[^>]*>/g, "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
@@ -27,12 +34,6 @@ const cleanText = (text = "") => {
     .trim();
 };
 
-/*
- * TEMPORARY CATEGORY DETECTION
- *
- * Later we will replace this with real
- * category information from the source/API.
- */
 const CATEGORY_KEYWORDS = {
   India: [
     "india",
@@ -160,10 +161,6 @@ const detectCategory = (item, source) => {
     ${item.description || ""}
   `.toLowerCase();
 
-  /*
-   * Only detect categories that this source
-   * actually supports.
-   */
   for (const category of allowedCategories) {
     const keywords = CATEGORY_KEYWORDS[category] || [];
 
@@ -176,16 +173,6 @@ const detectCategory = (item, source) => {
     }
   }
 
-  /*
-   * TEMPORARY FALLBACK
-   *
-   * If we cannot identify the category from
-   * the RSS item, use the first category
-   * configured for the source.
-   *
-   * This will be replaced later with genuine
-   * source/feed category information.
-   */
   return allowedCategories[0];
 };
 
@@ -207,31 +194,77 @@ const extractImage = (item) => {
 
 export const fetchRSSSource = async (source) => {
   try {
+    // ==========================================
+    // 1. VALIDATION
+    // ==========================================
+
+    if (!source) {
+      throw new Error("RSS source is required");
+    }
+
     if (!source.rssUrl) {
       throw new Error(`RSS URL not configured for ${source.name}`);
     }
 
-    console.log(`Fetching RSS: ${source.name}`);
+    console.log(`\n📡 Fetching RSS: ${source.name}`);
+
+    // ==========================================
+    // 2. FETCH RSS
+    // ==========================================
 
     const feed = await parser.parseURL(source.rssUrl);
 
-    console.log(`${source.name}: ${feed.items.length} articles found`);
+    console.log(`📰 ${source.name}: ${feed.items.length} RSS items found`);
+
+    // ==========================================
+    // 3. TIME WINDOW
+    // ==========================================
+
+    const now = new Date();
+
+    const since = new Date(
+      now.getTime() - NEWS_LOOKBACK_HOURS * 60 * 60 * 1000,
+    );
+
+    console.log(
+      `🕐 Looking for news from ${since.toISOString()} to ${now.toISOString()}`,
+    );
+
+    // ==========================================
+    // 4. COUNTERS
+    // ==========================================
 
     let saved = 0;
     let skipped = 0;
 
-    /*
-     * Track how many articles we have stored
-     * for each category during this fetch.
-     */
     const categoryCounts = {};
 
     for (const category of source.categories || []) {
       categoryCounts[category] = 0;
     }
 
-    for (const item of feed.items) {
+    // ==========================================
+    // 5. SORT RSS ITEMS BY PUBLISHED DATE
+    // ==========================================
+
+    const sortedItems = [...feed.items].sort((a, b) => {
+      const dateA = a.pubDate ? new Date(a.pubDate).getTime() : 0;
+
+      const dateB = b.pubDate ? new Date(b.pubDate).getTime() : 0;
+
+      return dateB - dateA;
+    });
+
+    // ==========================================
+    // 6. PROCESS ARTICLES
+    // ==========================================
+
+    for (const item of sortedItems) {
       try {
+        // ------------------------------------------
+        // Basic validation
+        // ------------------------------------------
+
         if (!item.title || !item.link) {
           skipped++;
           continue;
@@ -245,35 +278,78 @@ export const fetchRSSSource = async (source) => {
 
         const url = item.link.trim();
 
-        /*
-         * Determine category.
-         */
-        const category = detectCategory(item, source);
+        if (!title || !url) {
+          skipped++;
+          continue;
+        }
+
+        // ------------------------------------------
+        // Published date
+        // ------------------------------------------
+
+        let publishedAt = null;
+
+        if (item.pubDate) {
+          const date = new Date(item.pubDate);
+
+          if (!Number.isNaN(date.getTime())) {
+            publishedAt = date;
+          }
+        }
 
         /*
-         * Only allow categories configured
-         * on this source.
+         * If RSS does not provide a valid date,
+         * skip the article.
+         *
+         * This is important because we cannot
+         * verify whether it is actually latest.
          */
+        if (!publishedAt) {
+          console.log(`⏭️ No valid publication date: ${title}`);
+
+          skipped++;
+          continue;
+        }
+
+        // ------------------------------------------
+        // Latest news filter
+        // ------------------------------------------
+
+        if (publishedAt < since) {
+          skipped++;
+          continue;
+        }
+
+        // Future-dated RSS article
+        if (publishedAt > now) {
+          skipped++;
+          continue;
+        }
+
+        // ------------------------------------------
+        // Category
+        // ------------------------------------------
+
+        const category = detectCategory(item, source);
+
         if (!source.categories?.includes(category)) {
           skipped++;
           continue;
         }
 
-        /*
-         * Maximum 5 articles per category
-         * for this source during this fetch.
-         */
+        // ------------------------------------------
+        // Category limit
+        // ------------------------------------------
+
         if (categoryCounts[category] >= MAX_ARTICLES_PER_CATEGORY) {
           skipped++;
           continue;
         }
 
-        /*
-         * URL-based hash.
-         *
-         * This allows RSS/API providers to
-         * detect the same article later.
-         */
+        // ------------------------------------------
+        // Duplicate check
+        // ------------------------------------------
+
         const contentHash = createContentHash(url);
 
         const exists = await NewsArticle.exists({
@@ -285,15 +361,9 @@ export const fetchRSSSource = async (source) => {
           continue;
         }
 
-        let publishedAt = null;
-
-        if (item.pubDate) {
-          const date = new Date(item.pubDate);
-
-          if (!Number.isNaN(date.getTime())) {
-            publishedAt = date;
-          }
-        }
+        // ------------------------------------------
+        // Save article
+        // ------------------------------------------
 
         await NewsArticle.create({
           source: source._id,
@@ -312,43 +382,65 @@ export const fetchRSSSource = async (source) => {
 
           category,
 
-          /*
-           * Store only the source's allowed
-           * categories as tags for now.
-           */
           tags: source.categories || [],
 
           fetchMethod: "rss",
 
           contentHash,
 
-          newsDate: new Date(),
+          /*
+           * Time when NewsMint fetched
+           * the article.
+           */
+          newsDate: now,
+
+          ai: {
+            processed: false,
+          },
         });
 
         categoryCounts[category]++;
 
         saved++;
       } catch (articleError) {
-        console.error(`Article Error: ${item.title}`, articleError.message);
+        /*
+         * One bad RSS article should not
+         * stop the complete source.
+         */
+
+        console.error(`❌ Article Error: ${item.title}`, articleError.message);
       }
     }
 
-    console.log(`${source.name} category counts:`, categoryCounts);
+    // ==========================================
+    // 7. RESULT
+    // ==========================================
+
+    console.log(`📊 ${source.name} category counts:`, categoryCounts);
+
+    console.log(`✅ ${source.name} | Saved: ${saved} | Skipped: ${skipped}`);
 
     return {
       success: true,
+
       source: source.name,
+
       total: feed.items.length,
+
       saved,
+
       skipped,
+
       categoryCounts,
     };
   } catch (error) {
-    console.error(`RSS Error - ${source.name}:`, error.message);
+    console.error(`❌ RSS Error - ${source?.name || "RSS"}:`, error.message);
 
     return {
       success: false,
-      source: source.name,
+
+      source: source?.name || "RSS",
+
       message: error.message,
     };
   }

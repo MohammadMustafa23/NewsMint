@@ -7,6 +7,7 @@ import NewsArticle from "../../models/NewsArticle.js";
 const GNEWS_URL = "https://gnews.io/api/v4/top-headlines";
 
 const MAX_ARTICLES_PER_CATEGORY = 5;
+const MAX_API_ARTICLES = 20;
 
 const createContentHash = (url) => {
   return crypto
@@ -16,7 +17,9 @@ const createContentHash = (url) => {
 };
 
 const cleanText = (text = "") => {
-  return text
+  if (!text) return "";
+
+  return String(text)
     .replace(/<[^>]*>/g, "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
@@ -27,13 +30,11 @@ const cleanText = (text = "") => {
 };
 
 /*
- * TEMPORARY CATEGORY DETECTION
+ * NewsMint category detection.
  *
- * GNews response does not currently give us
- * a reliable NewsMint category.
- *
- * So we detect category from title +
- * description.
+ * GNews top-headlines does not always provide
+ * a category that matches our NewsMint categories,
+ * so we detect it from title + description.
  */
 const CATEGORY_KEYWORDS = {
   India: [
@@ -41,6 +42,7 @@ const CATEGORY_KEYWORDS = {
     "indian",
     "delhi",
     "mumbai",
+    "jaipur",
     "rajasthan",
     "uttar pradesh",
     "bihar",
@@ -160,8 +162,8 @@ const getCategory = (item, source) => {
   `.toLowerCase();
 
   /*
-   * Only search through categories that
-   * this Source actually supports.
+   * Only check categories configured
+   * for this particular source.
    */
   for (const category of allowedCategories) {
     const keywords = CATEGORY_KEYWORDS[category] || [];
@@ -176,13 +178,17 @@ const getCategory = (item, source) => {
   }
 
   /*
-   * TEMPORARY FALLBACK
+   * Fallback to first configured category.
    */
   return allowedCategories[0];
 };
 
 export const fetchGNews = async (source) => {
   try {
+    // ==========================================
+    // 1. VALIDATION
+    // ==========================================
+
     if (!source) {
       throw new Error("GNews source is required");
     }
@@ -191,22 +197,44 @@ export const fetchGNews = async (source) => {
       throw new Error("GNews API key is not configured");
     }
 
-    console.log(`Fetching API: ${source.name}`);
+    console.log(`\n📡 Fetching GNews: ${source.name}`);
+
+    // ==========================================
+    // 2. API PARAMETERS
+    // ==========================================
+
+    const params = {
+      apikey: GNEWS_API_KEY,
+
+      country: "in",
+
+      lang: "en",
+
+      max: MAX_API_ARTICLES,
+    };
+
+    // ==========================================
+    // 3. API REQUEST
+    // ==========================================
 
     const response = await axios.get(GNEWS_URL, {
-      params: {
-        apikey: GNEWS_API_KEY,
-        country: "in",
-        lang: "en",
-        max: 10,
-      },
-
+      params,
       timeout: 15000,
     });
 
-    const articles = response.data.articles || [];
+    if (response.data?.errors && response.data.errors.length) {
+      throw new Error(response.data.errors.join(", "));
+    }
 
-    console.log(`${source.name}: ${articles.length} articles found`);
+    const articles = Array.isArray(response.data?.articles)
+      ? response.data.articles
+      : [];
+
+    console.log(`📰 ${source.name}: ${articles.length} articles found`);
+
+    // ==========================================
+    // 4. COUNTERS
+    // ==========================================
 
     let saved = 0;
     let skipped = 0;
@@ -217,8 +245,16 @@ export const fetchGNews = async (source) => {
       categoryCounts[category] = 0;
     }
 
+    // ==========================================
+    // 5. PROCESS ARTICLES
+    // ==========================================
+
     for (const item of articles) {
       try {
+        // ------------------------------------------
+        // Basic validation
+        // ------------------------------------------
+
         if (!item.title || !item.url) {
           skipped++;
           continue;
@@ -230,9 +266,15 @@ export const fetchGNews = async (source) => {
 
         const url = item.url.trim();
 
-        /*
-         * Determine category.
-         */
+        if (!title || !url) {
+          skipped++;
+          continue;
+        }
+
+        // ------------------------------------------
+        // Category
+        // ------------------------------------------
+
         const category = getCategory(item, source);
 
         if (!category) {
@@ -240,17 +282,19 @@ export const fetchGNews = async (source) => {
           continue;
         }
 
-        /*
-         * Maximum 5 articles per category.
-         */
+        // ------------------------------------------
+        // Category limit
+        // ------------------------------------------
+
         if (categoryCounts[category] >= MAX_ARTICLES_PER_CATEGORY) {
           skipped++;
           continue;
         }
 
-        /*
-         * URL based duplicate check.
-         */
+        // ------------------------------------------
+        // Duplicate check
+        // ------------------------------------------
+
         const contentHash = createContentHash(url);
 
         const exists = await NewsArticle.exists({
@@ -262,6 +306,10 @@ export const fetchGNews = async (source) => {
           continue;
         }
 
+        // ------------------------------------------
+        // Published date
+        // ------------------------------------------
+
         let publishedAt = null;
 
         if (item.publishedAt) {
@@ -272,11 +320,16 @@ export const fetchGNews = async (source) => {
           }
         }
 
-        /*
-         * GNews source.name is the publisher,
-         * NOT the article author.
-         */
+        // ------------------------------------------
+        // GNews source is publisher,
+        // not necessarily article author.
+        // ------------------------------------------
+
         const author = "";
+
+        // ------------------------------------------
+        // Save article
+        // ------------------------------------------
 
         await NewsArticle.create({
           source: source._id,
@@ -302,17 +355,32 @@ export const fetchGNews = async (source) => {
           contentHash,
 
           newsDate: new Date(),
+
+          ai: {
+            processed: false,
+          },
         });
 
         categoryCounts[category]++;
 
         saved++;
       } catch (articleError) {
-        console.error(`Article Error: ${item.title}`, articleError.message);
+        /*
+         * One article failure should not
+         * stop the complete GNews fetch.
+         */
+
+        console.error(`❌ Article Error: ${item.title}`, articleError.message);
       }
     }
 
-    console.log(`${source.name} category counts:`, categoryCounts);
+    // ==========================================
+    // 6. RESULT
+    // ==========================================
+
+    console.log(`📊 ${source.name} category counts:`, categoryCounts);
+
+    console.log(`✅ ${source.name} | Saved: ${saved} | Skipped: ${skipped}`);
 
     return {
       success: true,
@@ -328,8 +396,12 @@ export const fetchGNews = async (source) => {
       categoryCounts,
     };
   } catch (error) {
+    // ==========================================
+    // API ERROR
+    // ==========================================
+
     console.error(
-      `GNews Error - ${source?.name || "GNews"}:`,
+      `❌ GNews Error - ${source?.name || "GNews"}:`,
       error.response?.data || error.message,
     );
 
@@ -338,7 +410,10 @@ export const fetchGNews = async (source) => {
 
       source: source?.name || "GNews",
 
-      message: error.response?.data?.message || error.message,
+      message:
+        error.response?.data?.errors?.join(", ") ||
+        error.response?.data?.message ||
+        error.message,
     };
   }
 };

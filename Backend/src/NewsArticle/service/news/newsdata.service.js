@@ -16,7 +16,9 @@ const createContentHash = (url) => {
 };
 
 const cleanText = (text = "") => {
-  return text
+  if (!text) return "";
+
+  return String(text)
     .replace(/<[^>]*>/g, "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
@@ -27,13 +29,34 @@ const cleanText = (text = "") => {
 };
 
 /*
- * TEMPORARY
+ * NewsData categories are different from
+ * NewsMint categories.
  *
- * NewsData already provides categories,
- * so we first try to use the API category.
- *
- * Later we can improve category mapping
- * when the complete category system is ready.
+ * This mapping converts NewsData categories
+ * into our NewsMint categories.
+ */
+const CATEGORY_MAP = {
+  business: "Business",
+  economy: "Business",
+
+  technology: "Technology",
+
+  sports: "Sports",
+
+  entertainment: "Entertainment",
+
+  world: "World",
+
+  politics: "India",
+
+  domestic: "India",
+
+  top: "General",
+};
+
+/*
+ * Convert NewsData category into one of our
+ * NewsMint categories.
  */
 const getCategory = (item, source) => {
   const allowedCategories = source.categories || [];
@@ -45,35 +68,44 @@ const getCategory = (item, source) => {
   const apiCategories = Array.isArray(item.category) ? item.category : [];
 
   /*
-   * Find the first API category that exists
-   * in our Source categories.
+   * First try to map the API category.
    */
-  const matchedCategory = apiCategories.find((category) =>
-    allowedCategories.some(
-      (allowedCategory) =>
-        allowedCategory.toLowerCase() === category.toLowerCase(),
-    ),
-  );
+  for (const apiCategory of apiCategories) {
+    const normalizedCategory = CATEGORY_MAP[apiCategory?.toLowerCase()];
 
-  if (matchedCategory) {
-    return allowedCategories.find(
+    if (!normalizedCategory) {
+      continue;
+    }
+
+    /*
+     * Check if the mapped NewsMint category
+     * is allowed for this source.
+     */
+    const matched = allowedCategories.find(
       (allowedCategory) =>
-        allowedCategory.toLowerCase() === matchedCategory.toLowerCase(),
+        allowedCategory.toLowerCase() === normalizedCategory.toLowerCase(),
     );
+
+    if (matched) {
+      return matched;
+    }
   }
 
   /*
-   * TEMPORARY FALLBACK
-   *
-   * If NewsData category doesn't match our
-   * current Source categories, use the first
-   * allowed category.
+   * Fallback:
+   * If API category cannot be mapped,
+   * use the first category configured
+   * for this source.
    */
   return allowedCategories[0];
 };
 
 export const fetchNewsData = async (source) => {
   try {
+    // ==========================================
+    // 1. VALIDATION
+    // ==========================================
+
     if (!source) {
       throw new Error("NewsData source is required");
     }
@@ -82,37 +114,119 @@ export const fetchNewsData = async (source) => {
       throw new Error("NewsData API key is not configured");
     }
 
-    console.log(`Fetching API: ${source.name}`);
+    console.log(`\n📡 Fetching NewsData: ${source.name}`);
+
+    // ==========================================
+    // 2. BUILD API PARAMETERS
+    // ==========================================
+
+    const params = {
+      apikey: NEWSDATA_API_KEY,
+
+      country: "in",
+
+      language: "en",
+
+      /*
+       * Ask NewsData to remove duplicates
+       * from its own response.
+       */
+      removeduplicate: 1,
+    };
+
+    /*
+     * NewsData supports category filtering.
+     *
+     * We only send categories that can be
+     * understood by NewsData.
+     */
+    const newsDataCategories = [];
+
+    for (const category of source.categories || []) {
+      const normalized = category.toLowerCase();
+
+      if (normalized === "business") {
+        newsDataCategories.push("business");
+      }
+
+      if (normalized === "technology") {
+        newsDataCategories.push("technology");
+      }
+
+      if (normalized === "sports") {
+        newsDataCategories.push("sports");
+      }
+
+      if (normalized === "entertainment") {
+        newsDataCategories.push("entertainment");
+      }
+
+      if (normalized === "world") {
+        newsDataCategories.push("world");
+      }
+
+      if (normalized === "india") {
+        newsDataCategories.push("politics");
+        newsDataCategories.push("domestic");
+      }
+    }
+
+    /*
+     * NewsData allows multiple categories.
+     */
+    if (newsDataCategories.length) {
+      params.category = [...new Set(newsDataCategories)].join(",");
+    }
+
+    // ==========================================
+    // 3. API REQUEST
+    // ==========================================
 
     const response = await axios.get(NEWSDATA_URL, {
-      params: {
-        apikey: NEWSDATA_API_KEY,
-        country: "in",
-        language: "en",
-      },
-
+      params,
       timeout: 15000,
     });
 
-    const articles = response.data.results || [];
+    // ==========================================
+    // 4. API RESPONSE VALIDATION
+    // ==========================================
 
-    console.log(`${source.name}: ${articles.length} articles found`);
+    if (response.data?.status !== "success") {
+      throw new Error(
+        response.data?.message ||
+          "NewsData API returned an unsuccessful response",
+      );
+    }
+
+    const articles = Array.isArray(response.data.results)
+      ? response.data.results
+      : [];
+
+    console.log(`📰 ${source.name}: ${articles.length} articles found`);
+
+    // ==========================================
+    // 5. COUNTERS
+    // ==========================================
 
     let saved = 0;
     let skipped = 0;
 
-    /*
-     * Track how many articles we save
-     * for each category.
-     */
     const categoryCounts = {};
 
     for (const category of source.categories || []) {
       categoryCounts[category] = 0;
     }
 
+    // ==========================================
+    // 6. PROCESS ARTICLES
+    // ==========================================
+
     for (const item of articles) {
       try {
+        // ------------------------------------------
+        // Basic validation
+        // ------------------------------------------
+
         if (!item.title || !item.link) {
           skipped++;
           continue;
@@ -120,34 +234,39 @@ export const fetchNewsData = async (source) => {
 
         const title = cleanText(item.title);
 
-        const description = cleanText(item.description || "");
+        const description = cleanText(item.description || item.content || "");
 
         const url = item.link.trim();
 
-        /*
-         * Determine category.
-         */
+        if (!title || !url) {
+          skipped++;
+          continue;
+        }
+
+        // ------------------------------------------
+        // Category
+        // ------------------------------------------
+
         const category = getCategory(item, source);
 
-        /*
-         * No valid category.
-         */
         if (!category) {
           skipped++;
           continue;
         }
 
-        /*
-         * Maximum 5 articles per category.
-         */
+        // ------------------------------------------
+        // Maximum articles per category
+        // ------------------------------------------
+
         if (categoryCounts[category] >= MAX_ARTICLES_PER_CATEGORY) {
           skipped++;
           continue;
         }
 
-        /*
-         * URL based duplicate hash.
-         */
+        // ------------------------------------------
+        // Duplicate hash
+        // ------------------------------------------
+
         const contentHash = createContentHash(url);
 
         const exists = await NewsArticle.exists({
@@ -159,6 +278,10 @@ export const fetchNewsData = async (source) => {
           continue;
         }
 
+        // ------------------------------------------
+        // Published date
+        // ------------------------------------------
+
         let publishedAt = null;
 
         if (item.pubDate) {
@@ -169,11 +292,23 @@ export const fetchNewsData = async (source) => {
           }
         }
 
+        // ------------------------------------------
+        // Author
+        // ------------------------------------------
+
         const author = Array.isArray(item.creator)
           ? item.creator[0] || ""
           : item.creator || "";
 
+        // ------------------------------------------
+        // Tags
+        // ------------------------------------------
+
         const tags = Array.isArray(item.keywords) ? item.keywords : [];
+
+        // ------------------------------------------
+        // Save article
+        // ------------------------------------------
 
         await NewsArticle.create({
           source: source._id,
@@ -198,18 +333,41 @@ export const fetchNewsData = async (source) => {
 
           contentHash,
 
+          /*
+           * This is the time NewsMint fetched
+           * the article.
+           */
           newsDate: new Date(),
+
+          /*
+           * AI processing starts as false
+           * automatically from schema default.
+           */
+          ai: {
+            processed: false,
+          },
         });
 
         categoryCounts[category]++;
 
         saved++;
       } catch (articleError) {
-        console.error(`Article Error: ${item.title}`, articleError.message);
+        /*
+         * One bad article should NOT stop
+         * the complete source.
+         */
+
+        console.error(`❌ Article Error: ${item.title}`, articleError.message);
       }
     }
 
-    console.log(`${source.name} category counts:`, categoryCounts);
+    // ==========================================
+    // 7. RESULT
+    // ==========================================
+
+    console.log(`📊 ${source.name} category counts:`, categoryCounts);
+
+    console.log(`✅ ${source.name} | Saved: ${saved} | Skipped: ${skipped}`);
 
     return {
       success: true,
@@ -225,8 +383,12 @@ export const fetchNewsData = async (source) => {
       categoryCounts,
     };
   } catch (error) {
+    // ==========================================
+    // API ERROR
+    // ==========================================
+
     console.error(
-      `NewsData Error - ${source?.name || "NewsData.io"}:`,
+      `❌ NewsData Error - ${source?.name || "NewsData.io"}:`,
       error.response?.data || error.message,
     );
 

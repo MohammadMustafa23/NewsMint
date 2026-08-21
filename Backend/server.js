@@ -5,9 +5,11 @@ import app from "./src/app.js";
 import connectDB from "./src/db/db.connection.js";
 import { connectRedis } from "./src/config/redis.js";
 import startTelegramPolling from "./src/TelegramBOT/service/telegram.service.js";
-import startDigestScheduler from "./src/Scheduler/digest.scheduler.js"
+import startDigestScheduler from "./src/Scheduler/digest.scheduler.js";
 import { PORT } from "./src/config/env.js";
 import { processDueUsers } from "./src/Scheduler/digest.scheduler.js";
+
+import { processNewsScheduler } from "./src/Scheduler/news.scheduler.js";
 
 // Mongo DB Connection Check
 connectDB();
@@ -21,5 +23,6 @@ app.listen(PORT, async () => {
 
   await processDueUsers(); // Call the function to process due users on server start
   startDigestScheduler();
-});
+  // await processNewsScheduler();
 
+});

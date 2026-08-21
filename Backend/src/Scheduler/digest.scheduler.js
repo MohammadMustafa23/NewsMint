@@ -4,6 +4,7 @@ import NewsArticle from "../NewsArticle/models/NewsArticle.js";
 import { formatTelegramDigest } from "./util/telegram.digest.formatter.js";
 import { getNextDeliveryAt } from "./util/digestTime.util.js";
 import { sendTelegramMessage } from "../TelegramBOT/service/telegram.message.service.js";
+import { splitTelegramMessage } from "./util/telegram.message.splitter.js";
 
 export const processDueUsers = async () => {
   const now = new Date();
@@ -106,9 +107,12 @@ export const processDueUsers = async () => {
       continue;
     }
 
-    // Send Telegram
-    await sendTelegramMessage(preference.telegram.chatId, telegramMessage);
-
+    const messageChunks = splitTelegramMessage(telegramMessage);
+    console.log(`📨 Digest split into ${messageChunks.length} message(s)`);
+    for (let i = 0; i < messageChunks.length; i++) {
+      await sendTelegramMessage(preference.telegram.chatId, messageChunks[i]);
+      console.log(`📤 Message ${i + 1}/${messageChunks.length} sent`);
+    }
     // Calculate next delivery
     const nextDeliveryAt = getNextDeliveryAt(
       preference.deliveryTime,

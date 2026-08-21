@@ -7,6 +7,7 @@ import { GUARDIAN_API_KEY } from "../../../config/env.js";
 const GUARDIAN_URL = "https://content.guardianapis.com/search";
 
 const MAX_ARTICLES_PER_CATEGORY = 5;
+const MAX_API_ARTICLES = 20;
 
 const createContentHash = (url) => {
   return crypto
@@ -16,7 +17,9 @@ const createContentHash = (url) => {
 };
 
 const cleanText = (text = "") => {
-  return text
+  if (!text) return "";
+
+  return String(text)
     .replace(/<[^>]*>/g, "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
@@ -27,17 +30,16 @@ const cleanText = (text = "") => {
 };
 
 /*
- * TEMPORARY CATEGORY MAPPING
- *
- * Guardian section names do not always exactly
- * match our NewsMint categories.
+ * Guardian section → NewsMint category
  */
 const CATEGORY_MAP = {
   politics: "India",
+
   "world news": "World",
   world: "World",
 
   business: "Business",
+
   technology: "Technology",
   tech: "Technology",
 
@@ -50,6 +52,10 @@ const CATEGORY_MAP = {
   television: "Entertainment",
 };
 
+/*
+ * Convert Guardian section into
+ * one of our NewsMint categories.
+ */
 const getCategory = (item, source) => {
   const allowedCategories = source.categories || [];
 
@@ -57,10 +63,10 @@ const getCategory = (item, source) => {
     return null;
   }
 
-  const sectionName = (item.sectionName || "").trim().toLowerCase();
+  const sectionName = cleanText(item.sectionName || "").toLowerCase();
 
   /*
-   * Exact match first.
+   * 1. Exact match
    */
   const exactMatch = allowedCategories.find(
     (category) => category.toLowerCase() === sectionName,
@@ -71,7 +77,7 @@ const getCategory = (item, source) => {
   }
 
   /*
-   * Temporary mapping.
+   * 2. Mapped category
    */
   const mappedCategory = CATEGORY_MAP[sectionName];
 
@@ -86,17 +92,17 @@ const getCategory = (item, source) => {
   }
 
   /*
-   * TEMPORARY FALLBACK
-   *
-   * If Guardian's section doesn't match
-   * our current categories, use first allowed
-   * category.
+   * 3. Fallback
    */
   return allowedCategories[0];
 };
 
 export const fetchGuardianNews = async (source) => {
   try {
+    // ==========================================
+    // 1. VALIDATION
+    // ==========================================
+
     if (!source) {
       throw new Error("Guardian source is required");
     }
@@ -105,42 +111,71 @@ export const fetchGuardianNews = async (source) => {
       throw new Error("Guardian API key is not configured");
     }
 
-    console.log(`Fetching API: ${source.name}`);
+    console.log(`\n📡 Fetching Guardian: ${source.name}`);
+
+    // ==========================================
+    // 2. API PARAMETERS
+    // ==========================================
+
+    const params = {
+      "api-key": GUARDIAN_API_KEY,
+
+      "page-size": MAX_API_ARTICLES,
+
+      "order-by": "newest",
+
+      /*
+       * Only request fields we actually use.
+       */
+      "show-fields": "trailText,thumbnail,byline",
+
+      "show-tags": "keyword",
+    };
+
+    // ==========================================
+    // 3. API REQUEST
+    // ==========================================
 
     const response = await axios.get(GUARDIAN_URL, {
-      params: {
-        "api-key": GUARDIAN_API_KEY,
-
-        "page-size": 20,
-
-        "order-by": "newest",
-
-        "show-fields": "trailText,thumbnail,byline",
-
-        "show-tags": "keyword",
-      },
-
+      params,
       timeout: 15000,
     });
 
-    const articles = response.data.response?.results || [];
+    const guardianResponse = response.data?.response;
 
-    console.log(`${source.name}: ${articles.length} articles found`);
+    if (!guardianResponse) {
+      throw new Error("Invalid Guardian API response");
+    }
+
+    const articles = Array.isArray(guardianResponse.results)
+      ? guardianResponse.results
+      : [];
+
+    console.log(`📰 ${source.name}: ${articles.length} articles found`);
+
+    // ==========================================
+    // 4. COUNTERS
+    // ==========================================
 
     let saved = 0;
     let skipped = 0;
 
-    /*
-     * Track category limits.
-     */
     const categoryCounts = {};
 
     for (const category of source.categories || []) {
       categoryCounts[category] = 0;
     }
 
+    // ==========================================
+    // 5. PROCESS ARTICLES
+    // ==========================================
+
     for (const item of articles) {
       try {
+        // ------------------------------------------
+        // Basic validation
+        // ------------------------------------------
+
         if (!item.webTitle || !item.webUrl) {
           skipped++;
           continue;
@@ -152,9 +187,15 @@ export const fetchGuardianNews = async (source) => {
 
         const url = item.webUrl.trim();
 
-        /*
-         * Determine NewsMint category.
-         */
+        if (!title || !url) {
+          skipped++;
+          continue;
+        }
+
+        // ------------------------------------------
+        // Category
+        // ------------------------------------------
+
         const category = getCategory(item, source);
 
         if (!category) {
@@ -162,17 +203,19 @@ export const fetchGuardianNews = async (source) => {
           continue;
         }
 
-        /*
-         * Maximum 5 per category.
-         */
+        // ------------------------------------------
+        // Category limit
+        // ------------------------------------------
+
         if (categoryCounts[category] >= MAX_ARTICLES_PER_CATEGORY) {
           skipped++;
           continue;
         }
 
-        /*
-         * URL-based duplicate detection.
-         */
+        // ------------------------------------------
+        // Duplicate check
+        // ------------------------------------------
+
         const contentHash = createContentHash(url);
 
         const exists = await NewsArticle.exists({
@@ -184,6 +227,10 @@ export const fetchGuardianNews = async (source) => {
           continue;
         }
 
+        // ------------------------------------------
+        // Published date
+        // ------------------------------------------
+
         let publishedAt = null;
 
         if (item.webPublicationDate) {
@@ -194,11 +241,25 @@ export const fetchGuardianNews = async (source) => {
           }
         }
 
+        // ------------------------------------------
+        // Author
+        // ------------------------------------------
+
         const author = cleanText(item.fields?.byline || "");
 
+        // ------------------------------------------
+        // Tags
+        // ------------------------------------------
+
         const tags = Array.isArray(item.tags)
-          ? item.tags.map((tag) => tag.webTitle).filter(Boolean)
+          ? item.tags
+              .map((tag) => cleanText(tag.webTitle || ""))
+              .filter(Boolean)
           : [];
+
+        // ------------------------------------------
+        // Save article
+        // ------------------------------------------
 
         await NewsArticle.create({
           source: source._id,
@@ -223,18 +284,40 @@ export const fetchGuardianNews = async (source) => {
 
           contentHash,
 
+          /*
+           * Time when NewsMint fetched
+           * this article.
+           */
           newsDate: new Date(),
+
+          ai: {
+            processed: false,
+          },
         });
 
         categoryCounts[category]++;
 
         saved++;
       } catch (articleError) {
-        console.error(`Article Error: ${item.webTitle}`, articleError.message);
+        /*
+         * Continue processing remaining
+         * Guardian articles.
+         */
+
+        console.error(
+          `❌ Article Error: ${item.webTitle}`,
+          articleError.message,
+        );
       }
     }
 
-    console.log(`${source.name} category counts:`, categoryCounts);
+    // ==========================================
+    // 6. RESULT
+    // ==========================================
+
+    console.log(`📊 ${source.name} category counts:`, categoryCounts);
+
+    console.log(`✅ ${source.name} | Saved: ${saved} | Skipped: ${skipped}`);
 
     return {
       success: true,
@@ -250,8 +333,12 @@ export const fetchGuardianNews = async (source) => {
       categoryCounts,
     };
   } catch (error) {
+    // ==========================================
+    // API ERROR
+    // ==========================================
+
     console.error(
-      `Guardian Error - ${source?.name || "The Guardian"}:`,
+      `❌ Guardian Error - ${source?.name || "The Guardian"}:`,
       error.response?.data || error.message,
     );
 
