@@ -1,6 +1,7 @@
 import Preference from "../models/Preference.js";
 import User from "../../Auth/models/user.model.js";
 import { redisClient } from "../../../config/redis.js";
+import { getNextDeliveryAt } from "../../../Scheduler/util/digestTime.util.js";
 const ALLOWED_CATEGORIES = [
   "Tech",
   "Rajasthan",
@@ -15,8 +16,14 @@ export const savePreferences = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const { categories, language, deliveryTime, phoneNumber } = req.body;
-
+    const {
+      categories,
+      language,
+      deliveryTime,
+      phoneNumber,
+      telegram,
+      timezone = "Asia/Kolkata",
+    } = req.body;
     // -----------------------------
     // Basic validation
     // -----------------------------
@@ -77,6 +84,8 @@ export const savePreferences = async (req, res) => {
       });
     }
 
+    const nextDeliveryAt = getNextDeliveryAt(deliveryTime, timezone);
+
     // -----------------------------
     // Get Telegram data from Redis
     // -----------------------------
@@ -123,8 +132,14 @@ export const savePreferences = async (req, res) => {
         language,
         deliveryTime,
         phoneNumber: cleanPhoneNumber,
+        timezone,
 
-        telegram: telegramData,
+        nextDeliveryAt,
+
+        telegram: {
+          chatId: telegram?.chatId || null,
+          connected: telegram?.connected || false,
+        },
 
         isCompleted: true,
       },

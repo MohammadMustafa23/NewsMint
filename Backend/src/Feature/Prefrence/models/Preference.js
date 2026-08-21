@@ -43,6 +43,11 @@ const preferenceSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    nextDeliveryAt: {
+      type: Date,
+      default: null,
+      index: true,
+    },
 
     timezone: {
       type: String,
