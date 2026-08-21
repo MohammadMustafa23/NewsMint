@@ -81,6 +81,24 @@ const newsArticleSchema = new mongoose.Schema(
         default: false,
       },
 
+      status: {
+        type: String,
+        enum: ["pending", "processing", "completed", "failed"],
+        default: "pending",
+        index: true,
+      },
+
+      attempts: {
+        type: Number,
+        default: 0,
+      },
+
+      nextRetryAt: {
+        type: Date,
+        default: null,
+        index: true,
+      },
+
       summary: {
         english: {
           type: String,

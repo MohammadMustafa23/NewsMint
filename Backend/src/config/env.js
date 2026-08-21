@@ -24,7 +24,10 @@ export const GNEWS_API_KEY=process.env.GNEWS_API_KEY;
 
 
 // LLM Api
-export const GEMINI_API_KEY=process.env.GEMINI_API_KEY;
+export const GEMINI_API_KEY_1=process.env.GEMINI_API_KEY_1;
+export const GEMINI_API_KEY_2=process.env.GEMINI_API_KEY_2;
+export const GEMINI_API_KEY_3=process.env.GEMINI_API_KEY_3;
+
 
 
 // Telegram BOT 

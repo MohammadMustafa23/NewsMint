@@ -9,7 +9,7 @@ import startDigestScheduler from "./src/Scheduler/digest.scheduler.js";
 import { PORT } from "./src/config/env.js";
 import { processDueUsers } from "./src/Scheduler/digest.scheduler.js";
 
-import { processNewsScheduler } from "./src/Scheduler/news.scheduler.js";
+import startNewsScheduler  from "./src/Scheduler/news.scheduler.js";
 
 // Mongo DB Connection Check
 connectDB();
@@ -22,7 +22,8 @@ app.listen(PORT, async () => {
   startTelegramPolling();
 
   await processDueUsers(); // Call the function to process due users on server start
-  startDigestScheduler();
-  // await processNewsScheduler();
 
+  startDigestScheduler();  // Call the function to start the digest scheduler on server start
+
+  startNewsScheduler();  // Call the function to start the news scheduler on server start
 });
