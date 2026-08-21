@@ -3,7 +3,14 @@ import api from "../../../services/axois.js";
 import SpinLoader from "../../../common/SpinLoader.jsx";
 import "./style/DashPreferences.css";
 import { connectTelegram } from "../../../services/telegram.service.js";
-const TOPICS = ["Tech", "Business", "Rajasthan", "Politics", "Sports"];
+const TOPICS = [
+  "India",
+  "Technology",
+  "Sports",
+  "World",
+  "Entertainment",
+  "General",
+];
 const LANGUAGES = ["English", "Hindi"];
 
 const DashPreferences = ({

@@ -2,7 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import "./style/DigestSetupForm.css";
 import SpinLoader from "../../common/SpinLoader";
 import { connectTelegram } from "../../services/telegram.service";
-const CATEGORIES = ["Tech", "Rajasthan", "India", "Markets", "Startups"];
+const CATEGORIES = [
+  "India",
+  "Technology",
+  "Sports",
+  "World",
+  "Entertainment",
+  "General",
+];
 const DELIVERY_TIMES = [
   "06:00 AM (IST)",
   "06:30 AM (IST)",

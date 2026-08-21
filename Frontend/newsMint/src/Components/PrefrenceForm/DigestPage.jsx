@@ -13,11 +13,10 @@ import { useNavigate } from "react-router-dom";
 const DigestPage = () => {
   const navigate = useNavigate();
   const [preferences, setPreferences] = useState({
-    categories: ["Tech", "Markets"],
+    categories: ["India", "Technology"],
     language: "English",
     deliveryTime: "07:30 AM (IST)",
     phoneNumber: "9876543210",
-
     telegram: {
       chatId: null,
       connected: false,
