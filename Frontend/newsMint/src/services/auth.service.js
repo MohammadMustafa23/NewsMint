@@ -14,6 +14,10 @@ export const loginUser = async (data) => {
   return response.data;
 };
 
+export const logOutUser = async () => {
+  const response = await api.get("/auth/logout");
+  return response.data;
+};
 
 export const loginwithGoogle = async (data) => {
   const response = await api.post("/auth/google", data);
@@ -36,13 +40,11 @@ export const resetPassword = async (data) => {
 };
 
 export const resendOTP = async (data) => {
-  const response = await api.post('/auth/resend-otp',data);
+  const response = await api.post("/auth/resend-otp", data);
   return response.data;
-}
+};
 
 export const getCurrentUser = async () => {
-  const response = await api.get('/auth/me');
+  const response = await api.get("/auth/me");
   return response.data;
-}
-
-
+};

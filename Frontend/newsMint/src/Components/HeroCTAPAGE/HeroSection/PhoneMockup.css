@@ -1,202 +1,661 @@
+/* =========================================================
+   NewsMint Phone Mockup
+   Premium Responsive WhatsApp-style UI
+   Theme: Gold + Navy + Soft Lavender
+========================================================= */
+
 .phone-mockup {
+  --phone-navy: #1a1a2e;
+  --phone-navy-light: #25253d;
+  --phone-gold: #eda83b;
+  --phone-gold-dark: #d98c1f;
+
+  --phone-lavender: #e9e4f8;
+  --phone-lavender-light: #f5f2fc;
+
+  --phone-text: #1a1a2e;
+  --phone-muted: #8d89a5;
+  --phone-border: #e7e3f1;
+
   width: 100%;
   max-width: 300px;
+  height: 580px;
+
   margin: 0 auto;
-  background: #ffffff;
-  border-radius: 32px;
-  box-shadow:
-    0 0 0 1px #e4e0f5,
-    0 30px 60px -20px rgba(26, 26, 46, 0.25);
-  overflow: hidden;
+
   display: flex;
   flex-direction: column;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #e4e0f5;
+  border-radius: 34px;
+
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+
+  box-shadow:
+    0 0 0 1px rgba(228, 224, 245, 0.4),
+    0 35px 80px -25px rgba(26, 26, 46, 0.28),
+    0 15px 35px -20px rgba(26, 26, 46, 0.16);
+
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
 }
+
+.phone-mockup:hover {
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 0 0 1px rgba(228, 224, 245, 0.4),
+    0 42px 90px -25px rgba(26, 26, 46, 0.3),
+    0 18px 40px -20px rgba(26, 26, 46, 0.17);
+}
+
+/* =========================================================
+   PHONE HEADER
+========================================================= */
 
 .phone-header {
+  min-height: 64px;
+
   display: flex;
   align-items: center;
+
   gap: 10px;
-  padding: 14px 16px;
-  background: #e9e4f8;
+
+  padding: 12px 14px;
+
+  background: linear-gradient(180deg, #eeeafa 0%, var(--phone-lavender) 100%);
+
+  border-bottom: 1px solid var(--phone-border);
 }
+
+/* Back */
 
 .phone-back {
-  background: none;
-  border: none;
-  color: #1a1a2e;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding: 0;
-}
+  width: 28px;
+  height: 28px;
 
-.phone-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #eda83b;
-  color: #1a1a2e;
-  font-weight: 700;
-  font-size: 13px;
+  flex-shrink: 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+
+  padding: 3px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: var(--phone-text);
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
+.phone-back:hover {
+  background: rgba(26, 26, 46, 0.07);
+
+  transform: translateX(-2px);
+}
+
+/* Avatar */
+
+.phone-avatar {
+  width: 34px;
+  height: 34px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, #f5bd58, var(--phone-gold));
+
+  color: var(--phone-text);
+
+  font-size: 13px;
+  font-weight: 800;
+
+  box-shadow: 0 4px 10px rgba(237, 168, 59, 0.25);
+}
+
+/* Header title */
+
 .phone-title {
+  min-width: 0;
+
   display: flex;
   flex-direction: column;
-  line-height: 1.25;
+
+  gap: 2px;
+
+  line-height: 1.2;
 }
 
 .phone-name {
-  font-size: 14px;
-  font-weight: 700;
-  color: #1a1a2e;
+  color: var(--phone-text);
+
+  font-size: 13px;
+  font-weight: 750;
+
+  white-space: nowrap;
 }
 
 .phone-status {
-  font-size: 11px;
-  color: #d98c1f;
-}
-
-.phone-body {
-  flex: 1;
-  background: #ffffff;
-  padding: 16px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 14px;
-  min-height: 320px;
-}
 
-.phone-date-pill {
-  background: #f1eef9;
-  color: #6b7280;
-  font-size: 11px;
-  padding: 4px 12px;
-  border-radius: 999px;
-}
+  gap: 5px;
 
-.digest-card {
-  width: 100%;
-  background: #1a1a2e;
-  border-radius: 14px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 90px;
-  position: relative;
-}
+  color: #c9811c;
 
-.digest-label {
-  color: #f3f1fb;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.digest-time {
-  position: absolute;
-  right: 14px;
-  bottom: 10px;
-  color: rgba(243, 241, 251, 0.45);
   font-size: 10px;
 }
 
-.voice-bubble {
-  align-self: flex-start;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #1a1a2e;
-  border-radius: 999px;
-  padding: 8px 14px 8px 8px;
+.phone-status::before {
+  content: "";
+
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #22c55e;
+
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
-.voice-play {
-  width: 26px;
-  height: 26px;
+/* =========================================================
+   PHONE BODY
+========================================================= */
+
+.phone-body {
+  flex: 1;
+
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 15px;
+
+  background: linear-gradient(180deg, #ffffff 0%, #fcfbfe 100%);
+
+  overflow: hidden;
+}
+
+/* Date */
+
+.phone-date-pill {
+  padding: 4px 11px;
+
+  border-radius: 999px;
+
+  background: var(--phone-lavender-light);
+
+  color: #817d98;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  letter-spacing: 0.02em;
+}
+
+/* =========================================================
+   DIGEST CARD
+========================================================= */
+
+.digest-card {
+  position: relative;
+
+  width: 100%;
+
+  min-height: 125px;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 15px;
+
+  border-radius: 15px;
+
+  background: linear-gradient(145deg, #24243a 0%, #19192b 100%);
+
+  color: #ffffff;
+
+  box-shadow: 0 9px 22px rgba(26, 26, 46, 0.15);
+
+  overflow: hidden;
+}
+
+.digest-card::after {
+  content: "";
+
+  position: absolute;
+
+  width: 100px;
+  height: 100px;
+
+  right: -45px;
+  top: -45px;
+
   border-radius: 50%;
-  background: #eda83b;
-  border: none;
-  color: #1a1a2e;
+
+  background: rgba(237, 168, 59, 0.08);
+
+  pointer-events: none;
+}
+
+/* Label */
+
+.digest-label {
+  position: relative;
+  z-index: 1;
+
+  color: var(--phone-gold);
+
+  font-size: 10px;
+  font-weight: 750;
+
+  letter-spacing: 0.08em;
+}
+
+/* Optional title if added later */
+
+.digest-card::before {
+  content: "Your morning in 60 seconds";
+
+  display: block;
+
+  margin-top: 10px;
+
+  color: #f8f7fb;
+
+  font-size: 12px;
+  font-weight: 650;
+
+  line-height: 1.4;
+}
+
+/* Time */
+
+.digest-time {
+  position: absolute;
+
+  right: 14px;
+  bottom: 10px;
+
+  color: rgba(243, 241, 251, 0.45);
+
+  font-size: 9px;
+}
+
+/* =========================================================
+   VOICE MESSAGE
+========================================================= */
+
+.voice-bubble {
+  align-self: flex-start;
+
+  min-width: 185px;
+  max-width: 215px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 7px 11px 7px 7px;
+
+  border-radius: 999px;
+
+  background: linear-gradient(135deg, #24243a, #19192b);
+
+  box-shadow: 0 7px 18px rgba(26, 26, 46, 0.12);
+}
+
+/* Play */
+
+.voice-play {
+  width: 28px;
+  height: 28px;
+
+  flex-shrink: 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  padding-left: 2px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: var(--phone-gold);
+
+  color: var(--phone-text);
+
   cursor: pointer;
-  flex-shrink: 0;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
 }
 
+.voice-play:hover {
+  transform: scale(1.08);
+
+  background: #f2b44c;
+}
+
+.voice-play:active {
+  transform: scale(0.96);
+}
+
+/* Wave */
+
 .voice-wave {
+  flex: 1;
+
+  min-width: 55px;
+
+  height: 25px;
+
   display: flex;
   align-items: center;
+
   gap: 2px;
-  height: 26px;
 }
 
 .wave-bar {
   width: 2px;
-  background: #eda83b;
-  border-radius: 2px;
+
+  min-height: 4px;
+
+  border-radius: 999px;
+
+  background: var(--phone-gold);
+
+  opacity: 0.85;
 }
+
+/* Duration */
 
 .voice-duration {
+  flex-shrink: 0;
+
   color: #d8d5e8;
-  font-size: 11px;
+
+  font-size: 9px;
 }
 
+/* =========================================================
+   PHONE FOOTER
+========================================================= */
+
 .phone-footer {
+  min-height: 60px;
+
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border-top: 1px solid #ece9f6;
+
+  gap: 8px;
+
+  padding: 9px 11px 12px;
+
   background: #ffffff;
+
+  border-top: 1px solid var(--phone-border);
 }
+
+/* Input */
 
 .phone-input {
   flex: 1;
+
+  min-width: 0;
+
+  height: 38px;
+
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: #f1eef9;
+
+  gap: 7px;
+
+  padding: 0 12px;
+
+  border: 1px solid #e8e4f2;
   border-radius: 999px;
-  padding: 8px 14px;
+
+  background: var(--phone-lavender-light);
+
+  box-shadow: inset 0 1px 2px rgba(26, 26, 46, 0.025);
 }
 
 .input-emoji {
+  flex-shrink: 0;
+
   font-size: 14px;
 }
 
 .input-placeholder {
+  overflow: hidden;
+
   color: #9b96b5;
-  font-size: 13px;
+
+  font-size: 11px;
+
+  white-space: nowrap;
 }
 
+/* Mic */
+
 .phone-mic {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #eda83b;
-  border: none;
-  color: #1a1a2e;
+  width: 35px;
+  height: 35px;
+
+  flex-shrink: 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, #f3b94f, var(--phone-gold));
+
+  color: var(--phone-text);
+
   cursor: pointer;
-  flex-shrink: 0;
+
+  box-shadow: 0 4px 10px rgba(237, 168, 59, 0.2);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-@media (max-width: 480px) {
+.phone-mic:hover {
+  transform: scale(1.06);
+
+  box-shadow: 0 6px 14px rgba(237, 168, 59, 0.28);
+}
+
+.phone-mic:active {
+  transform: scale(0.96);
+}
+
+/* =========================================================
+   RESPONSIVE — 768px
+========================================================= */
+
+@media (max-width: 768px) {
   .phone-mockup {
-    max-width: 260px;
+    max-width: 280px;
+    height: 540px;
+
+    border-radius: 32px;
   }
 
   .phone-body {
-    min-height: 280px;
+    padding: 14px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — 480px
+========================================================= */
+
+@media (max-width: 480px) {
+  .phone-mockup {
+    max-width: 265px;
+    height: 510px;
+
+    border-radius: 30px;
+  }
+
+  .phone-header {
+    min-height: 59px;
+
+    padding: 10px 12px;
+  }
+
+  .phone-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .phone-body {
+    padding: 12px;
+
+    gap: 11px;
+  }
+
+  .digest-card {
+    min-height: 115px;
+
+    padding: 13px;
+  }
+
+  .voice-bubble {
+    min-width: 175px;
+  }
+
+  .phone-footer {
+    min-height: 56px;
+
+    padding: 8px 9px 10px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — 360px
+========================================================= */
+
+@media (max-width: 360px) {
+  .phone-mockup {
+    max-width: 245px;
+    height: 475px;
+
+    border-radius: 28px;
+  }
+
+  .phone-header {
+    min-height: 55px;
+
+    padding: 9px 10px;
+  }
+
+  .phone-avatar {
+    width: 30px;
+    height: 30px;
+
+    font-size: 12px;
+  }
+
+  .phone-name {
+    font-size: 12px;
+  }
+
+  .phone-status {
+    font-size: 9px;
+  }
+
+  .phone-body {
+    padding: 10px;
+
+    gap: 9px;
+  }
+
+  .digest-card {
+    min-height: 105px;
+
+    padding: 12px;
+  }
+
+  .voice-bubble {
+    min-width: 160px;
+
+    padding-right: 9px;
+  }
+
+  .phone-input {
+    height: 35px;
+
+    padding: 0 10px;
+  }
+
+  .phone-mic {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.phone-back:focus-visible,
+.voice-play:focus-visible,
+.phone-mic:focus-visible {
+  outline: 3px solid rgba(237, 168, 59, 0.3);
+
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .phone-mockup,
+  .phone-back,
+  .voice-play,
+  .phone-mic {
+    transition: none;
+  }
+
+  .phone-mockup:hover,
+  .voice-play:hover,
+  .phone-mic:hover {
+    transform: none;
   }
 }

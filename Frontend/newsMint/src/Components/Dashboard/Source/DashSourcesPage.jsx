@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import DashSourceHeader from "./DashSourceHeader";
 import DashSourceToolbar from "./DashSourceToolbar";
 import DashSourceGrid from "./DashSourceGrid";
+import SpinLoader from "../../../common/SpinLoader";
 
 import {
   getAllSources,
@@ -232,7 +233,8 @@ const DashSourcesPage = () => {
   if (loading) {
     return (
       <div className="dash-sources-page">
-        <div className="dash-sources-page__container">
+        <div className="dash-sources-page__container dash-sources-page__container--loading">
+          <SpinLoader size="medium" />
           <p>Loading sources...</p>
         </div>
       </div>

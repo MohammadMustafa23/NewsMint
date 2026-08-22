@@ -4,6 +4,8 @@ import DashStatusBar from "./DashStatusBar";
 import DashPreferences from "./DashPreferences";
 import DashLivePreview from "./DashLivePreview";
 
+import SpinLoader from "../../../common/SpinLoader";
+
 import { getMyPreferences } from "../../../services/prefrence.service";
 
 import "./style/DashPage.css";
@@ -46,7 +48,8 @@ const DashPage = () => {
   if (loading) {
     return (
       <div className="dash-page">
-        <div className="dash-page__container">
+        <div className="dash-page__container dash-page__container--loading">
+          <SpinLoader size="medium" />
           <p>Loading your preferences...</p>
         </div>
       </div>

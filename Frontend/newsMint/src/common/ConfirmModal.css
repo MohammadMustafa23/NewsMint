@@ -1,0 +1,440 @@
+/* =========================================================
+   NewsMint — Reusable Confirmation Modal
+   Theme: Gold + Navy + Lavender
+========================================================= */
+
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(15, 23, 42, 0.45);
+
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+
+  animation: confirmOverlayIn 0.2s ease;
+}
+
+/* =========================================================
+   Modal
+========================================================= */
+
+.confirm-modal {
+  --modal-navy: #1a1a2e;
+  --modal-text: #475569;
+  --modal-muted: #8d89a5;
+  --modal-border: #e7e3f1;
+  --modal-lavender: #f5f2fc;
+  --modal-gold: #eda83b;
+  --modal-gold-dark: #d98c1f;
+
+  position: relative;
+
+  width: 100%;
+  max-width: 420px;
+
+  padding: 32px;
+
+  border: 1px solid rgba(255, 255, 255, 0.8);
+
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 30px 80px rgba(15, 23, 42, 0.2),
+    0 10px 30px rgba(15, 23, 42, 0.08);
+
+  text-align: center;
+
+  animation: confirmModalIn 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* =========================================================
+   Close
+========================================================= */
+
+.confirm-modal__close {
+  position: absolute;
+
+  top: 14px;
+  right: 14px;
+
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: #9aa1af;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.confirm-modal__close:hover:not(:disabled) {
+  background: #f4f2f8;
+
+  color: var(--modal-navy);
+
+  transform: rotate(90deg);
+}
+
+.confirm-modal__close:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.5;
+}
+
+/* =========================================================
+   Icon
+========================================================= */
+
+.confirm-modal__icon {
+  width: 58px;
+  height: 58px;
+
+  margin: 2px auto 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 17px;
+
+  background: var(--modal-lavender);
+
+  color: var(--modal-gold-dark);
+
+  box-shadow: inset 0 0 0 1px rgba(237, 168, 59, 0.1);
+}
+
+/* =========================================================
+   Content
+========================================================= */
+
+.confirm-modal__content h2 {
+  margin: 0 0 9px;
+
+  color: var(--modal-navy);
+
+  font-family: Georgia, "Times New Roman", Times, serif;
+
+  font-size: 23px;
+  font-weight: 700;
+
+  line-height: 1.25;
+
+  letter-spacing: -0.02em;
+}
+
+.confirm-modal__content p {
+  max-width: 330px;
+
+  margin: 0 auto;
+
+  color: var(--modal-text);
+
+  font-size: 13px;
+
+  line-height: 1.65;
+}
+
+/* =========================================================
+   Actions
+========================================================= */
+
+.confirm-modal__actions {
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 27px;
+}
+
+.confirm-modal__button {
+  flex: 1;
+
+  min-height: 44px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 11px 18px;
+
+  border-radius: 9px;
+
+  font-family: inherit;
+
+  font-size: 13px;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Cancel */
+
+.confirm-modal__button--cancel {
+  border: 1px solid var(--modal-border);
+
+  background: #ffffff;
+
+  color: var(--modal-navy);
+}
+
+.confirm-modal__button--cancel:hover:not(:disabled) {
+  background: #f8f7fb;
+
+  border-color: #d8d4e5;
+
+  transform: translateY(-1px);
+}
+
+/* Confirm */
+
+.confirm-modal__button--confirm {
+  border: 1px solid transparent;
+
+  color: #ffffff;
+}
+
+.confirm-modal__button--confirm:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   Gold Variant
+========================================================= */
+
+.confirm-modal__button--warning {
+  background: var(--modal-gold);
+
+  color: var(--modal-navy);
+
+  box-shadow: 0 5px 14px rgba(237, 168, 59, 0.22);
+}
+
+.confirm-modal__button--warning:hover:not(:disabled) {
+  background: var(--modal-gold-dark);
+
+  box-shadow: 0 7px 18px rgba(237, 168, 59, 0.28);
+}
+
+/* =========================================================
+   Danger Variant
+========================================================= */
+
+.confirm-modal--danger .confirm-modal__icon {
+  background: #fff1f1;
+
+  color: #dc4b4b;
+}
+
+.confirm-modal__button--danger {
+  background: #dc4b4b;
+
+  box-shadow: 0 5px 14px rgba(220, 75, 75, 0.18);
+}
+
+.confirm-modal__button--danger:hover:not(:disabled) {
+  background: #c93d3d;
+
+  box-shadow: 0 7px 18px rgba(220, 75, 75, 0.24);
+}
+
+/* =========================================================
+   Logout Variant
+========================================================= */
+
+.confirm-modal--logout .confirm-modal__icon {
+  background: var(--modal-lavender);
+
+  color: var(--modal-gold-dark);
+}
+
+.confirm-modal__button--logout {
+  background: var(--modal-navy);
+
+  color: #ffffff;
+
+  box-shadow: 0 5px 14px rgba(26, 26, 46, 0.18);
+}
+
+.confirm-modal__button--logout:hover:not(:disabled) {
+  background: #25253d;
+
+  box-shadow: 0 7px 18px rgba(26, 26, 46, 0.24);
+}
+
+/* =========================================================
+   Info Variant
+========================================================= */
+
+.confirm-modal--info .confirm-modal__icon {
+  background: #eef5ff;
+
+  color: #4c7fd8;
+}
+
+.confirm-modal__button--info {
+  background: #4c7fd8;
+
+  box-shadow: 0 5px 14px rgba(76, 127, 216, 0.2);
+}
+
+/* =========================================================
+   Loading
+========================================================= */
+
+.confirm-modal__button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.65;
+}
+
+.confirm-modal__spinner {
+  width: 14px;
+  height: 14px;
+
+  border: 2px solid rgba(255, 255, 255, 0.35);
+
+  border-top-color: currentColor;
+
+  border-radius: 50%;
+
+  animation: confirmSpinner 0.7s linear infinite;
+}
+
+/* =========================================================
+   Animations
+========================================================= */
+
+@keyframes confirmOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes confirmModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes confirmSpinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   Focus
+========================================================= */
+
+.confirm-modal__button:focus-visible,
+.confirm-modal__close:focus-visible {
+  outline: 3px solid rgba(237, 168, 59, 0.3);
+
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   Mobile
+========================================================= */
+
+@media (max-width: 480px) {
+  .confirm-modal-overlay {
+    padding: 16px;
+  }
+
+  .confirm-modal {
+    max-width: 100%;
+
+    padding: 28px 20px 20px;
+
+    border-radius: 18px;
+  }
+
+  .confirm-modal__icon {
+    width: 54px;
+    height: 54px;
+
+    margin-bottom: 17px;
+  }
+
+  .confirm-modal__content h2 {
+    font-size: 21px;
+  }
+
+  .confirm-modal__content p {
+    font-size: 12px;
+  }
+
+  .confirm-modal__actions {
+    margin-top: 23px;
+  }
+
+  .confirm-modal__button {
+    min-height: 43px;
+
+    padding: 10px 14px;
+
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   Reduced Motion
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .confirm-modal-overlay,
+  .confirm-modal,
+  .confirm-modal__close,
+  .confirm-modal__button,
+  .confirm-modal__spinner {
+    animation: none;
+    transition: none;
+  }
+}

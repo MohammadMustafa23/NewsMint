@@ -1,47 +1,247 @@
-/* components/common/SpinLoader.css */
+/* =========================================================
+   NewsMint Premium Loader
+   Theme: Gold + Navy + Lavender
+========================================================= */
 
 .spin-loader-wrapper {
+  --loader-navy: #1a1a2e;
+  --loader-gold: #eda83b;
+  --loader-gold-dark: #d98c1f;
+  --loader-lavender: #e9e4f8;
+  --loader-muted: #8d89a5;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  padding: 16px;
+
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
 }
+
+/* =========================================================
+   Fullscreen
+========================================================= */
 
 .spin-loader-wrapper--fullscreen {
   position: fixed;
   inset: 0;
+
   z-index: 9999;
-  background: rgba(255, 255, 255, 0.85);
+
+  min-height: 100vh;
+
+  flex-direction: column;
+
+  gap: 16px;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(237, 168, 59, 0.08),
+      transparent 35%
+    ),
+    rgba(248, 249, 252, 0.96);
+
+  backdrop-filter: blur(8px);
 }
+
+/* =========================================================
+   Loader
+========================================================= */
 
 .spin-loader {
-  display: block;
-  border-radius: 50%;
-  border-style: solid;
-  border-color: #e5e7eb;
-  border-top-color: #2563eb;
-  animation: spin-loader 0.8s linear infinite;
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
 }
 
+/* =========================================================
+   Sizes
+========================================================= */
+
 .spin-loader--small {
-  width: 20px;
-  height: 20px;
-  border-width: 2px;
+  width: 34px;
+  height: 34px;
 }
 
 .spin-loader--medium {
-  width: 36px;
-  height: 36px;
-  border-width: 4px;
+  width: 48px;
+  height: 48px;
 }
 
 .spin-loader--large {
-  width: 48px;
-  height: 48px;
-  border-width: 4px;
+  width: 68px;
+  height: 68px;
 }
 
-@keyframes spin-loader {
+/* =========================================================
+   Core
+========================================================= */
+
+.spin-loader__core {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 48%;
+  height: 48%;
+
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, #f3bd58, var(--loader-gold));
+
+  color: var(--loader-navy);
+
+  font-family: Georgia, "Times New Roman", serif;
+
+  font-size: 45%;
+  font-weight: 800;
+
+  box-shadow: 0 4px 14px rgba(237, 168, 59, 0.3);
+
+  animation: loaderPulse 1.8s ease-in-out infinite;
+}
+
+/* =========================================================
+   Orbit
+========================================================= */
+
+.spin-loader__orbit {
+  position: absolute;
+  inset: 0;
+
+  border-radius: 50%;
+
+  border: 2px solid rgba(237, 168, 59, 0.16);
+
+  border-top-color: var(--loader-gold);
+  border-right-color: var(--loader-gold);
+
+  animation: loaderRotate 1s linear infinite;
+}
+
+/* =========================================================
+   Orbit Dot
+========================================================= */
+
+.spin-loader__dot {
+  position: absolute;
+
+  top: -4px;
+  left: 50%;
+
+  width: 7px;
+  height: 7px;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  background: var(--loader-gold);
+
+  box-shadow:
+    0 0 0 4px rgba(237, 168, 59, 0.1),
+    0 0 12px rgba(237, 168, 59, 0.45);
+}
+
+/* =========================================================
+   Fullscreen Text
+========================================================= */
+
+.spin-loader__text {
+  color: var(--loader-muted);
+
+  font-size: 13px;
+  font-weight: 500;
+
+  letter-spacing: 0.02em;
+
+  animation: loaderText 1.8s ease-in-out infinite;
+}
+
+/* =========================================================
+   Animations
+========================================================= */
+
+@keyframes loaderRotate {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes loaderPulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+
+    box-shadow: 0 4px 14px rgba(237, 168, 59, 0.25);
+  }
+
+  50% {
+    transform: scale(1.05);
+
+    box-shadow: 0 5px 20px rgba(237, 168, 59, 0.4);
+  }
+}
+
+@keyframes loaderText {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   Small
+========================================================= */
+
+.spin-loader--small .spin-loader__orbit {
+  border-width: 1.5px;
+}
+
+.spin-loader--small .spin-loader__dot {
+  width: 5px;
+  height: 5px;
+
+  top: -3px;
+}
+
+/* =========================================================
+   Large
+========================================================= */
+
+.spin-loader--large .spin-loader__orbit {
+  border-width: 3px;
+}
+
+.spin-loader--large .spin-loader__dot {
+  width: 9px;
+  height: 9px;
+
+  top: -5px;
+}
+
+/* =========================================================
+   Reduced Motion
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .spin-loader__orbit,
+  .spin-loader__core,
+  .spin-loader__text {
+    animation: none;
   }
 }
