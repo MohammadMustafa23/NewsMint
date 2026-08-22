@@ -1,7 +1,7 @@
 import NewsArticle from "../../models/NewsArticle.js";
 import { summarizeNewsBatch } from "../ai/summarizer.service.js";
 
-const BATCH_SIZE = 10;
+const BATCH_SIZE = 5;
 const RETRY_DELAY = 10 * 60 * 1000;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

@@ -1,38 +1,57 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+
 import {
   GEMINI_API_KEY_1,
   GEMINI_API_KEY_2,
   GEMINI_API_KEY_3,
 } from "../../../config/env.js";
 
-const MAX_BATCH_SIZE = 10;
+const MAX_BATCH_SIZE = 5;
 const MAX_DESCRIPTION_CHARS = 600;
 
-const AI_CONFIGS = [
+// ======================================================
+// GEMINI MODELS
+// ======================================================
+
+const GEMINI_MODELS = [
+  "gemini-3.6-flash",
+  "gemini-3.5-flash",
+  "gemini-3.7-flash",
+];
+
+// ======================================================
+// GEMINI API KEYS
+// ======================================================
+
+const GEMINI_KEYS = [
   {
     name: "Gemini-1",
-    model: "gemini-3.7-flash",
     apiKey: GEMINI_API_KEY_1,
   },
   {
     name: "Gemini-2",
-    model: "gemini-3.7-flash",
     apiKey: GEMINI_API_KEY_2,
   },
   {
     name: "Gemini-3",
-    model: "gemini-3.7-flash",
     apiKey: GEMINI_API_KEY_3,
   },
 ].filter((config) => config.apiKey);
 
+// ======================================================
+// RESPONSE SCHEMA
+// ======================================================
+
 const RESPONSE_SCHEMA = {
   type: "object",
+
   properties: {
     articles: {
       type: "array",
+
       items: {
         type: "object",
+
         properties: {
           articleId: {
             type: "string",
@@ -40,6 +59,7 @@ const RESPONSE_SCHEMA = {
 
           summary: {
             type: "object",
+
             properties: {
               english: {
                 type: "string",
@@ -55,21 +75,26 @@ const RESPONSE_SCHEMA = {
 
           keyPoints: {
             type: "object",
+
             properties: {
               english: {
                 type: "array",
+
                 items: {
                   type: "string",
                 },
+
                 minItems: 3,
                 maxItems: 3,
               },
 
               hindi: {
                 type: "array",
+
                 items: {
                   type: "string",
                 },
+
                 minItems: 3,
                 maxItems: 3,
               },
@@ -87,7 +112,12 @@ const RESPONSE_SCHEMA = {
   required: ["articles"],
 };
 
-const SYSTEM_INSTRUCTION = `You are the AI news summarizer for NewsMint.
+// ======================================================
+// SYSTEM INSTRUCTION
+// ======================================================
+
+const SYSTEM_INSTRUCTION = `
+You are the AI news summarizer for NewsMint.
 
 For each article in the input array, return exactly one result.
 
@@ -109,39 +139,51 @@ Rules:
 - Return exactly one result for every input article.
 
 Hinglish example:
+
 "Or bhai, aaj ki main news ye hai ki Jaipur mein ek naya AI Center open kiya gaya hai. Yahan students ko AI aur latest technology ke baare mein training di jayegi."
 
 Avoid formal Hindi:
-"Aaj Jaipur mein ek naveen kritrim buddhimatta kendra ka udghatan kiya gaya."`;
 
-const createModel = (config) => {
-  const genAI = new GoogleGenerativeAI(config.apiKey);
+"Aaj Jaipur mein ek naveen kritrim buddhimatta kendra ka udghatan kiya gaya."
+`;
+
+// ======================================================
+// CREATE GEMINI MODEL
+// ======================================================
+
+const createModel = (apiKey, model) => {
+  const genAI = new GoogleGenerativeAI(apiKey);
 
   return genAI.getGenerativeModel({
-    model: config.model,
+    model,
 
     systemInstruction: SYSTEM_INSTRUCTION,
 
     generationConfig: {
-      temperature: 0.35,
       maxOutputTokens: 8192,
+
       responseMimeType: "application/json",
+
       responseSchema: RESPONSE_SCHEMA,
     },
   });
 };
 
+// ======================================================
+// CHECK RETRYABLE ERROR
+// ======================================================
+
 const isRetryableError = (error) => {
   const status =
     error?.status || error?.response?.status || error?.cause?.status;
 
-  if (
-    status === 429 ||
-    status === 500 ||
-    status === 502 ||
-    status === 503 ||
-    status === 504
-  ) {
+  // Rate limit / quota
+  if (status === 429) {
+    return true;
+  }
+
+  // Temporary server errors
+  if (status === 500 || status === 502 || status === 503 || status === 504) {
     return true;
   }
 
@@ -152,9 +194,15 @@ const isRetryableError = (error) => {
     message.includes("quota") ||
     message.includes("resource exhausted") ||
     message.includes("too many requests") ||
-    message.includes("temporarily unavailable")
+    message.includes("temporarily unavailable") ||
+    message.includes("overloaded") ||
+    message.includes("service unavailable")
   );
 };
+
+// ======================================================
+// PARSE + VALIDATE GEMINI RESPONSE
+// ======================================================
 
 const parseAndValidateResponse = (result, articles) => {
   const candidate = result.response?.candidates?.[0];
@@ -220,6 +268,7 @@ const parseAndValidateResponse = (result, articles) => {
     );
   }
 
+  // Keep original article order
   return articles.map((article) => {
     const id = article._id.toString();
 
@@ -230,20 +279,26 @@ const parseAndValidateResponse = (result, articles) => {
 
       summary: {
         english: result.summary.english,
-
         hindi: result.summary.hindi,
       },
 
       keyPoints: {
         english: result.keyPoints.english,
-
         hindi: result.keyPoints.hindi,
       },
     };
   });
 };
 
+// ======================================================
+// SUMMARIZE NEWS BATCH
+// ======================================================
+
 export const summarizeNewsBatch = async (articles) => {
+  // ----------------------------------------------------
+  // Validate input
+  // ----------------------------------------------------
+
   if (!Array.isArray(articles) || !articles.length) {
     throw new Error("No articles provided for summarization");
   }
@@ -252,9 +307,13 @@ export const summarizeNewsBatch = async (articles) => {
     throw new Error(`Maximum ${MAX_BATCH_SIZE} articles allowed per batch`);
   }
 
-  if (!AI_CONFIGS.length) {
+  if (!GEMINI_KEYS.length) {
     throw new Error("No Gemini API keys configured");
   }
+
+  // ----------------------------------------------------
+  // Prepare news data
+  // ----------------------------------------------------
 
   const newsData = articles.map((article) => ({
     articleId: article._id.toString(),
@@ -269,37 +328,70 @@ export const summarizeNewsBatch = async (articles) => {
 
   let lastError = null;
 
-  for (const config of AI_CONFIGS) {
-    try {
-      console.log(`🤖 Trying ${config.name} | ${config.model}`);
+  // ====================================================
+  // FALLBACK SYSTEM
+  //
+  // 3.6:
+  //   Key 1 → Key 2 → Key 3
+  //
+  // 3.5:
+  //   Key 1 → Key 2 → Key 3
+  //
+  // 3.7:
+  //   Key 1 → Key 2 → Key 3
+  // ====================================================
 
-      const model = createModel(config);
+  for (const model of GEMINI_MODELS) {
+    for (const keyConfig of GEMINI_KEYS) {
+      try {
+        console.log(`🤖 Trying ${keyConfig.name} | ${model}`);
 
-      const result = await model.generateContent(prompt);
+        const geminiModel = createModel(keyConfig.apiKey, model);
 
-      const validatedResult = parseAndValidateResponse(result, articles);
+        const result = await geminiModel.generateContent(prompt);
 
-      console.log(
-        `✅ ${config.name} successfully processed ${articles.length} articles`,
-      );
+        const validatedResult = parseAndValidateResponse(result, articles);
 
-      return validatedResult;
-    } catch (error) {
-      lastError = error;
+        console.log(
+          `✅ SUCCESS | ${keyConfig.name} | ${model} | ${articles.length} articles`,
+        );
 
-      console.error(`❌ ${config.name} failed:`, error.message);
+        return validatedResult;
+      } catch (error) {
+        lastError = error;
 
-      if (!isRetryableError(error)) {
-        throw error;
+        console.error(`❌ FAILED | ${keyConfig.name} | ${model}`);
+
+        console.error(`   Reason: ${error.message}`);
+
+        // ----------------------------------------------
+        // Non-retryable error
+        // ----------------------------------------------
+
+        if (!isRetryableError(error)) {
+          console.error(`🛑 Non-retryable error. Stopping.`);
+
+          throw error;
+        }
+
+        // ----------------------------------------------
+        // Retryable error
+        // ----------------------------------------------
+
+        console.warn(`🔄 Retryable error. Switching configuration...`);
       }
-
-      console.log(`🔄 Trying next Gemini configuration...`);
     }
+
+    console.warn(
+      `⚠️ All API keys failed for ${model}. Moving to next model...`,
+    );
   }
 
-  const error = new Error(
-    "All configured Gemini API keys/models are unavailable",
-  );
+  // ====================================================
+  // EVERYTHING FAILED
+  // ====================================================
+
+  const error = new Error("All Gemini API keys and models are unavailable");
 
   error.retryable = true;
   error.cause = lastError;
