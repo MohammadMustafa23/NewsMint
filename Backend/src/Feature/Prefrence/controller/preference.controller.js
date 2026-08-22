@@ -6,10 +6,19 @@ import { getNextDeliveryAt } from "../../../Scheduler/util/digestTime.util.js";
 const ALLOWED_CATEGORIES = [
   "India",
   "Technology",
-  "Sports",
+  "Artificial Intelligence",
+  "Business",
+  "Finance & Markets",
   "World",
+  "Science",
+  "Space",
+  "Cybersecurity",
+  "Startups",
+  "Education & Careers",
+  "Health",
+  "Sports",
   "Entertainment",
-  "General",
+  "Environment & Climate",
 ];
 
 const ALLOWED_LANGUAGES = ["English", "Hindi"];

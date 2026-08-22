@@ -1,172 +1,82 @@
 import cron from "node-cron";
 
-import Source from "../Feature/NewsSource/models/source.models.js";
-
-import { fetchRSSSource } from "../NewsArticle/service/news/rss.service.js";
-import { fetchGNews } from "../NewsArticle/service/news/gnews.service.js";
-import { fetchNewsData } from "../NewsArticle/service/news/newsdata.service.js";
-import { fetchGuardianNews } from "../NewsArticle/service/news/guardian.service.js";
-
+import { fetchAllNews } from "../NewsArticle/ActualNewsFetchwork/news-fetch.service.js";
 import { startAINewsWorker } from "./service/news-ai.worker.js";
 
 export const processNewsScheduler = async () => {
   const startedAt = new Date();
 
   console.log("\n========================================");
-  console.log("📰 NewsMint Scheduler 2 Started");
+  console.log("📰 NewsMint Daily News Scheduler Started");
   console.log(`⏰ ${startedAt.toISOString()}`);
   console.log("========================================\n");
 
   try {
-    const sources = await Source.find({
-      isActive: true,
-    })
-      .sort({ sortOrder: 1 })
-      .lean();
+    console.log("📡 Starting News Fetch...");
 
-    if (!sources.length) {
-      console.log("⚠️ No active sources found");
-
-      return {
-        success: true,
-        sources: 0,
-        saved: 0,
-        skipped: 0,
-      };
-    }
-
-    console.log(`📡 Active sources: ${sources.length}`);
-
-    let successfulSources = 0;
-    let failedSources = 0;
-    let totalSaved = 0;
-    let totalSkipped = 0;
-
-    for (const source of sources) {
-      try {
-        console.log(
-          `\n🔄 Fetching: ${source.name} | ${source.fetchMethod}${
-            source.provider ? ` | ${source.provider}` : ""
-          }`,
-        );
-
-        let result = null;
-
-        if (source.fetchMethod === "rss") {
-          result = await fetchRSSSource(source);
-        } else if (source.fetchMethod === "api") {
-          const provider = source.provider?.toLowerCase();
-
-          if (provider === "gnews") {
-            result = await fetchGNews(source);
-          } else if (provider === "newsdata") {
-            result = await fetchNewsData(source);
-          } else if (provider === "guardian") {
-            result = await fetchGuardianNews(source);
-          } else {
-            console.log(`⏭️ Unknown API provider: ${source.provider}`);
-            continue;
-          }
-        } else if (source.fetchMethod === "scrape") {
-          console.log(`⏭️ Scraping not implemented: ${source.name}`);
-          continue;
-        } else {
-          console.log(`⏭️ Unknown fetch method: ${source.fetchMethod}`);
-          continue;
-        }
-
-        if (result?.success) {
-          successfulSources++;
-
-          totalSaved += result.saved || 0;
-          totalSkipped += result.skipped || 0;
-
-          console.log(
-            `✅ ${source.name} | Saved: ${result.saved || 0} | Skipped: ${
-              result.skipped || 0
-            }`,
-          );
-        } else {
-          failedSources++;
-          console.log(
-            `❌ ${source.name} failed: ${result?.message || "Unknown error"}`,
-          );
-        }
-      } catch (error) {
-        failedSources++;
-        console.error(`❌ Source failed: ${source.name}`, error.message);
-      }
-    }
+    const newsResult = await fetchAllNews();
 
     console.log("\n----------------------------------------");
-    console.log("📊 FETCH SUMMARY");
+    console.log("📊 NEWS FETCH SUMMARY");
     console.log("----------------------------------------");
 
-    console.log(`Sources:    ${sources.length}`);
-    console.log(`Successful: ${successfulSources}`);
-    console.log(`Failed:     ${failedSources}`);
-    console.log(`Saved:      ${totalSaved}`);
-    console.log(`Skipped:    ${totalSkipped}`);
-
+    console.log(`📂 Categories: ${newsResult.categories || 0}`);
+    console.log(`📰 Candidates: ${newsResult.totalCandidates || 0}`);
+    console.log(`🎯 Selected: ${newsResult.totalSelected || 0}`);
+    console.log(`💾 Saved: ${newsResult.totalSaved || 0}`);
     console.log("\n🤖 Starting AI News Worker...");
 
-    startAINewsWorker().then((result) => {
-        if (result.success) {
-          console.log(
-            `✅ AI Worker Finished | Processed: ${result.processed} | Batches: ${result.batches}`,
-          );
-        } else {
-          console.error(`⚠️ AI Worker Finished With Error: ${result.message}`);
-        }
-      })
-      .catch((error) => {
-        console.error("❌ AI Worker Error:", error.message);
-      });
+    // startAINewsWorker()
+    //   .then((result) => {
+    //     if (result.success) {
+    //       console.log(
+    //         `✅ AI Worker Finished | ` +
+    //           `Processed: ${result.processed} | ` +
+    //           `Batches: ${result.batches}`,
+    //       );
+    //     } else {
+    //       console.error(
+    //         `⚠️ AI Worker Finished With Error: ${
+    //           result.message || "Unknown error"
+    //         }`,
+    //       );
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.error("❌ AI Worker Error:", error.message);
+    //   });
 
+    // Log completion details
     const completedAt = new Date();
-
     console.log("\n========================================");
-    console.log("✅ NewsMint Scheduler 2 Completed");
+    console.log("✅ NewsMint Daily News Scheduler Completed");
     console.log("========================================");
-
-    console.log(`📰 New articles saved: ${totalSaved}`);
-
-    console.log(`⏭️ Articles skipped: ${totalSkipped}`);
-
+    console.log(`📰 New articles saved: ${newsResult.totalSaved || 0}`);
     console.log(`⏱️ Started: ${startedAt.toISOString()}`);
-
     console.log(`⏱️ Finished: ${completedAt.toISOString()}`);
-
     console.log("🤖 AI Worker is running independently");
-
     console.log("========================================\n");
 
     return {
       success: true,
-
-      sources: {
-        total: sources.length,
-        successful: successfulSources,
-        failed: failedSources,
-      },
-
       news: {
-        saved: totalSaved,
-        skipped: totalSkipped,
+        categories: newsResult.categories || 0,
+        candidates: newsResult.totalCandidates || 0,
+        selected: newsResult.totalSelected || 0,
+        saved: newsResult.totalSaved || 0,
       },
-
       startedAt,
       completedAt,
     };
   } catch (error) {
-    console.error("❌ NewsMint Scheduler 2 Error:", error.message);
+    console.error("❌ NewsMint Scheduler Error:", error.message);
 
     throw error;
   }
 };
 
 const startNewsScheduler = () => {
-  cron.schedule("0 6,18 * * *", async () => {
+  cron.schedule("05 19 22 8 *", async () => {
     try {
       await processNewsScheduler();
     } catch (error) {
@@ -174,7 +84,7 @@ const startNewsScheduler = () => {
     }
   });
 
-  console.log("📅 NewsMint Scheduler 2 started");
+  console.log("📅 NewsMint Scheduler started");
   console.log("⏰ Runs daily at 6:00 AM and 6:00 PM");
 };
 

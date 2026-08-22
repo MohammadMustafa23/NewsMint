@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ALLOWED_CATEGORIES } from "../../../NewsArticle/service/contents/news.constants.js";
 
 const sourceSchema = new mongoose.Schema(
   {
@@ -45,10 +46,17 @@ const sourceSchema = new mongoose.Schema(
     categories: {
       type: [String],
       required: true,
-      validate: {
-        validator: (value) => value.length > 0,
-        message: "At least one category is required.",
-      },
+      validate: [
+        {
+          validator: (value) => value.length > 0,
+          message: "At least one category is required.",
+        },
+        {
+          validator: (value) =>
+            value.every((category) => ALLOWED_CATEGORIES.includes(category)),
+          message: "Source contains an invalid NewsMint category.",
+        },
+      ],
     },
 
     // India / Global

@@ -1,20 +1,11 @@
 import axios from "axios";
-import crypto from "crypto";
 
-import NewsArticle from "../../models/NewsArticle.js";
 import { GUARDIAN_API_KEY } from "../../../config/env.js";
+import { CATEGORY_QUERIES } from "../contents/news.constants.js";
 
 const GUARDIAN_URL = "https://content.guardianapis.com/search";
 
-const MAX_ARTICLES_PER_CATEGORY = 5;
-const MAX_API_ARTICLES = 20;
-
-const createContentHash = (url) => {
-  return crypto
-    .createHash("sha256")
-    .update(url.trim().toLowerCase())
-    .digest("hex");
-};
+const MAX_RESULTS = 10;
 
 const cleanText = (text = "") => {
   if (!text) return "";
@@ -29,89 +20,32 @@ const cleanText = (text = "") => {
     .trim();
 };
 
-/*
- * Guardian section → NewsMint category
- */
-const CATEGORY_MAP = {
-  politics: "India",
-
-  "world news": "World",
-  world: "World",
-
-  business: "Business",
-
-  technology: "Technology",
-  tech: "Technology",
-
-  sport: "Sports",
-  sports: "Sports",
-
-  culture: "Entertainment",
-  film: "Entertainment",
-  music: "Entertainment",
-  television: "Entertainment",
-};
-
-/*
- * Convert Guardian section into
- * one of our NewsMint categories.
- */
-const getCategory = (item, source) => {
-  const allowedCategories = source.categories || [];
-
-  if (!allowedCategories.length) {
-    return null;
-  }
-
-  const sectionName = cleanText(item.sectionName || "").toLowerCase();
-
-  /*
-   * 1. Exact match
-   */
-  const exactMatch = allowedCategories.find(
-    (category) => category.toLowerCase() === sectionName,
-  );
-
-  if (exactMatch) {
-    return exactMatch;
-  }
-
-  /*
-   * 2. Mapped category
-   */
-  const mappedCategory = CATEGORY_MAP[sectionName];
-
-  if (mappedCategory) {
-    const allowedMatch = allowedCategories.find(
-      (category) => category.toLowerCase() === mappedCategory.toLowerCase(),
-    );
-
-    if (allowedMatch) {
-      return allowedMatch;
-    }
-  }
-
-  /*
-   * 3. Fallback
-   */
-  return allowedCategories[0];
-};
-
-export const fetchGuardianNews = async (source) => {
+export const fetchGuardianNews = async (category, source) => {
   try {
     // ==========================================
     // 1. VALIDATION
     // ==========================================
 
-    if (!source) {
-      throw new Error("Guardian source is required");
+    if (!category) {
+      throw new Error("Category is required");
+    }
+
+    if (!source?._id) {
+      throw new Error("Guardian Source document is required");
     }
 
     if (!GUARDIAN_API_KEY) {
       throw new Error("Guardian API key is not configured");
     }
 
-    console.log(`\n📡 Fetching Guardian: ${source.name}`);
+    const query = CATEGORY_QUERIES[category];
+
+    if (!query) {
+      throw new Error(`No Guardian query configured for ${category}`);
+    }
+
+    console.log(`📡 Guardian → ${category}`);
+    console.log(`🔎 Query: ${query}`);
 
     // ==========================================
     // 2. API PARAMETERS
@@ -120,13 +54,12 @@ export const fetchGuardianNews = async (source) => {
     const params = {
       "api-key": GUARDIAN_API_KEY,
 
-      "page-size": MAX_API_ARTICLES,
+      q: query,
+
+      "page-size": MAX_RESULTS,
 
       "order-by": "newest",
 
-      /*
-       * Only request fields we actually use.
-       */
       "show-fields": "trailText,thumbnail,byline",
 
       "show-tags": "keyword",
@@ -147,38 +80,20 @@ export const fetchGuardianNews = async (source) => {
       throw new Error("Invalid Guardian API response");
     }
 
-    const articles = Array.isArray(guardianResponse.results)
+    const items = Array.isArray(guardianResponse.results)
       ? guardianResponse.results
       : [];
 
-    console.log(`📰 ${source.name}: ${articles.length} articles found`);
+    console.log(`📰 Guardian → ${category}: ${items.length} raw candidates`);
 
     // ==========================================
-    // 4. COUNTERS
+    // 4. NORMALIZE
     // ==========================================
 
-    let saved = 0;
-    let skipped = 0;
-
-    const categoryCounts = {};
-
-    for (const category of source.categories || []) {
-      categoryCounts[category] = 0;
-    }
-
-    // ==========================================
-    // 5. PROCESS ARTICLES
-    // ==========================================
-
-    for (const item of articles) {
-      try {
-        // ------------------------------------------
-        // Basic validation
-        // ------------------------------------------
-
+    const articles = items
+      .map((item) => {
         if (!item.webTitle || !item.webUrl) {
-          skipped++;
-          continue;
+          return null;
         }
 
         const title = cleanText(item.webTitle);
@@ -188,68 +103,30 @@ export const fetchGuardianNews = async (source) => {
         const url = item.webUrl.trim();
 
         if (!title || !url) {
-          skipped++;
-          continue;
+          return null;
         }
 
-        // ------------------------------------------
-        // Category
-        // ------------------------------------------
-
-        const category = getCategory(item, source);
-
-        if (!category) {
-          skipped++;
-          continue;
-        }
-
-        // ------------------------------------------
-        // Category limit
-        // ------------------------------------------
-
-        if (categoryCounts[category] >= MAX_ARTICLES_PER_CATEGORY) {
-          skipped++;
-          continue;
-        }
-
-        // ------------------------------------------
-        // Duplicate check
-        // ------------------------------------------
-
-        const contentHash = createContentHash(url);
-
-        const exists = await NewsArticle.exists({
-          contentHash,
-        });
-
-        if (exists) {
-          skipped++;
-          continue;
-        }
-
-        // ------------------------------------------
+        // --------------------------------------
         // Published date
-        // ------------------------------------------
+        // --------------------------------------
 
-        let publishedAt = null;
+        const publishedAt = item.webPublicationDate
+          ? new Date(item.webPublicationDate)
+          : null;
 
-        if (item.webPublicationDate) {
-          const date = new Date(item.webPublicationDate);
-
-          if (!Number.isNaN(date.getTime())) {
-            publishedAt = date;
-          }
+        if (!publishedAt || Number.isNaN(publishedAt.getTime())) {
+          return null;
         }
 
-        // ------------------------------------------
+        // --------------------------------------
         // Author
-        // ------------------------------------------
+        // --------------------------------------
 
         const author = cleanText(item.fields?.byline || "");
 
-        // ------------------------------------------
+        // --------------------------------------
         // Tags
-        // ------------------------------------------
+        // --------------------------------------
 
         const tags = Array.isArray(item.tags)
           ? item.tags
@@ -257,12 +134,14 @@ export const fetchGuardianNews = async (source) => {
               .filter(Boolean)
           : [];
 
-        // ------------------------------------------
-        // Save article
-        // ------------------------------------------
+        // --------------------------------------
+        // Normalized article
+        // --------------------------------------
 
-        await NewsArticle.create({
+        return {
           source: source._id,
+
+          sourceKey: "the-guardian",
 
           title,
 
@@ -281,73 +160,21 @@ export const fetchGuardianNews = async (source) => {
           tags,
 
           fetchMethod: "api",
+        };
+      })
+      .filter(Boolean);
 
-          contentHash,
+    console.log(
+      `📰 Guardian → ${category}: ${articles.length} valid candidates`,
+    );
 
-          /*
-           * Time when NewsMint fetched
-           * this article.
-           */
-          newsDate: new Date(),
-
-          ai: {
-            processed: false,
-          },
-        });
-
-        categoryCounts[category]++;
-
-        saved++;
-      } catch (articleError) {
-        /*
-         * Continue processing remaining
-         * Guardian articles.
-         */
-
-        console.error(
-          `❌ Article Error: ${item.webTitle}`,
-          articleError.message,
-        );
-      }
-    }
-
-    // ==========================================
-    // 6. RESULT
-    // ==========================================
-
-    console.log(`📊 ${source.name} category counts:`, categoryCounts);
-
-    console.log(`✅ ${source.name} | Saved: ${saved} | Skipped: ${skipped}`);
-
-    return {
-      success: true,
-
-      source: source.name,
-
-      total: articles.length,
-
-      saved,
-
-      skipped,
-
-      categoryCounts,
-    };
+    return articles;
   } catch (error) {
-    // ==========================================
-    // API ERROR
-    // ==========================================
-
     console.error(
-      `❌ Guardian Error - ${source?.name || "The Guardian"}:`,
+      `❌ Guardian ${category}:`,
       error.response?.data || error.message,
     );
 
-    return {
-      success: false,
-
-      source: source?.name || "The Guardian",
-
-      message: error.response?.data?.message || error.message,
-    };
+    return [];
   }
 };
