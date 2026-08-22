@@ -5,11 +5,21 @@ import { connectTelegram } from "../../services/telegram.service";
 const CATEGORIES = [
   "India",
   "Technology",
-  "Sports",
+  "Artificial Intelligence",
+  "Business",
+  "Finance & Markets",
   "World",
+  "Science",
+  "Space",
+  "Cybersecurity",
+  "Startups",
+  "Education & Careers",
+  "Health",
+  "Sports",
   "Entertainment",
-  "General",
+  "Environment & Climate",
 ];
+
 const DELIVERY_TIMES = [
   "06:00 AM (IST)",
   "06:30 AM (IST)",

@@ -6,11 +6,21 @@ import { connectTelegram } from "../../../services/telegram.service.js";
 const TOPICS = [
   "India",
   "Technology",
-  "Sports",
+  "Artificial Intelligence",
+  "Business",
+  "Finance & Markets",
   "World",
+  "Science",
+  "Space",
+  "Cybersecurity",
+  "Startups",
+  "Education & Careers",
+  "Health",
+  "Sports",
   "Entertainment",
-  "General",
+  "Environment & Climate",
 ];
+
 const LANGUAGES = ["English", "Hindi"];
 
 const DashPreferences = ({
@@ -130,16 +140,6 @@ const DashPreferences = ({
               {topic}
             </button>
           ))}
-
-          <button
-            type="button"
-            disabled={!isEditing}
-            className={`dash-pref-pill dash-pref-pill--add ${
-              !isEditing ? "dash-pref-pill--readonly" : ""
-            }`}
-          >
-            <span>+</span> Add More
-          </button>
         </div>
 
         <p className="dash-pref-sources">{sourcesText}</p>
@@ -307,7 +307,7 @@ const DashPreferences = ({
                 type="button"
                 className="dash-pref-telegram__connect-btn"
                 onClick={handleTelegramConnect}
-                disabled={isTelegramConnecting}
+                disabled={!isEditing}
               >
                 {isTelegramConnecting
                   ? "Waiting for Telegram..."
