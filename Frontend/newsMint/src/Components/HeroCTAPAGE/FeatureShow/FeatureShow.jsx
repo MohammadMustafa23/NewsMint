@@ -17,6 +17,7 @@ const features = [
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
       >
         <path d="M9 18h6" />
         <path d="M10 22h4" />
@@ -43,6 +44,7 @@ const features = [
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
       >
         <line x1="4" y1="21" x2="4" y2="14" />
         <line x1="4" y1="10" x2="4" y2="3" />
@@ -71,6 +73,7 @@ const features = [
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
       >
         <polygon points="12 2 2 7 12 12 22 7 12 2" />
         <polyline points="2 17 12 22 22 17" />
@@ -93,6 +96,7 @@ const features = [
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
       >
         <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
         <path d="M18 14h-8" />
@@ -116,6 +120,7 @@ const features = [
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
       >
         <path d="m5 8 6 6" />
         <path d="m4 14 6-6 2-3" />
@@ -141,6 +146,7 @@ const features = [
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
       >
         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
       </svg>
@@ -161,6 +167,7 @@ const features = [
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
       >
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         <line x1="8" y1="9" x2="16" y2="9" />
@@ -182,6 +189,7 @@ const features = [
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
       >
         <circle cx="12" cy="12" r="10" />
         <polyline points="12 6 12 12 16 14" />
@@ -192,24 +200,33 @@ const features = [
 
 const FeatureShow = () => {
   return (
-    <section className="feature-show">
-      <div className="feature-show__container">
-        <span className="feature-show__label">KEY CAPABILITIES</span>
-        <h2 className="feature-show__title">
+    <section className="nm-features" id="features">
+      <div className="nm-features__container">
+        <span className="nm-features__eyebrow">KEY CAPABILITIES</span>
+
+        <h2 className="nm-features__title">
           Everything you need to stay informed
         </h2>
 
-        <div className="feature-show__grid">
-          {features.map((feature) => (
-            <div className="feature-show__card" key={feature.id}>
-              <div className="feature-show__icon-box">
-                <span className="feature-show__icon">{feature.icon}</span>
+        <div className="nm-features__grid">
+          {features.map((feature, index) => (
+            <article className="nm-features__card" key={feature.id}>
+              <div className="nm-features__card-number">
+                {String(index + 1).padStart(2, "0")}
               </div>
-              <h3 className="feature-show__card-title">{feature.title}</h3>
-              <p className="feature-show__card-description">
-                {feature.description}
-              </p>
-            </div>
+
+              <div className="nm-features__icon">{feature.icon}</div>
+
+              <div className="nm-features__content">
+                <h3 className="nm-features__card-title">{feature.title}</h3>
+
+                <p className="nm-features__card-description">
+                  {feature.description}
+                </p>
+              </div>
+
+              <span className="nm-features__arrow">→</span>
+            </article>
           ))}
         </div>
       </div>

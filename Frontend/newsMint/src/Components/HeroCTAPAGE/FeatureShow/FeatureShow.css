@@ -1,210 +1,613 @@
-/* ========================================
-   FeatureShow - NewsMint
-   ======================================== */
+/* =========================================================
+   NewsMint Features
+   Unique Namespace: nm-features
+   Theme: Existing Gold + Navy + Lavender
+========================================================= */
 
-.feature-show {
-  background-color: #f8f9fc;
-  padding: 100px 24px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+.nm-features {
+  --nm-bg: #f8f9fc;
+  --nm-white: #ffffff;
+
+  --nm-navy: #0f172a;
+  --nm-navy-soft: #1e293b;
+
+  --nm-text: #475569;
+  --nm-muted: #94a3b8;
+
+  --nm-gold: #a67c00;
+  --nm-gold-bright: #e8b923;
+  --nm-gold-soft: #fff8df;
+
+  --nm-lavender: #eef1ff;
+  --nm-lavender-light: #f5f6ff;
+
+  --nm-border: #e3e7f0;
+
+  position: relative;
+  isolation: isolate;
+
+  padding: 105px 24px 115px;
+
+  background:
+    radial-gradient(
+      circle at 5% 20%,
+      rgba(166, 124, 0, 0.045),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 95% 85%,
+      rgba(99, 102, 241, 0.035),
+      transparent 30%
+    ),
+    var(--nm-bg);
+
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+
+  overflow: hidden;
 }
 
-.feature-show__container {
-  max-width: 1200px;
+/* =========================================================
+   Background Decoration
+========================================================= */
+
+.nm-features::before {
+  content: "";
+
+  position: absolute;
+  z-index: -1;
+
+  width: 400px;
+  height: 400px;
+
+  top: -240px;
+  right: -160px;
+
+  border: 1px solid rgba(166, 124, 0, 0.08);
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 0 50px rgba(166, 124, 0, 0.02),
+    0 0 0 100px rgba(166, 124, 0, 0.012);
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   Container
+========================================================= */
+
+.nm-features__container {
+  width: 100%;
+  max-width: 1180px;
+
   margin: 0 auto;
+
   text-align: center;
 }
 
-.feature-show__label {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 2.5px;
+/* =========================================================
+   Eyebrow
+========================================================= */
+
+.nm-features__eyebrow {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 9px;
+
+  margin-bottom: 17px;
+
+  color: var(--nm-gold);
+
+  font-size: 11px;
+  font-weight: 750;
+
+  letter-spacing: 2.4px;
+
   text-transform: uppercase;
-  color: #a67c00;
-  margin-bottom: 16px;
 }
 
-.feature-show__title {
-  font-family: Georgia, 'Times New Roman', Times, serif;
-  font-size: 42px;
+.nm-features__eyebrow::before,
+.nm-features__eyebrow::after {
+  content: "";
+
+  width: 18px;
+  height: 1px;
+
+  background: var(--nm-gold);
+
+  opacity: 0.55;
+}
+
+/* =========================================================
+   Title
+========================================================= */
+
+.nm-features__title {
+  max-width: 700px;
+
+  margin: 0 auto 60px;
+
+  color: var(--nm-navy);
+
+  font-family: Georgia, "Times New Roman", Times, serif;
+
+  font-size: clamp(34px, 4vw, 44px);
+
   font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 60px 0;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+
+  line-height: 1.15;
+
+  letter-spacing: -0.03em;
 }
 
-/* ========================================
-   Feature Grid
-   ======================================== */
+/* =========================================================
+   Grid
+========================================================= */
 
-.feature-show__grid {
+.nm-features__grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 16px;
+
   text-align: left;
 }
 
-/* ========================================
-   Feature Card
-   ======================================== */
+/* =========================================================
+   Card
+========================================================= */
 
-.feature-show__card {
-  background-color: #eef1ff;
-  border-radius: 16px;
-  padding: 28px 24px;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(0, 0, 0, 0.02);
-}
+.nm-features__card {
+  position: relative;
 
-.feature-show__card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
-  background-color: #e8ecff;
-}
+  min-height: 245px;
 
-/* Icon Box */
-.feature-show__icon-box {
-  width: 44px;
-  height: 44px;
-  background: #ffffff;
-  border-radius: 10px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 18px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  flex-direction: column;
+
+  padding: 25px 22px 22px;
+
+  border: 1px solid var(--nm-border);
+
+  border-radius: 17px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(238, 241, 255, 0.9),
+    rgba(248, 249, 255, 0.95)
+  );
+
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.025);
+
+  overflow: hidden;
+
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    background 0.3s ease;
 }
 
-.feature-show__icon {
-  color: #a67c00;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Top Gold Accent */
+
+.nm-features__card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 22px;
+
+  width: 32px;
+  height: 2px;
+
+  border-radius: 0 0 4px 4px;
+
+  background: var(--nm-gold-bright);
+
+  transition:
+    width 0.3s ease,
+    opacity 0.3s ease;
 }
 
-/* Card Title */
-.feature-show__card-title {
-  font-family: Georgia, 'Times New Roman', Times, serif;
-  font-size: 18px;
+/* Decorative Glow */
+
+.nm-features__card::after {
+  content: "";
+
+  position: absolute;
+
+  width: 130px;
+  height: 130px;
+
+  right: -70px;
+  bottom: -70px;
+
+  border-radius: 50%;
+
+  background: rgba(232, 185, 35, 0.08);
+
+  opacity: 0;
+
+  transition: opacity 0.3s ease;
+
+  pointer-events: none;
+}
+
+/* Hover */
+
+.nm-features__card:hover {
+  transform: translateY(-6px);
+
+  border-color: rgba(166, 124, 0, 0.2);
+
+  background: linear-gradient(145deg, #eef1ff, #f9faff);
+
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.08),
+    0 5px 15px rgba(166, 124, 0, 0.05);
+}
+
+.nm-features__card:hover::before {
+  width: 55px;
+}
+
+.nm-features__card:hover::after {
+  opacity: 1;
+}
+
+/* =========================================================
+   Card Number
+========================================================= */
+
+.nm-features__card-number {
+  position: absolute;
+
+  top: 19px;
+  right: 20px;
+
+  color: rgba(15, 23, 42, 0.12);
+
+  font-family: Georgia, "Times New Roman", serif;
+
+  font-size: 12px;
   font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 10px 0;
+
+  letter-spacing: 0.05em;
+
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.nm-features__card:hover .nm-features__card-number {
+  color: rgba(166, 124, 0, 0.35);
+
+  transform: translateY(-2px);
+}
+
+/* =========================================================
+   Icon
+========================================================= */
+
+.nm-features__icon {
+  position: relative;
+  z-index: 2;
+
+  width: 47px;
+  height: 47px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 20px;
+
+  border: 1px solid rgba(166, 124, 0, 0.12);
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.92);
+
+  color: var(--nm-gold);
+
+  box-shadow: 0 5px 13px rgba(15, 23, 42, 0.045);
+
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.nm-features__icon svg {
+  width: 21px;
+  height: 21px;
+
+  stroke-width: 1.9;
+}
+
+.nm-features__card:hover .nm-features__icon {
+  transform: translateY(-2px) scale(1.05);
+
+  background: var(--nm-gold-soft);
+
+  box-shadow: 0 8px 18px rgba(166, 124, 0, 0.12);
+}
+
+/* =========================================================
+   Content
+========================================================= */
+
+.nm-features__content {
+  position: relative;
+  z-index: 2;
+}
+
+/* =========================================================
+   Card Title
+========================================================= */
+
+.nm-features__card-title {
+  margin: 0 0 9px;
+
+  color: var(--nm-navy);
+
+  font-family: Georgia, "Times New Roman", Times, serif;
+
+  font-size: 17px;
+
+  font-weight: 700;
+
   line-height: 1.35;
+
+  letter-spacing: -0.01em;
 }
 
-/* Card Description */
-.feature-show__card-description {
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: #64748b;
+/* =========================================================
+   Description
+========================================================= */
+
+.nm-features__card-description {
   margin: 0;
+
+  color: var(--nm-text);
+
+  font-size: 12.8px;
+
+  line-height: 1.65;
 }
 
-/* ========================================
-   RESPONSIVE BREAKPOINTS
-   ======================================== */
+/* =========================================================
+   Arrow
+========================================================= */
 
-/* Tablet: 768px - 1023px */
+.nm-features__arrow {
+  position: absolute;
+
+  right: 20px;
+  bottom: 18px;
+
+  color: var(--nm-gold);
+
+  font-size: 17px;
+  font-weight: 600;
+
+  opacity: 0;
+
+  transform: translateX(-6px);
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.nm-features__card:hover .nm-features__arrow {
+  opacity: 0.9;
+
+  transform: translateX(0);
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
 @media (max-width: 1023px) {
-  .feature-show {
-    padding: 70px 24px;
+  .nm-features {
+    padding: 80px 24px 90px;
   }
 
-  .feature-show__title {
-    font-size: 36px;
+  .nm-features__title {
     margin-bottom: 48px;
+
+    font-size: 36px;
   }
 
-  .feature-show__grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
-  }
+  .nm-features__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 
-  .feature-show__card {
-    padding: 24px 22px;
-  }
-
-  .feature-show__card-title {
-    font-size: 17px;
-  }
-}
-
-/* Mobile: below 768px */
-@media (max-width: 767px) {
-  .feature-show {
-    padding: 50px 20px;
-  }
-
-  .feature-show__title {
-    font-size: 30px;
-    margin-bottom: 40px;
-  }
-
-  .feature-show__grid {
-    grid-template-columns: 1fr;
     gap: 16px;
   }
 
-  .feature-show__card {
-    padding: 24px 22px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
+  .nm-features__card {
+    min-height: 220px;
 
-  .feature-show__icon-box {
-    margin-bottom: 16px;
-  }
-
-  .feature-show__card-title {
-    font-size: 18px;
-  }
-
-  .feature-show__card-description {
-    font-size: 14px;
-    max-width: 320px;
+    padding: 24px 21px;
   }
 }
 
-/* Small Mobile: below 480px */
-@media (max-width: 479px) {
-  .feature-show {
-    padding: 40px 16px;
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 767px) {
+  .nm-features {
+    padding: 65px 20px 75px;
   }
 
-  .feature-show__title {
-    font-size: 26px;
-    margin-bottom: 32px;
-  }
+  .nm-features__eyebrow {
+    margin-bottom: 14px;
 
-  .feature-show__label {
-    font-size: 11px;
+    font-size: 10px;
+
     letter-spacing: 2px;
   }
 
-  .feature-show__card {
-    padding: 22px 18px;
+  .nm-features__eyebrow::before,
+  .nm-features__eyebrow::after {
+    width: 13px;
   }
 
-  .feature-show__icon-box {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
+  .nm-features__title {
+    margin-bottom: 38px;
+
+    font-size: 30px;
   }
 
-  .feature-show__icon svg {
-    width: 20px;
-    height: 20px;
+  .nm-features__grid {
+    grid-template-columns: 1fr;
+
+    gap: 13px;
+
+    text-align: center;
   }
 
-  .feature-show__card-title {
+  .nm-features__card {
+    min-height: auto;
+
+    align-items: center;
+
+    padding: 25px 22px 28px;
+
+    border-radius: 16px;
+  }
+
+  .nm-features__card::before {
+    left: 50%;
+
+    transform: translateX(-50%);
+  }
+
+  .nm-features__card:hover::before {
+    width: 45px;
+  }
+
+  .nm-features__card-number {
+    top: 16px;
+    right: 17px;
+  }
+
+  .nm-features__icon {
+    margin-bottom: 15px;
+  }
+
+  .nm-features__card-title {
+    font-size: 18px;
+  }
+
+  .nm-features__card-description {
+    max-width: 360px;
+
+    font-size: 13.5px;
+  }
+
+  .nm-features__arrow {
+    display: none;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 479px) {
+  .nm-features {
+    padding: 52px 16px 62px;
+  }
+
+  .nm-features__title {
+    margin-bottom: 30px;
+
+    font-size: 26px;
+  }
+
+  .nm-features__grid {
+    gap: 11px;
+  }
+
+  .nm-features__card {
+    padding: 22px 18px 24px;
+
+    border-radius: 14px;
+  }
+
+  .nm-features__icon {
+    width: 42px;
+    height: 42px;
+
+    margin-bottom: 13px;
+
+    border-radius: 10px;
+  }
+
+  .nm-features__icon svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .nm-features__card-title {
     font-size: 16px;
   }
 
-  .feature-show__card-description {
-    font-size: 13px;
+  .nm-features__card-description {
+    font-size: 12.5px;
+
+    line-height: 1.6;
+  }
+}
+
+/* =========================================================
+   EXTRA SMALL
+========================================================= */
+
+@media (max-width: 360px) {
+  .nm-features {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+  .nm-features__title {
+    font-size: 24px;
+  }
+
+  .nm-features__card {
+    padding: 20px 16px 22px;
+  }
+
+  .nm-features__card-description {
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .nm-features__card,
+  .nm-features__card::before,
+  .nm-features__card::after,
+  .nm-features__icon,
+  .nm-features__card-number,
+  .nm-features__arrow {
+    transition: none;
+  }
+
+  .nm-features__card:hover {
+    transform: none;
   }
 }

@@ -6,9 +6,13 @@ import Prefrence from "./Components/Pages/Prefrence";
 import DashBoard from "./Components/Pages/Dashboard";
 import ProtectedRoute from "./security/ProtectedRoute";
 
-import HomeDash from './Components/Dashboard/HomePage/HomeDash'
-import HomeSource from './Components/Dashboard/Source/HomeSource'
-import HomeTopNews from './Components/Dashboard/TopNews/HomeTopNews'
+import HomeDash from "./Components/Dashboard/HomePage/HomeDash";
+import HomeSource from "./Components/Dashboard/Source/HomeSource";
+import HomeTopNews from "./Components/Dashboard/TopNews/HomeTopNews";
+
+
+import PrivacyPolicy from "./Components/HeroCTAPAGE/Footer/PrivacyPolicy";
+import TermsOfService from "./Components/HeroCTAPAGE/Footer/TermsOfService";
 
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
@@ -63,7 +67,9 @@ function App() {
           <Route path="source" element={<HomeSource />} />
           <Route path="top-news" element={<HomeTopNews />} />
         </Route>
-        
+
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
       </Routes>
     </>
   );

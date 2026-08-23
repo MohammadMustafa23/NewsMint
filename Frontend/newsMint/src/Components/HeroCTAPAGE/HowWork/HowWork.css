@@ -1,147 +1,432 @@
-/* NewsMint Process Section */
+/* =========================================================
+   NewsMint Process Section
+   Premium Version — Same Color Theme
+========================================================= */
+
 .newsmint-process {
-  background-color: #f0f3ff;
-  padding: 80px 24px;
+  --process-bg: #f0f3ff;
+  --process-white: #ffffff;
+
+  --process-navy: #0f172a;
+  --process-text: #475569;
+  --process-muted: #64748b;
+
+  --process-gold: #a67c00;
+  --process-gold-light: #d4a017;
+
+  --process-border: rgba(15, 23, 42, 0.07);
+  --process-line: #d1d5db;
+
+  position: relative;
+  isolation: isolate;
+
+  padding: 95px 24px 105px;
+
+  background-color: var(--process-bg);
+
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
+
+  overflow: hidden;
 }
+
+/* =========================================================
+   Decorative Background
+========================================================= */
+
+.newsmint-process::before {
+  content: "";
+
+  position: absolute;
+  z-index: -1;
+
+  width: 420px;
+  height: 420px;
+
+  top: -260px;
+  left: -180px;
+
+  border-radius: 50%;
+
+  border: 1px solid rgba(166, 124, 0, 0.08);
+
+  box-shadow:
+    0 0 0 55px rgba(166, 124, 0, 0.025),
+    0 0 0 110px rgba(166, 124, 0, 0.015);
+
+  pointer-events: none;
+}
+
+.newsmint-process::after {
+  content: "";
+
+  position: absolute;
+  z-index: -1;
+
+  width: 300px;
+  height: 300px;
+
+  right: -150px;
+  bottom: -180px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.25);
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   Container
+========================================================= */
 
 .newsmint-process__container {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1180px;
+
   margin: 0 auto;
+
   text-align: center;
 }
+
+/* =========================================================
+   Section Label
+========================================================= */
 
 .newsmint-process__label {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 600;
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 9px;
+
+  margin-bottom: 17px;
+
+  color: var(--process-gold);
+
+  font-size: 11px;
+  font-weight: 700;
+
   letter-spacing: 2.5px;
+
   text-transform: uppercase;
-  color: #a67c00;
-  margin-bottom: 16px;
 }
+
+.newsmint-process__label::before,
+.newsmint-process__label::after {
+  content: "";
+
+  width: 18px;
+  height: 1px;
+
+  background: var(--process-gold);
+
+  opacity: 0.55;
+}
+
+/* =========================================================
+   Section Title
+========================================================= */
 
 .newsmint-process__title {
+  max-width: 680px;
+
+  margin: 0 auto 65px;
+
+  color: var(--process-navy);
+
   font-family: Georgia, "Times New Roman", Times, serif;
-  font-size: 42px;
+
+  font-size: clamp(34px, 4vw, 44px);
+
   font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 60px 0;
-  line-height: 1.2;
+
+  line-height: 1.15;
+
+  letter-spacing: -0.03em;
 }
 
-/* Steps Grid */
+/* =========================================================
+   Steps
+========================================================= */
+
 .newsmint-process__steps {
+  position: relative;
+
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  gap: 24px;
-  position: relative;
-}
+  justify-content: space-between;
 
-.newsmint-process__step {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: 260px;
-}
+  gap: 20px;
 
-/* Icon Wrapper */
-.newsmint-process__icon-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 24px;
   width: 100%;
 }
 
-.newsmint-process__icon-box {
-  width: 72px;
-  height: 72px;
-  background: #ffffff;
-  border-radius: 16px;
+/* =========================================================
+   Individual Step
+========================================================= */
+
+.newsmint-process__step {
+  position: relative;
+
+  flex: 1;
+
+  width: 100%;
+  max-width: 265px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+}
+
+/* =========================================================
+   Icon Wrapper
+========================================================= */
+
+.newsmint-process__icon-wrapper {
+  position: relative;
+
+  width: 100%;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.04);
+
+  margin-bottom: 25px;
+}
+
+/* =========================================================
+   Icon Box
+========================================================= */
+
+.newsmint-process__icon-box {
   position: relative;
-  z-index: 2;
+  z-index: 3;
+
+  width: 74px;
+  height: 74px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   flex-shrink: 0;
+
+  border: 1px solid rgba(166, 124, 0, 0.12);
+
+  border-radius: 17px;
+
+  background: var(--process-white);
+
+  color: var(--process-gold);
+
+  box-shadow:
+    0 6px 18px rgba(15, 23, 42, 0.055),
+    0 1px 3px rgba(15, 23, 42, 0.04);
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Gold inner ring */
+
+.newsmint-process__icon-box::before {
+  content: "";
+
+  position: absolute;
+  inset: 6px;
+
+  border: 1px solid rgba(166, 124, 0, 0.08);
+
+  border-radius: 12px;
+
+  pointer-events: none;
 }
 
 .newsmint-process__icon {
-  color: #a67c00;
+  position: relative;
+  z-index: 2;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  color: var(--process-gold);
+
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease;
 }
 
-/* Connector Line */
+.newsmint-process__icon svg {
+  width: 27px;
+  height: 27px;
+}
+
+/* Hover */
+
+.newsmint-process__step:hover .newsmint-process__icon-box {
+  transform: translateY(-5px);
+
+  border-color: rgba(166, 124, 0, 0.2);
+
+  box-shadow:
+    0 14px 28px rgba(15, 23, 42, 0.08),
+    0 5px 12px rgba(166, 124, 0, 0.06);
+}
+
+.newsmint-process__step:hover .newsmint-process__icon {
+  transform: scale(1.08);
+}
+
+/* =========================================================
+   Connector
+========================================================= */
+
 .newsmint-process__connector {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: calc(100% + 48px);
-  height: 2px;
-  background: linear-gradient(90deg, #d1d5db 0%, #d1d5db 100%);
-  transform: translateY(-50%);
   z-index: 1;
+
+  top: 37px;
+
+  left: calc(50% + 37px);
+
+  width: calc(100% - 74px);
+
+  height: 1px;
+
+  background: repeating-linear-gradient(
+    90deg,
+    var(--process-line) 0,
+    var(--process-line) 6px,
+    transparent 6px,
+    transparent 11px
+  );
+
+  transform: translateY(-50%);
+
+  opacity: 0.9;
 }
 
-/* Content */
+/* Connector endpoint dots */
+
+.newsmint-process__connector::before,
+.newsmint-process__connector::after {
+  content: "";
+
+  position: absolute;
+  top: 50%;
+
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: var(--process-line);
+
+  transform: translateY(-50%);
+}
+
+.newsmint-process__connector::before {
+  left: 0;
+}
+
+.newsmint-process__connector::after {
+  right: 0;
+}
+
+/* =========================================================
+   Content
+========================================================= */
+
 .newsmint-process__content {
+  position: relative;
+  z-index: 2;
+
   padding: 0 8px;
 }
 
+/* =========================================================
+   Step Title
+========================================================= */
+
 .newsmint-process__step-title {
+  margin: 0 0 10px;
+
+  color: var(--process-navy);
+
   font-family: Georgia, "Times New Roman", Times, serif;
-  font-size: 20px;
-  font-weight: 600;
-  color: #0f172a;
-  margin: 0 0 12px 0;
+
+  font-size: 19px;
+
+  font-weight: 700;
+
   line-height: 1.3;
+
+  letter-spacing: -0.015em;
 }
 
 .newsmint-process__step-number {
+  margin-right: 3px;
+
+  color: var(--process-gold);
+
   font-weight: 700;
 }
 
+/* =========================================================
+   Description
+========================================================= */
+
 .newsmint-process__step-description {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #64748b;
-  margin: 0;
+  max-width: 245px;
+
+  margin: 0 auto;
+
+  color: var(--process-muted);
+
+  font-size: 13px;
+
+  line-height: 1.65;
+
+  letter-spacing: -0.002em;
 }
 
-/* ========================
-   RESPONSIVE BREAKPOINTS
-   ======================== */
+/* =========================================================
+   TABLET
+   1023px
+========================================================= */
 
-/* Tablet: 768px - 1023px */
 @media (max-width: 1023px) {
   .newsmint-process {
-    padding: 60px 24px;
+    padding: 78px 24px 85px;
   }
 
   .newsmint-process__title {
+    margin-bottom: 52px;
+
     font-size: 36px;
-    margin-bottom: 48px;
   }
 
   .newsmint-process__steps {
-    gap: 16px;
+    gap: 12px;
   }
 
   .newsmint-process__icon-box {
-    width: 64px;
-    height: 64px;
-    border-radius: 14px;
+    width: 66px;
+    height: 66px;
+
+    border-radius: 15px;
+  }
+
+  .newsmint-process__icon-box::before {
+    border-radius: 10px;
   }
 
   .newsmint-process__icon svg {
@@ -149,108 +434,12 @@
     height: 24px;
   }
 
-  .newsmint-process__step-title {
-    font-size: 18px;
-  }
-
-  .newsmint-process__step-description {
-    font-size: 13px;
-  }
-
   .newsmint-process__connector {
-    width: calc(100% + 32px);
-  }
-}
+    top: 33px;
 
-/* Mobile: below 768px */
-@media (max-width: 767px) {
-  .newsmint-process {
-    padding: 48px 20px;
-  }
+    left: calc(50% + 33px);
 
-  .newsmint-process__title {
-    font-size: 28px;
-    margin-bottom: 40px;
-  }
-
-  .newsmint-process__steps {
-    flex-direction: column;
-    align-items: center;
-    gap: 36px;
-  }
-
-  .newsmint-process__step {
-    max-width: 320px;
-    width: 100%;
-  }
-
-  .newsmint-process__icon-wrapper {
-    margin-bottom: 16px;
-  }
-
-  .newsmint-process__icon-box {
-    width: 68px;
-    height: 68px;
-    border-radius: 16px;
-  }
-
-  .newsmint-process__icon svg {
-    width: 26px;
-    height: 26px;
-  }
-
-  /* Vertical connector for mobile */
-  .newsmint-process__connector {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    width: 2px;
-    height: 36px;
-    background: #d1d5db;
-    transform: translateX(-50%);
-  }
-
-  .newsmint-process__step-title {
-    font-size: 18px;
-    margin-bottom: 8px;
-  }
-
-  .newsmint-process__step-description {
-    font-size: 14px;
-    max-width: 280px;
-    margin: 0 auto;
-  }
-}
-
-/* Small Mobile: below 480px */
-@media (max-width: 479px) {
-  .newsmint-process {
-    padding: 40px 16px;
-  }
-
-  .newsmint-process__title {
-    font-size: 24px;
-    margin-bottom: 32px;
-  }
-
-  .newsmint-process__label {
-    font-size: 11px;
-    letter-spacing: 2px;
-  }
-
-  .newsmint-process__step {
-    max-width: 100%;
-  }
-
-  .newsmint-process__icon-box {
-    width: 60px;
-    height: 60px;
-    border-radius: 14px;
-  }
-
-  .newsmint-process__icon svg {
-    width: 22px;
-    height: 22px;
+    width: calc(100% - 66px);
   }
 
   .newsmint-process__step-title {
@@ -258,10 +447,229 @@
   }
 
   .newsmint-process__step-description {
-    font-size: 13px;
+    font-size: 12.5px;
+  }
+}
+
+/* =========================================================
+   SMALL TABLET
+   850px
+========================================================= */
+
+@media (max-width: 850px) {
+  .newsmint-process__steps {
+    gap: 8px;
+  }
+
+  .newsmint-process__step {
+    max-width: 220px;
+  }
+
+  .newsmint-process__step-description {
+    max-width: 200px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   767px
+========================================================= */
+
+@media (max-width: 767px) {
+  .newsmint-process {
+    padding: 65px 20px 75px;
+  }
+
+  .newsmint-process__label {
+    margin-bottom: 14px;
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+  }
+
+  .newsmint-process__label::before,
+  .newsmint-process__label::after {
+    width: 13px;
+  }
+
+  .newsmint-process__title {
+    margin-bottom: 45px;
+
+    font-size: 30px;
+
+    line-height: 1.18;
+  }
+
+  .newsmint-process__steps {
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 38px;
+  }
+
+  .newsmint-process__step {
+    max-width: 370px;
+
+    width: 100%;
+  }
+
+  .newsmint-process__icon-wrapper {
+    margin-bottom: 17px;
+  }
+
+  .newsmint-process__icon-box {
+    width: 68px;
+    height: 68px;
+
+    border-radius: 16px;
+  }
+
+  .newsmint-process__icon svg {
+    width: 25px;
+    height: 25px;
+  }
+
+  /* Vertical connector */
+
+  .newsmint-process__connector {
+    top: calc(100% + 19px);
+
+    left: 50%;
+
+    width: 1px;
+    height: 38px;
+
+    transform: translateX(-50%);
+
+    background: repeating-linear-gradient(
+      180deg,
+      var(--process-line) 0,
+      var(--process-line) 6px,
+      transparent 6px,
+      transparent 11px
+    );
+  }
+
+  .newsmint-process__connector::before,
+  .newsmint-process__connector::after {
+    display: none;
+  }
+
+  .newsmint-process__step:last-child .newsmint-process__connector {
+    display: none;
+  }
+
+  .newsmint-process__step-title {
+    margin-bottom: 8px;
+
+    font-size: 18px;
+  }
+
+  .newsmint-process__step-description {
+    max-width: 320px;
+
+    font-size: 13.5px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   479px
+========================================================= */
+
+@media (max-width: 479px) {
+  .newsmint-process {
+    padding: 52px 16px 62px;
+  }
+
+  .newsmint-process__title {
+    margin-bottom: 37px;
+
+    font-size: 26px;
+  }
+
+  .newsmint-process__step {
+    max-width: 100%;
+  }
+
+  .newsmint-process__icon-box {
+    width: 61px;
+    height: 61px;
+
+    border-radius: 14px;
+  }
+
+  .newsmint-process__icon-box::before {
+    inset: 5px;
+
+    border-radius: 10px;
+  }
+
+  .newsmint-process__icon svg {
+    width: 22px;
+    height: 22px;
   }
 
   .newsmint-process__connector {
+    top: calc(100% + 14px);
+
     height: 28px;
+  }
+
+  .newsmint-process__step-title {
+    font-size: 17px;
+  }
+
+  .newsmint-process__step-description {
+    max-width: 290px;
+
+    font-size: 12.5px;
+
+    line-height: 1.6;
+  }
+}
+
+/* =========================================================
+   EXTRA SMALL
+   360px
+========================================================= */
+
+@media (max-width: 360px) {
+  .newsmint-process {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+  .newsmint-process__title {
+    font-size: 24px;
+  }
+
+  .newsmint-process__steps {
+    gap: 34px;
+  }
+
+  .newsmint-process__step-description {
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .newsmint-process__icon-box,
+  .newsmint-process__icon {
+    transition: none;
+  }
+
+  .newsmint-process__step:hover .newsmint-process__icon-box {
+    transform: none;
+  }
+
+  .newsmint-process__step:hover .newsmint-process__icon {
+    transform: none;
   }
 }

@@ -1,34 +1,44 @@
 import React from "react";
 import "./Footer.css";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
+  const GITHUB_URL = "https://github.com/MohammadMustafa23";
+
   return (
     <footer className="footer">
       <div className="footer__container">
         {/* Logo */}
-        <a href="#" className="footer__logo">
+        <Link to="/" className="footer__logo">
           NewsMint
-        </a>
+        </Link>
 
         {/* Copyright */}
         <p className="footer__copyright">
-          © 2024 NewsMint. A Free Personal Project.
+          © 2026 NewsMint. A Free Personal Project.
         </p>
 
         {/* Links */}
         <ul className="footer__links">
           <li>
-            <a href="#privacy" className="footer__link">
+            <Link to="/privacy-policy" className="footer__link">
               Privacy Policy
-            </a>
+            </Link>
           </li>
+
           <li>
-            <a href="#terms" className="footer__link">
+            <Link to="/terms-of-service" className="footer__link">
               Terms of Service
-            </a>
+            </Link>
           </li>
+
           <li>
-            <a href="#contact" className="footer__link">
+            <a
+              href={GITHUB_URL}
+              className="footer__link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Contact Us
             </a>
           </li>

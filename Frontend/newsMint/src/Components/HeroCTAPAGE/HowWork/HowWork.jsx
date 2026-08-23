@@ -57,7 +57,7 @@ const steps = [
 
 const HowWork = () => {
   return (
-    <section className="newsmint-process">
+    <section className="newsmint-process" id="how-it-works" >
       <div className="newsmint-process__container">
         <span className="newsmint-process__label">THE PROCESS</span>
         <h2 className="newsmint-process__title">How NewsMint Works</h2>

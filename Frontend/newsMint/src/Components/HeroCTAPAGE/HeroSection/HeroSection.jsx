@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom'
 const HeroSection = () => {
   const navigate = useNavigate();
   return (
-    <section className="hero-section">
+     <section className="hero-section" id="home">
       <div className="hero-section__container">
         {/* Left Content */}
         <div className="hero-section__content">

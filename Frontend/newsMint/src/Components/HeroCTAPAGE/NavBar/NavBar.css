@@ -1,251 +1,542 @@
-/* ========================================
-   Navbar - NewsMint
-   ======================================== */
+/* =========================================================
+   NewsMint — Premium Glass Navbar
+========================================================= */
 
-.navbar {
-  background-color: #f8f9fc;
-  padding: 0 24px;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
-    Arial, sans-serif;
+/* =========================================================
+   NewsMint Navbar — Seamless Glass
+========================================================= */
+
+.nm-nav {
+  --page-bg: #f8f9fc;
+  --navy: #0f172a;
+  --text: #64748b;
+  --gold: #e8b923;
+  --gold-dark: #d4a017;
+
   position: sticky;
   top: 0;
   z-index: 1000;
-  border-bottom: 1px solid transparent;
+
+  width: 100%;
+
+  padding: 14px 24px 0;
+
+  background: #f8f9fc;
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
 }
 
-.navbar__container {
-  max-width: 1200px;
+
+/* =========================================================
+   Glass Navbar
+========================================================= */
+
+.nm-nav__glass {
+  width: min(1180px, 100%);
+  height: 66px;
+
   margin: 0 auto;
+
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 70px;
+
+  padding: 0 10px 0 18px;
+
+  /*
+    IMPORTANT:
+    Transparent glass so Hero background
+    remains visually connected.
+  */
+  background: rgba(248, 249, 252, 0.82);
+
+  border: 1px solid rgba(255, 255, 255, 0.8);
+
+  border-radius: 18px;
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  box-shadow:
+    0 8px 28px rgba(15, 23, 42, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease;
 }
-
-/* ========================================
+/* =========================================================
    Logo
-   ======================================== */
+========================================================= */
 
-.navbar__logo {
-  font-family: Georgia, "Times New Roman", Times, serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: #0f172a;
-  text-decoration: none;
-  letter-spacing: -0.02em;
+.nm-nav__logo {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: var(--gold);
+
+  cursor: pointer;
+
   flex-shrink: 0;
 }
 
-/* ========================================
-   Desktop Nav Links
-   ======================================== */
+.nm-nav__logo-mark {
+  width: 39px;
+  height: 34px;
 
-.navbar__links {
   display: flex;
   align-items: center;
-  gap: 32px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  justify-content: center;
+
+  transition: transform 0.25s ease;
 }
 
-.navbar__link {
-  font-size: 15px;
-  font-weight: 500;
-  color: #64748b;
-  text-decoration: none;
-  transition: color 0.2s ease;
+.nm-nav__logo-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.nm-nav__logo:hover .nm-nav__logo-mark {
+  transform: translateY(-1px) scale(1.04);
+}
+
+.nm-nav__logo-text {
+  color: #d8911d;
+
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+
+  font-size: 25px;
+  font-weight: 800;
+
+  letter-spacing: -1.4px;
+
+  line-height: 1;
+}
+
+/* =========================================================
+   Desktop Links
+========================================================= */
+
+.nm-nav__links {
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 34px;
+
+  margin: 0 40px;
+}
+
+.nm-nav__link {
   position: relative;
+
+  color: var(--text);
+
+  font-size: 14px;
+  font-weight: 550;
+
+  text-decoration: none;
+
+  white-space: nowrap;
+
+  padding: 8px 0;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
-.navbar__link:hover {
-  color: #0f172a;
-}
-
-.navbar__link::after {
+.nm-nav__link::after {
   content: "";
+
   position: absolute;
-  bottom: -4px;
-  left: 0;
+
+  left: 50%;
+  bottom: 1px;
+
   width: 0;
   height: 2px;
-  background-color: #e8b923;
+
+  border-radius: 20px;
+
+  background: var(--gold);
+
+  transform: translateX(-50%);
+
   transition: width 0.25s ease;
-  border-radius: 1px;
 }
 
-.navbar__link:hover::after {
+.nm-nav__link:hover {
+  color: var(--navy);
+
+  transform: translateY(-1px);
+}
+
+.nm-nav__link:hover::after {
   width: 100%;
 }
 
-/* ========================================
-   CTA Button
-   ======================================== */
+/* =========================================================
+   CTA
+========================================================= */
 
-.navbar__cta {
+.nm-nav__cta {
+  height: 42px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 24px;
-  font-size: 14px;
-  font-weight: 600;
+
+  gap: 9px;
+
+  padding: 0 18px;
+
+  border-radius: 10px;
+
+  background: var(--gold);
+
   color: #1e293b;
-  background-color: #e8b923;
-  border-radius: 6px;
+
+  font-size: 13px;
+  font-weight: 700;
+
   text-decoration: none;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 10px rgba(232, 185, 35, 0.3);
-  flex-shrink: 0;
+
+  box-shadow: 0 4px 12px rgba(232, 185, 35, 0.22);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.navbar__cta:hover {
-  background-color: #d4a017;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(232, 185, 35, 0.4);
+.nm-nav__cta span {
+  font-size: 17px;
+
+  line-height: 1;
+
+  transition: transform 0.2s ease;
 }
 
-/* ========================================
-   Hamburger (Mobile)
-   ======================================== */
+.nm-nav__cta:hover {
+  background: var(--gold-dark);
 
-.navbar__hamburger {
+  transform: translateY(-2px);
+
+  box-shadow: 0 7px 18px rgba(232, 185, 35, 0.28);
+}
+
+.nm-nav__cta:hover span {
+  transform: translateX(3px);
+}
+
+/* =========================================================
+   Mobile Toggle
+========================================================= */
+
+.nm-nav__toggle {
   display: none;
-  flex-direction: column;
-  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
+  margin-left: auto;
+
   align-items: center;
-  width: 36px;
-  height: 36px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
+  justify-content: center;
+  flex-direction: column;
+
   gap: 5px;
+
+  border: 1px solid #e4e8ef;
+
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.7);
+
+  cursor: pointer;
 }
 
-.navbar__hamburger-line {
-  display: block;
-  width: 22px;
+.nm-nav__toggle span {
+  width: 19px;
   height: 2px;
-  background-color: #0f172a;
-  border-radius: 2px;
-  transition: all 0.3s ease;
-  transform-origin: center;
+
+  border-radius: 20px;
+
+  background: var(--navy);
+
+  transition:
+    transform 0.25s ease,
+    opacity 0.2s ease;
 }
 
-.navbar__hamburger--open .navbar__hamburger-line:nth-child(1) {
+.nm-nav__toggle--open span:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }
 
-.navbar__hamburger--open .navbar__hamburger-line:nth-child(2) {
+.nm-nav__toggle--open span:nth-child(2) {
   opacity: 0;
 }
 
-.navbar__hamburger--open .navbar__hamburger-line:nth-child(3) {
+.nm-nav__toggle--open span:nth-child(3) {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-/* ========================================
+/* =========================================================
    Mobile Menu
-   ======================================== */
+========================================================= */
 
-.navbar__mobile-menu {
+.nm-nav__mobile {
+  width: min(1180px, calc(100% - 48px));
+
+  margin: 9px auto 0;
+
   display: none;
-  max-height: 0;
-  overflow: hidden;
-  transition:
-    max-height 0.35s ease,
-    opacity 0.3s ease;
+
   opacity: 0;
+
+  transform: translateY(-8px);
+
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
 }
 
-.navbar__mobile-menu--open {
-  max-height: 400px;
+.nm-nav__mobile--open {
   opacity: 1;
+
+  transform: translateY(0);
 }
 
-.navbar__mobile-links {
-  list-style: none;
-  margin: 0;
-  padding: 16px 0 24px;
+.nm-nav__mobile-inner {
+  padding: 10px;
+
+  border: 1px solid rgba(255, 255, 255, 0.85);
+
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.88);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.09);
+}
+
+/* =========================================================
+   Mobile Links
+========================================================= */
+
+.nm-nav__mobile-link {
+  height: 48px;
+
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+  align-items: center;
+  justify-content: space-between;
 
-.navbar__mobile-link {
-  display: block;
-  padding: 12px 16px;
-  font-size: 16px;
-  font-weight: 500;
-  color: #475569;
-  text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
+  padding: 0 14px;
 
-.navbar__mobile-link:hover {
-  background-color: #f1f5f9;
-  color: #0f172a;
-}
+  border-radius: 9px;
 
-.navbar__mobile-cta {
-  display: block;
-  margin-top: 8px;
-  padding: 12px 16px;
-  font-size: 15px;
+  color: var(--text);
+
+  font-size: 14px;
   font-weight: 600;
-  color: #1e293b;
-  background-color: #e8b923;
-  border-radius: 8px;
+
   text-decoration: none;
-  text-align: center;
-  transition: all 0.25s ease;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
-.navbar__mobile-cta:hover {
-  background-color: #d4a017;
+.nm-nav__mobile-link:hover {
+  background: #f1f3fa;
+
+  color: var(--navy);
 }
 
-/* ========================================
-   RESPONSIVE BREAKPOINTS
-   ======================================== */
+.nm-nav__mobile-link span {
+  color: var(--gold-dark);
 
-/* Tablet & Mobile: below 768px */
+  font-size: 17px;
+}
+
+/* =========================================================
+   Mobile CTA
+========================================================= */
+
+.nm-nav__mobile-cta {
+  height: 46px;
+
+  margin-top: 7px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  border-radius: 9px;
+
+  background: var(--gold);
+
+  color: #1e293b;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+.nm-nav__mobile-cta span {
+  font-size: 17px;
+}
+
+/* =========================================================
+   Tablet
+========================================================= */
+
+@media (max-width: 900px) {
+  .nm-nav__links {
+    gap: 24px;
+
+    margin: 0 25px;
+  }
+
+  .nm-nav__logo-text {
+    font-size: 23px;
+  }
+
+  .nm-nav__logo-mark {
+    width: 36px;
+    height: 32px;
+  }
+
+  .nm-nav__link {
+    font-size: 13px;
+  }
+}
+
+/* =========================================================
+   Mobile
+========================================================= */
+
 @media (max-width: 767px) {
-  .navbar {
-    padding: 0 20px;
+  .nm-nav {
+    padding: 10px 14px 0;
   }
 
-  .navbar__container {
-    height: 64px;
+  .nm-nav__glass {
+    height: 60px;
+
+    padding: 0 9px 0 14px;
+
+    border-radius: 15px;
   }
 
-  .navbar__links,
-  .navbar__cta {
+  .nm-nav__links,
+  .nm-nav__cta {
     display: none;
   }
 
-  .navbar__hamburger {
+  .nm-nav__toggle {
     display: flex;
   }
 
-  .navbar__mobile-menu {
+  .nm-nav__mobile {
     display: block;
+  }
+
+  .nm-nav__logo-mark {
+    width: 34px;
+    height: 30px;
+  }
+
+  .nm-nav__logo-text {
+    font-size: 22px;
   }
 }
 
-/* Small Mobile: below 480px */
+/* =========================================================
+   Small Mobile
+========================================================= */
+
 @media (max-width: 479px) {
-  .navbar {
-    padding: 0 16px;
+  .nm-nav {
+    padding: 8px 10px 0;
   }
 
-  .navbar__container {
-    height: 60px;
+  .nm-nav__glass {
+    height: 56px;
+
+    border-radius: 14px;
   }
 
-  .navbar__logo {
+  .nm-nav__logo-mark {
+    width: 30px;
+    height: 27px;
+  }
+
+  .nm-nav__logo-text {
     font-size: 20px;
+
+    letter-spacing: -1px;
+  }
+
+  .nm-nav__toggle {
+    width: 36px;
+    height: 36px;
+  }
+
+  .nm-nav__mobile {
+    width: calc(100% - 20px);
+  }
+}
+
+/* =========================================================
+   Accessibility
+========================================================= */
+
+.nm-nav__logo:focus-visible,
+.nm-nav__link:focus-visible,
+.nm-nav__cta:focus-visible,
+.nm-nav__toggle:focus-visible,
+.nm-nav__mobile-link:focus-visible,
+.nm-nav__mobile-cta:focus-visible {
+  outline: 3px solid rgba(232, 185, 35, 0.3);
+
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   Reduced Motion
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .nm-nav__logo-mark,
+  .nm-nav__link,
+  .nm-nav__link::after,
+  .nm-nav__cta,
+  .nm-nav__cta span,
+  .nm-nav__toggle span,
+  .nm-nav__mobile {
+    transition: none;
   }
 }
