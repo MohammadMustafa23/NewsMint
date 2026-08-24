@@ -5,46 +5,59 @@ import DashSourceToolbar from "./DashSourceToolbar";
 import DashSourceGrid from "./DashSourceGrid";
 import SpinLoader from "../../../common/SpinLoader";
 
+import { getAllSources, getMySources } from "../../../services/source.service";
+
 import {
-  getAllSources,
-  getMySources,
-  addSource,
-  removeSource,
-} from "../../../services/source.service";
+  getMyPreferences,
+  updatePreferences,
+} from "../../../services/prefrence.service";
 
 import "./style/DashSourcesPage.css";
 
 const SOURCE_LIMIT = 3;
 
 const DashSourcesPage = () => {
+  /* =========================================================
+     State
+  ========================================================= */
+
   const [sources, setSources] = useState([]);
-  const [selectedSources, setSelectedSources] = useState([]);
+
+  // Currently saved sources from backend
+  const [savedSourceIds, setSavedSourceIds] = useState([]);
+
+  // Temporary local selection
+  const [selectedSourceIds, setSelectedSourceIds] = useState([]);
+
+  // Existing preference data required by PUT /preference
+  const [preferences, setPreferences] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
 
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  /*
-   * --------------------------------------------------
-   * Fetch Sources
-   * --------------------------------------------------
-   */
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  /* =========================================================
+     Fetch Data
+  ========================================================= */
+
   useEffect(() => {
-    const fetchSources = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const [sourcesData, mySourcesData] = await Promise.all([
-          getAllSources(),
-          getMySources(),
-        ]);
+        const [sourcesData, mySourcesData, preferencesData] = await Promise.all(
+          [getAllSources(), getMySources(), getMyPreferences()],
+        );
 
         console.log("All Sources:", sourcesData);
         console.log("My Sources:", mySourcesData);
+        console.log("My Preferences:", preferencesData);
 
         if (!sourcesData?.success) {
           throw new Error("Failed to load sources.");
@@ -54,10 +67,38 @@ const DashSourcesPage = () => {
           throw new Error("Failed to load your selected sources.");
         }
 
-        setSources(sourcesData.sources || []);
-        setSelectedSources(mySourcesData.selectedSources || []);
+        if (!preferencesData?.success || !preferencesData?.preference) {
+          throw new Error("Failed to load your preferences.");
+        }
+
+        /* -----------------------------------------------------
+           All sources
+        ----------------------------------------------------- */
+
+        const allSources = sourcesData.sources || [];
+
+        setSources(allSources);
+
+        /* -----------------------------------------------------
+           Selected sources
+        ----------------------------------------------------- */
+
+        const selected = mySourcesData.selectedSources || [];
+
+        const selectedIds = selected
+          .map((source) => (typeof source === "object" ? source._id : source))
+          .filter(Boolean);
+
+        setSavedSourceIds(selectedIds);
+        setSelectedSourceIds(selectedIds);
+
+        /* -----------------------------------------------------
+           Existing preferences
+        ----------------------------------------------------- */
+
+        setPreferences(preferencesData.preference);
       } catch (error) {
-        console.error("Get Sources Error:", error);
+        console.error("Load Sources Error:", error);
 
         setError(
           error?.response?.data?.message ||
@@ -69,28 +110,27 @@ const DashSourcesPage = () => {
       }
     };
 
-    fetchSources();
+    fetchData();
   }, []);
 
-  /*
-   * --------------------------------------------------
-   * Selected Source IDs
-   * --------------------------------------------------
-   *
-   * /sources/me returns populated source objects.
-   * Convert them into IDs for easy checking.
-   */
-  const selectedSourceIds = useMemo(() => {
-    return selectedSources.map((source) =>
-      typeof source === "object" ? source._id : source,
-    );
-  }, [selectedSources]);
+  /* =========================================================
+     Check Unsaved Changes
+  ========================================================= */
 
-  /*
-   * --------------------------------------------------
-   * Available Filters
-   * --------------------------------------------------
-   */
+  const hasUnsavedChanges = useMemo(() => {
+    if (selectedSourceIds.length !== savedSourceIds.length) {
+      return true;
+    }
+
+    const savedSet = new Set(savedSourceIds);
+
+    return selectedSourceIds.some((id) => !savedSet.has(id));
+  }, [selectedSourceIds, savedSourceIds]);
+
+  /* =========================================================
+     Available Filters
+  ========================================================= */
+
   const filters = useMemo(() => {
     const categories = new Set();
 
@@ -103,15 +143,14 @@ const DashSourcesPage = () => {
     return ["All", ...Array.from(categories)];
   }, [sources]);
 
-  /*
-   * --------------------------------------------------
-   * Filter + Search
-   * --------------------------------------------------
-   */
-  const filteredSources = useMemo(() => {
-    return sources.filter((source) => {
-      const query = searchQuery.trim().toLowerCase();
+  /* =========================================================
+     Search + Filter
+  ========================================================= */
 
+  const filteredSources = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    return sources.filter((source) => {
       const matchesSearch =
         !query ||
         source.name?.toLowerCase().includes(query) ||
@@ -124,128 +163,190 @@ const DashSourcesPage = () => {
     });
   }, [sources, searchQuery, activeFilter]);
 
-  /*
-   * --------------------------------------------------
-   * Search
-   * --------------------------------------------------
-   */
+  /* =========================================================
+     Search
+  ========================================================= */
+
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
 
-  /*
-   * --------------------------------------------------
-   * Category Filter
-   * --------------------------------------------------
-   */
+  /* =========================================================
+     Filter
+  ========================================================= */
+
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
   };
 
-  /*
-   * --------------------------------------------------
-   * Add / Remove Source
-   * --------------------------------------------------
-   */
-  const handleToggleSource = async (sourceId, isAdded) => {
-    if (actionLoading) return;
+  /* =========================================================
+     Add Source
+     ONLY LOCAL STATE
+  ========================================================= */
+
+  const handleAddSource = (sourceId) => {
+    setError("");
+    setSuccessMessage("");
+
+    setSelectedSourceIds((prev) => {
+      // Already selected
+      if (prev.includes(sourceId)) {
+        return prev;
+      }
+
+      // Limit
+      if (prev.length >= SOURCE_LIMIT) {
+        setError(`You can select a maximum of ${SOURCE_LIMIT} sources.`);
+
+        return prev;
+      }
+
+      return [...prev, sourceId];
+    });
+  };
+
+  /* =========================================================
+     Remove Source
+     ONLY LOCAL STATE
+  ========================================================= */
+
+  const handleRemoveSource = (sourceId) => {
+    setError("");
+    setSuccessMessage("");
+
+    setSelectedSourceIds((prev) => prev.filter((id) => id !== sourceId));
+  };
+
+  /* =========================================================
+     Toggle Source
+  ========================================================= */
+
+  const handleToggleSource = (sourceId, isAdded) => {
+    if (isAdded) {
+      handleRemoveSource(sourceId);
+    } else {
+      handleAddSource(sourceId);
+    }
+  };
+
+  /* =========================================================
+     Save Changes
+     ONE API REQUEST
+  ========================================================= */
+
+  const handleSaveChanges = async () => {
+    if (!hasUnsavedChanges || saving) {
+      return;
+    }
 
     try {
-      setActionLoading(true);
+      setSaving(true);
+
       setError("");
+      setSuccessMessage("");
 
-      if (isAdded) {
-        /*
-         * Remove source
-         */
-        const data = await removeSource(sourceId);
+      console.log("Saving Sources:", selectedSourceIds);
 
-        console.log("Remove Source:", data);
+      /*
+       * IMPORTANT:
+       * Your backend updatePreferences currently
+       * expects the complete preference object.
+       */
 
-        if (!data?.success) {
-          throw new Error(data?.message || "Failed to remove source.");
-        }
+      const response = await updatePreferences({
+        categories: preferences.categories || [],
 
-        setSelectedSources((prev) =>
-          prev.filter((source) => {
-            const id = typeof source === "object" ? source._id : source;
+        sources: selectedSourceIds,
 
-            return id !== sourceId;
-          }),
-        );
-      } else {
-        /*
-         * Add source
-         */
-        if (selectedSourceIds.length >= SOURCE_LIMIT) {
-          setError(`You can select a maximum of ${SOURCE_LIMIT} sources.`);
-          return;
-        }
+        language: preferences.language,
 
-        const data = await addSource(sourceId);
+        deliveryTime: preferences.deliveryTime,
 
-        console.log("Add Source:", data);
+        phoneNumber: preferences.phoneNumber,
 
-        if (!data?.success) {
-          throw new Error(data?.message || "Failed to add source.");
-        }
+        timezone: preferences.timezone || "Asia/Kolkata",
 
-        /*
-         * Get the source object from our already-loaded
-         * source catalog.
-         */
-        const addedSource = sources.find((source) => source._id === sourceId);
+        telegram: preferences.telegram || {
+          connected: false,
+          chatId: null,
+        },
+      });
 
-        if (addedSource) {
-          setSelectedSources((prev) => [...prev, addedSource]);
-        }
+      console.log("Update Preferences Response:", response);
+
+      if (!response?.success) {
+        throw new Error(response?.message || "Failed to update preferences.");
       }
+
+      /* -----------------------------------------------------
+         Save successful
+      ----------------------------------------------------- */
+
+      setSavedSourceIds(selectedSourceIds);
+
+      setPreferences((prev) => ({
+        ...prev,
+
+        sources: selectedSourceIds,
+      }));
+
+      setSuccessMessage("Sources updated successfully.");
+
+      console.log("✅ Sources updated successfully");
     } catch (error) {
-      console.error("Toggle Source Error:", error);
+      console.error("Save Sources Error:", error);
 
       setError(
         error?.response?.data?.message ||
           error?.message ||
-          "Failed to update source.",
+          "Failed to update sources.",
       );
     } finally {
-      setActionLoading(false);
+      setSaving(false);
     }
   };
 
-  /*
-   * --------------------------------------------------
-   * Load More
-   * --------------------------------------------------
-   *
-   * Currently all active sources are fetched at once.
-   * Keep this callback ready for pagination later.
-   */
+  /* =========================================================
+     Cancel Changes
+  ========================================================= */
+
+  const handleCancelChanges = () => {
+    if (saving) return;
+
+    setSelectedSourceIds(savedSourceIds);
+
+    setError("");
+    setSuccessMessage("");
+  };
+
+  /* =========================================================
+     Load More
+  ========================================================= */
+
   const handleLoadMore = () => {
     console.log("Load more sources");
   };
 
-  /*
-   * --------------------------------------------------
-   * Loading State
-   * --------------------------------------------------
-   */
+  /* =========================================================
+     Loading
+  ========================================================= */
+
   if (loading) {
     return (
       <div className="dash-sources-page">
         <div className="dash-sources-page__container dash-sources-page__container--loading">
           <SpinLoader size="medium" />
+
           <p>Loading sources...</p>
         </div>
       </div>
     );
   }
 
-  /*
-   * --------------------------------------------------
-   * Error State
-   * --------------------------------------------------
-   */
+  /* =========================================================
+     Error
+  ========================================================= */
+
   if (error && sources.length === 0) {
     return (
       <div className="dash-sources-page">
@@ -256,17 +357,23 @@ const DashSourcesPage = () => {
     );
   }
 
+  /* =========================================================
+     UI
+  ========================================================= */
+
   return (
     <div className="dash-sources-page">
       <div className="dash-sources-page__container">
+        {/* Header */}
         <DashSourceHeader
           title="Choose your sources"
           subtitle="NewsMint only summarizes from outlets you trust. Add or remove sources anytime — your digest updates instantly."
           infoText={`Select up to ${SOURCE_LIMIT} sources`}
-          selectedCount={selectedSources.length}
+          selectedCount={selectedSourceIds.length}
           totalCount={SOURCE_LIMIT}
         />
 
+        {/* Toolbar */}
         <DashSourceToolbar
           filters={filters}
           activeFilter={activeFilter}
@@ -274,15 +381,65 @@ const DashSourcesPage = () => {
           onFilterChange={handleFilterChange}
         />
 
+        {/* Messages */}
+
         {error && <p className="dash-sources-page__error">{error}</p>}
 
+        {successMessage && (
+          <p className="dash-sources-page__success">{successMessage}</p>
+        )}
+
+        {/* Sources */}
         <DashSourceGrid
           sources={filteredSources}
           selectedSourceIds={selectedSourceIds}
           onToggleSource={handleToggleSource}
           onLoadMore={handleLoadMore}
-          actionLoading={actionLoading}
+          actionLoading={false}
         />
+
+        {/* ===================================================
+            Save Bar
+        =================================================== */}
+
+        {hasUnsavedChanges && (
+          <div className="dash-sources-page__save-bar">
+            <div className="dash-sources-page__save-info">
+              <strong>Unsaved changes</strong>
+
+              <span>
+                {selectedSourceIds.length} of {SOURCE_LIMIT} sources selected
+              </span>
+            </div>
+
+            <div className="dash-sources-page__save-actions">
+              <button
+                type="button"
+                className="dash-sources-page__cancel-button"
+                onClick={handleCancelChanges}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="dash-sources-page__save-button"
+                onClick={handleSaveChanges}
+                disabled={saving}
+              >
+                {saving ? (
+                  <>
+                    <span className="dash-sources-page__button-spinner" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

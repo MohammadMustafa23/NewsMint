@@ -1,21 +1,6 @@
 import React from "react";
 import "./style/DashTrending.css";
 
-const DEFAULT_TOPICS = [
-  { category: "Technology", tag: "#AIResearch", mentions: "24k mentions" },
-  {
-    category: "Regional Business",
-    tag: "#JaipurStartups",
-    mentions: "18k mentions",
-  },
-  { category: "Economy", tag: "#GlobalTrade", mentions: "15k mentions" },
-  {
-    category: "Environment",
-    tag: "#ClimateSummit24",
-    mentions: "12k mentions",
-  },
-];
-
 const TrendIcon = () => (
   <svg
     width="16"
@@ -26,6 +11,7 @@ const TrendIcon = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
   >
     <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
     <polyline points="16 7 22 7 22 13" />
@@ -34,31 +20,51 @@ const TrendIcon = () => (
 
 const DashTrending = ({
   title = "Trending Now",
-  topics = DEFAULT_TOPICS,
+  topics = [],
   onTopicClick,
 }) => {
+  const validTopics = topics.filter((topic) => topic?.tag);
+
   return (
     <div className="dash-trending">
+      {/* Header */}
       <div className="dash-trending__header">
         <TrendIcon />
         <span>{title}</span>
       </div>
 
+      {/* Topics */}
       <div className="dash-trending__list">
-        {topics.map((topic, idx) => (
-          <button
-            key={idx}
-            type="button"
-            className="dash-trending__item"
-            onClick={() => onTopicClick?.(topic.tag)}
-          >
-            <div className="dash-trending__item-left">
-              <span className="dash-trending__category">{topic.category}</span>
-              <span className="dash-trending__tag">{topic.tag}</span>
-            </div>
-            <span className="dash-trending__mentions">{topic.mentions}</span>
-          </button>
-        ))}
+        {validTopics.length > 0 ? (
+          validTopics.map((topic, index) => (
+            <button
+              key={`${topic.tag}-${topic.category || "general"}-${index}`}
+              type="button"
+              className="dash-trending__item"
+              onClick={() => onTopicClick?.(topic)}
+            >
+              <div className="dash-trending__item-left">
+                {topic.category && (
+                  <span className="dash-trending__category">
+                    {topic.category}
+                  </span>
+                )}
+
+                <span className="dash-trending__tag">{topic.tag}</span>
+              </div>
+
+              {topic.mentions && (
+                <span className="dash-trending__mentions">
+                  {topic.mentions}
+                </span>
+              )}
+            </button>
+          ))
+        ) : (
+          <div className="dash-trending__empty">
+            No trending topics available.
+          </div>
+        )}
       </div>
     </div>
   );

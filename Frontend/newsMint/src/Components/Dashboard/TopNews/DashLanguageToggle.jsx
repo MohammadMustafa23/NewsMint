@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./style/DashLanguageToggle.css";
 
 const LANGUAGES = [
@@ -11,24 +11,31 @@ const DashLanguageToggle = ({
   selected = "ENG",
   onChange,
 }) => {
-  const [active, setActive] = useState(selected);
-
   const handleClick = (code) => {
-    setActive(code);
+    if (code === selected) return;
+
     onChange?.(code);
   };
 
   return (
     <div className="dash-language-toggle">
       <span className="dash-language-toggle__label">{label}</span>
-      <div className="dash-language-toggle__group">
+
+      <div
+        className="dash-language-toggle__group"
+        role="group"
+        aria-label={label}
+      >
         {LANGUAGES.map((lang) => (
           <button
             key={lang.code}
             type="button"
-            className={`dash-language-toggle__btn ${active === lang.code ? "dash-language-toggle__btn--active" : ""}`}
+            className={`dash-language-toggle__btn ${
+              selected === lang.code ? "dash-language-toggle__btn--active" : ""
+            }`}
             onClick={() => handleClick(lang.code)}
             aria-label={`Switch to ${lang.label}`}
+            aria-pressed={selected === lang.code}
           >
             {lang.code}
           </button>

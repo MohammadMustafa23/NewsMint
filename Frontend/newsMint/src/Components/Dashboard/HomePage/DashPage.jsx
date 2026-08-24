@@ -6,14 +6,22 @@ import DashLivePreview from "./DashLivePreview";
 
 import SpinLoader from "../../../common/SpinLoader";
 
-import { getMyPreferences } from "../../../services/prefrence.service";
+import {
+  getMyPreferences,
+  updatePreferences,
+} from "../../../services/prefrence.service";
 
 import "./style/DashPage.css";
 
 const DashPage = () => {
   const [preferences, setPreferences] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
   const [error, setError] = useState("");
+
+  // =========================================================
+  // Fetch Preferences
+  // =========================================================
 
   useEffect(() => {
     const fetchPreferences = async () => {
@@ -45,6 +53,10 @@ const DashPage = () => {
     fetchPreferences();
   }, []);
 
+  // =========================================================
+  // Loading
+  // =========================================================
+
   if (loading) {
     return (
       <div className="dash-page">
@@ -55,6 +67,10 @@ const DashPage = () => {
       </div>
     );
   }
+
+  // =========================================================
+  // Error
+  // =========================================================
 
   if (error) {
     return (
@@ -70,25 +86,106 @@ const DashPage = () => {
     return null;
   }
 
+  // =========================================================
+  // Local UI handlers
+  // =========================================================
+
   const handlePauseToggle = (paused) => {
     console.log("Digest paused:", paused);
+
+    // Later:
+    // API for pause/resume digest
   };
 
   const handleTopicToggle = (topics) => {
-    console.log("Topics updated:", topics);
+    console.log("Topics changed:", topics);
+
+    setPreferences((prev) => ({
+      ...prev,
+      categories: topics,
+    }));
   };
 
   const handleLanguageChange = (lang) => {
     console.log("Language changed:", lang);
+
+    setPreferences((prev) => ({
+      ...prev,
+      language: lang,
+    }));
   };
 
-  const handleTimeChange = () => {
-    console.log("Open time picker");
+  const handleTimeChange = (time) => {
+    console.log("Delivery time changed:", time);
+
+    setPreferences((prev) => ({
+      ...prev,
+      deliveryTime: time,
+    }));
   };
 
-  const handleUpdate = (updatedPreferences) => {
-    console.log("Preferences updated:", updatedPreferences);
+  // =========================================================
+  // UPDATE PREFERENCES
+  // =========================================================
+
+  const handleUpdate = async (updatedPreferences) => {
+    try {
+      setUpdating(true);
+      setError("");
+
+      console.log("Updating Preferences:", updatedPreferences);
+
+      const response = await updatePreferences({
+        categories: updatedPreferences.categories ?? preferences.categories,
+
+        language: updatedPreferences.language ?? preferences.language,
+
+        deliveryTime:
+          updatedPreferences.deliveryTime ?? preferences.deliveryTime,
+
+        phoneNumber: updatedPreferences.phoneNumber ?? preferences.phoneNumber,
+
+        timezone:
+          updatedPreferences.timezone ?? preferences.timezone ?? "Asia/Kolkata",
+
+        telegram: updatedPreferences.telegram ?? preferences.telegram,
+      });
+
+      console.log("Updated Preferences Response:", response);
+
+      if (!response?.success) {
+        throw new Error(response?.message || "Failed to update preferences.");
+      }
+
+      // Update UI with backend response
+      setPreferences((prev) => ({
+        ...prev,
+
+        ...response.preference,
+
+        telegram: {
+          ...prev.telegram,
+          ...response.preference?.telegram,
+        },
+      }));
+
+      console.log("✅ Preferences updated successfully");
+    } catch (error) {
+      console.error("Update Preferences Error:", error);
+
+      setError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to update preferences.",
+      );
+    } finally {
+      setUpdating(false);
+    }
   };
+
+  // =========================================================
+  // UI
+  // =========================================================
 
   return (
     <div className="dash-page">
@@ -123,6 +220,7 @@ const DashPage = () => {
             onTopicToggle={handleTopicToggle}
             onLanguageChange={handleLanguageChange}
             onTimeChange={handleTimeChange}
+            updating={updating}
           />
 
           <DashLivePreview

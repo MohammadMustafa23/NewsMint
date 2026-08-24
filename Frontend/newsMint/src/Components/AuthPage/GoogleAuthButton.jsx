@@ -37,7 +37,7 @@ const GoogleAuthButton = ({
         return;
       }
 
-      toast.success(`Welcome ${data?.user?.name || data?.userName || ""}!`);
+      toast.success(`Welcome Back ${data.userName}`);
 
       // Check user's preference status
       const preferenceData = await getMyPreferences();

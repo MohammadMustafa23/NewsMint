@@ -14,3 +14,8 @@ export const checkMyPreferences = async () => {
   const response = await api.get("/preferences/me");
   return response.data;
 };
+
+export const updatePreferences = async (preferenceData) => {
+  const response = await api.put("/preferences/update-preferences", preferenceData);
+  return response.data;
+};

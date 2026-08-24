@@ -1,10 +1,23 @@
 /* ============================================ */
-/* DashSourcesPage — Layout & Responsive        */
+/* DashSourcesPage — Layout & Responsive       */
 /* ============================================ */
 
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap");
 
+/* ============================================ */
+/* Root Page                                    */
+/* ============================================ */
+
 .dash-sources-page {
+  width: 100%;
+  min-height: 100vh;
+
+  padding: 40px 32px;
+
+  box-sizing: border-box;
+
+  background: #faf8f4;
+
   font-family:
     "Inter",
     system-ui,
@@ -13,38 +26,39 @@
     "Segoe UI",
     Roboto,
     sans-serif;
-  background: #faf8f4;
-  min-height: 100vh;
-  padding: 40px 32px;
+
+  color: #1e293b;
+}
+
+.dash-sources-page *,
+.dash-sources-page *::before,
+.dash-sources-page *::after {
   box-sizing: border-box;
 }
 
+/* ============================================ */
+/* Main Container                               */
+/* ============================================ */
+
 .dash-sources-page__container {
+  width: 100%;
   max-width: 1400px;
+
   margin: 0 auto;
+
+  position: relative;
 }
 
 /* ============================================ */
-/* Responsive                                   */
+/* Loading                                      */
 /* ============================================ */
-
-@media (max-width: 768px) {
-  .dash-sources-page {
-    padding: 32px 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .dash-sources-page {
-    padding: 24px 16px;
-  }
-}
 
 .dash-sources-page__container--loading {
   min-height: 60vh;
 
   display: flex;
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
 
@@ -60,4 +74,375 @@
 
   font-size: 13px;
   font-weight: 500;
+}
+
+/* ============================================ */
+/* Error Message                                */
+/* ============================================ */
+
+.dash-sources-page__error {
+  width: 100%;
+
+  margin: 18px 0 20px;
+  padding: 12px 16px;
+
+  display: flex;
+  align-items: center;
+
+  border: 1px solid #f1c7c7;
+  border-radius: 10px;
+
+  background: #fff5f5;
+
+  color: #b42318;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  line-height: 1.5;
+}
+
+/* ============================================ */
+/* Success Message                              */
+/* ============================================ */
+
+.dash-sources-page__success {
+  width: 100%;
+
+  margin: 18px 0 20px;
+  padding: 12px 16px;
+
+  display: flex;
+  align-items: center;
+
+  border: 1px solid #b7e2c2;
+  border-radius: 10px;
+
+  background: #f1fbf4;
+
+  color: #18733b;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  line-height: 1.5;
+}
+
+/* ============================================ */
+/* Save Bar                                     */
+/* ============================================ */
+
+.dash-sources-page__save-bar {
+  width: 100%;
+
+  margin-top: 28px;
+  padding: 14px 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border: 1px solid #e7e1d7;
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+}
+
+/* ============================================ */
+/* Save Information                             */
+/* ============================================ */
+
+.dash-sources-page__save-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.dash-sources-page__save-info strong {
+  color: #1e293b;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  line-height: 1.3;
+}
+
+.dash-sources-page__save-info span {
+  color: #8d89a5;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  line-height: 1.4;
+}
+
+/* ============================================ */
+/* Save Actions                                 */
+/* ============================================ */
+
+.dash-sources-page__save-actions {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+/* ============================================ */
+/* Cancel Button                                */
+/* ============================================ */
+
+.dash-sources-page__cancel-button,
+.dash-sources-page__save-button {
+  min-height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+/* ============================================ */
+/* Cancel                                       */
+/* ============================================ */
+
+.dash-sources-page__cancel-button {
+  padding: 0 15px;
+
+  border: 1px solid #ddd8cf;
+
+  background: #ffffff;
+
+  color: #64748b;
+}
+
+.dash-sources-page__cancel-button:hover:not(:disabled) {
+  border-color: #cfc8bd;
+
+  background: #faf9f7;
+
+  color: #334155;
+}
+
+/* ============================================ */
+/* Save                                         */
+/* ============================================ */
+
+.dash-sources-page__save-button {
+  min-width: 112px;
+
+  padding: 0 17px;
+
+  border: 1px solid #d18b12;
+
+  background: #d8911d;
+
+  color: #ffffff;
+
+  box-shadow: 0 3px 8px rgba(216, 145, 29, 0.18);
+}
+
+.dash-sources-page__save-button:hover:not(:disabled) {
+  background: #c98212;
+
+  border-color: #c98212;
+}
+
+/* ============================================ */
+/* Disabled Buttons                             */
+/* ============================================ */
+
+.dash-sources-page__cancel-button:disabled,
+.dash-sources-page__save-button:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+
+  box-shadow: none;
+}
+
+/* ============================================ */
+/* Save Button Spinner                          */
+/* ============================================ */
+
+.dash-sources-page__button-spinner {
+  width: 14px;
+  height: 14px;
+
+  margin-right: 7px;
+
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+
+  border-radius: 50%;
+
+  animation: dash-sources-spin 0.7s linear infinite;
+}
+
+@keyframes dash-sources-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================ */
+/* Tablet                                       */
+/* ============================================ */
+
+@media (max-width: 1024px) {
+  .dash-sources-page {
+    padding: 34px 24px;
+  }
+
+  .dash-sources-page__save-bar {
+    margin-top: 24px;
+  }
+}
+
+/* ============================================ */
+/* Mobile                                       */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .dash-sources-page {
+    padding: 32px 20px;
+  }
+
+  .dash-sources-page__save-bar {
+    padding: 14px;
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 14px;
+  }
+
+  .dash-sources-page__save-info {
+    width: 100%;
+  }
+
+  .dash-sources-page__save-actions {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 8px;
+  }
+
+  .dash-sources-page__cancel-button,
+  .dash-sources-page__save-button {
+    width: 100%;
+  }
+
+  .dash-sources-page__error,
+  .dash-sources-page__success {
+    margin-top: 14px;
+    margin-bottom: 16px;
+
+    padding: 11px 13px;
+
+    font-size: 12px;
+  }
+}
+
+/* ============================================ */
+/* Small Mobile                                */
+/* ============================================ */
+
+@media (max-width: 480px) {
+  .dash-sources-page {
+    padding: 24px 16px;
+  }
+
+  .dash-sources-page__save-bar {
+    margin-top: 20px;
+
+    padding: 12px;
+
+    border-radius: 10px;
+  }
+
+  .dash-sources-page__save-info strong {
+    font-size: 12px;
+  }
+
+  .dash-sources-page__save-info span {
+    font-size: 10px;
+  }
+
+  .dash-sources-page__cancel-button,
+  .dash-sources-page__save-button {
+    min-height: 42px;
+
+    font-size: 11px;
+  }
+
+  .dash-sources-page__error,
+  .dash-sources-page__success {
+    padding: 10px 12px;
+
+    border-radius: 9px;
+
+    font-size: 11px;
+  }
+}
+
+/* ============================================ */
+/* Extra Small Mobile                           */
+/* ============================================ */
+
+@media (max-width: 360px) {
+  .dash-sources-page {
+    padding: 20px 12px;
+  }
+
+  .dash-sources-page__save-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-sources-page__save-button {
+    order: -1;
+  }
+}
+
+/* ============================================ */
+/* Reduced Motion                               */
+/* ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-sources-page__button-spinner {
+    animation: none;
+  }
+
+  .dash-sources-page__cancel-button,
+  .dash-sources-page__save-button {
+    transition: none;
+  }
 }

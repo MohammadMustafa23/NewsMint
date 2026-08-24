@@ -10,10 +10,10 @@ const ProtectedRoute = ({
   requirePreferences = false,
   requireNoPreferences = false,
 }) => {
-  console.log("🔥 ProtectedRoute RENDERED");
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [hasPreferences, setHasPreferences] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -31,6 +31,9 @@ const ProtectedRoute = ({
           return;
         }
 
+        // Save user
+        setUser(userResponse.user);
+
         setIsAuthenticated(true);
 
         const preferenceResponse = await checkMyPreferences();
@@ -42,6 +45,7 @@ const ProtectedRoute = ({
         console.error("Protected Route Error:", error);
 
         setIsAuthenticated(false);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -50,30 +54,30 @@ const ProtectedRoute = ({
     checkAccess();
   }, [requirePreferences, requireNoPreferences]);
 
-  // While checking authentication/preferences
+  // Loading
   if (loading) {
     return <SpinLoader />;
   }
 
-  // User is NOT logged in
+  // Not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/authantication-page" replace />;
   }
 
-  // Route requires preferences
-  // Example: Dashboard
+  // Preferences required
   if (requirePreferences && !hasPreferences) {
     return <Navigate to="/preference" replace />;
   }
 
-  // Route should ONLY be available
-  // before preferences are completed
-  // Example: Preference page
+  // Preferences must NOT exist
   if (requireNoPreferences && hasPreferences) {
     return <Navigate to="/home-page" replace />;
   }
 
-  return children;
+  // Pass user to child component
+  return React.cloneElement(children, {
+    user,
+  });
 };
 
 export default ProtectedRoute;

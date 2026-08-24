@@ -10,13 +10,13 @@ import SpinLoader from "../../common/SpinLoader";
 import "./style/DigestPage.css";
 import { useNavigate } from "react-router-dom";
 
-const DigestPage = () => {
+const DigestPage = ({ userName }) => {
   const navigate = useNavigate();
   const [preferences, setPreferences] = useState({
     categories: ["India", "Technology"],
     language: "English",
     deliveryTime: "07:30 AM (IST)",
-    phoneNumber: "9876543210",
+    phoneNumber: "",
     telegram: {
       chatId: null,
       connected: false,
@@ -135,7 +135,7 @@ const DigestPage = () => {
       <div className="digest-page__grid">
         {/* Preference Form */}
         <DigestSetupForm
-          userName="Jayesh"
+          userName={userName}
           phoneNumber={preferences.phoneNumber}
           selectedCategories={preferences.categories}
           selectedLanguage={preferences.language}
@@ -151,7 +151,7 @@ const DigestPage = () => {
 
         {/* Live Preview */}
         <LivePreview
-          userName="Jayesh"
+          userName={userName}
           categories={preferences.categories}
           language={preferences.language}
           phoneNumber={preferences.phoneNumber}

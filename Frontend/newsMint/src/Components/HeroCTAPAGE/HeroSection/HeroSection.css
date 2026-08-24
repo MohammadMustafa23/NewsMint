@@ -1260,6 +1260,7 @@
   }
 
   .hero-section__buttons {
+    display: flex;
     justify-content: center;
   }
 
@@ -1295,6 +1296,10 @@
 /* =========================================================
    MOBILE — 600px
 ========================================================= */
+/* =========================================================
+   MOBILE BUTTONS
+   600px and below
+========================================================= */
 
 @media (max-width: 600px) {
   .hero-section {
@@ -1313,18 +1318,43 @@
     font-size: 14px;
   }
 
+  /* =========================
+     Buttons — One Row
+  ========================= */
+
   .hero-section__buttons {
     width: 100%;
 
-    flex-direction: column;
+    display: flex;
+    flex-direction: row;
+
+    align-items: stretch;
+    justify-content: center;
 
     gap: 10px;
+
+    margin: 0 auto;
   }
 
   .hero-section__btn {
-    width: 100%;
+    width: auto;
+    flex: 1 1 0;
 
-    min-height: 49px;
+    min-width: 0;
+    min-height: 46px;
+
+    padding: 0 10px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    font-size: 12px;
+    line-height: 1.2;
+
+    white-space: nowrap;
   }
 
   .hero-section__trust {
@@ -1345,6 +1375,10 @@
    SMALL MOBILE
    480px and below
 ========================================================= */
+/* =========================================================
+   SMALL MOBILE
+   480px and below
+========================================================= */
 
 @media (max-width: 480px) {
   .hero-section {
@@ -1353,22 +1387,36 @@
 
   .hero-section__badge {
     padding: 6px 10px;
-
     font-size: 10px;
   }
 
   .hero-section__title {
     font-size: 31px;
-
     letter-spacing: -0.025em;
   }
 
   .hero-section__description {
     max-width: 350px;
-
     font-size: 13.5px;
-
     line-height: 1.65;
+  }
+
+  /* =========================
+     Hero Buttons
+  ========================= */
+
+  .hero-section__buttons {
+    gap: 8px;
+  }
+
+  .hero-section__btn {
+    min-height: 44px;
+
+    padding: 0 8px;
+
+    font-size: 11.5px;
+
+    border-radius: 9px;
   }
 
   .hero-section__trust {
@@ -1382,7 +1430,6 @@
   .hero-section__trust-item span {
     width: 14px;
     height: 14px;
-
     font-size: 9px;
   }
 
@@ -1406,7 +1453,6 @@
     width: 175px;
   }
 }
-
 /* =========================================================
    EXTRA SMALL DEVICES
    360px and below

@@ -1,114 +1,251 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import DashHeroArticle from "./DashHeroArticle";
 import DashLanguageToggle from "./DashLanguageToggle";
 import DashTrending from "./DashTrending";
-import DashBriefingsGrid from "./DashBriefingsGrid";
+import { getMyNews } from "../../../services/news.service.js";
 import "./style/HomeTopNews.css";
 
-const TRENDING_TOPICS = [
-  { category: "Technology", tag: "#AIResearch", mentions: "24k mentions" },
-  {
-    category: "Regional Business",
-    tag: "#JaipurStartups",
-    mentions: "18k mentions",
-  },
-  { category: "Economy", tag: "#GlobalTrade", mentions: "15k mentions" },
-  {
-    category: "Environment",
-    tag: "#ClimateSummit24",
-    mentions: "12k mentions",
-  },
-];
-
-const BRIEFINGS = [
-  {
-    id: "1",
-    icon: "🏛",
-    category: "The Chronical",
-    title:
-      "Central Bank Signals Pause on Interest Rate Hikes Amidst Inflation Data",
-    description:
-      "Following three consecutive quarters of aggressive tightening, policymakers hinted at a more measured approach in the coming...",
-  },
-  {
-    id: "2",
-    icon: "🔋",
-    category: "Tech Frontiers",
-    title:
-      "Breakthrough in Solid-State Battery Tech Could Revolutionize EV Range",
-    description:
-      "A consortium of university researchers and automotive engineers announced a new stable electrolyte composition that effectively double...",
-  },
-  {
-    id: "3",
-    icon: "🌐",
-    category: "Global Diplomat",
-    title:
-      "European Union Proposes Sweeping Regulations on Generative AI Models",
-    description:
-      "The draft legislation focuses heavily on transparency mandates, requiring developers of large language models to disclose training dat...",
-  },
-];
-
 const HomeTopNews = () => {
+  const [news, setNews] = useState([]);
+  const [language, setLanguage] = useState("English");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchMyNews = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await getMyNews();
+
+        if (response.success) {
+          setNews(response.data.news || []);
+          setLanguage(response.data.language || "English");
+        } else {
+          setError(response.message || "Failed to load your news.");
+        }
+      } catch (error) {
+        console.error("Failed to fetch user news:", error);
+
+        setError(error.response?.data?.message || "Failed to load your news.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMyNews();
+  }, []);
+
   const handleLanguageChange = (lang) => {
-    console.log("Language changed to:", lang);
+    console.log("Language changed:", lang);
   };
 
-  const handleTopicClick = (tag) => {
-    console.log("Clicked topic:", tag);
+  const handleTopicClick = (topic) => {
+    console.log("Clicked topic:", topic);
   };
 
   const handleReadHero = () => {
-    console.log("Read full hero story");
+    if (!news[0]) return;
+
+    if (news[0].url) {
+      window.open(news[0].url, "_blank", "noopener,noreferrer");
+    }
   };
 
-  const handleReadBriefing = (id) => {
-    console.log("Read briefing:", id);
+  const handleReadBriefing = (article) => {
+    if (!article?.url) {
+      console.log("Article URL not available");
+      return;
+    }
+
+    window.open(article.url, "_blank", "noopener,noreferrer");
   };
+
+  if (loading) {
+    return (
+      <div className="dash-top-news-page">
+        <div className="dash-top-news-page__container">
+          <p>Loading your news...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dash-top-news-page">
+        <div className="dash-top-news-page__container">
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!news.length) {
+    return (
+      <div className="dash-top-news-page">
+        <div className="dash-top-news-page__container">
+          <p>No news available for your selected preferences.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // First article = Hero
+  const heroNews = news[0];
+
+  /*
+   * Remove hero from remaining news.
+   * All remaining articles will be shown.
+   */
+  const remainingNews = news.slice(1);
+
+  /*
+   * Group articles by category
+   */
+  const groupedNews = remainingNews.reduce((groups, article) => {
+    const category = article.category || "General";
+
+    if (!groups[category]) {
+      groups[category] = [];
+    }
+
+    groups[category].push(article);
+
+    return groups;
+  }, {});
+
+  /*
+   * Trending topics
+   */
+  const trendingTopics = [
+    ...new Map(
+      news.flatMap((article) =>
+        (article.tags || []).map((tag) => [
+          tag,
+          {
+            category: article.category || "General",
+            tag: tag.startsWith("#") ? tag : `#${tag}`,
+            mentions: "Trending",
+          },
+        ]),
+      ),
+    ).values(),
+  ].slice(0, 4);
 
   return (
     <div className="dash-top-news-page">
       <div className="dash-top-news-page__container">
-        {/* Top Section: Hero + Sidebar */}
+        {/* HERO + SIDEBAR */}
         <div className="dash-top-news-page__top">
           <DashHeroArticle
             label="Headline of the Day"
-            imageUrl="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=400&fit=crop"
-            imageAlt="Global Markets"
-            title="Global Markets Rally Following Unexpected Shifts in Continental Trade Policy"
-            description="In an unprecedented move that caught many leading analysts off guard, key continental powers have signed a provisional accord restructuring tariffs across major tech and agriculture sectors, sending ripples of optimism through early morning trading sessions."
-            author="Jonathan Reed"
-            readTime="8 Min Read"
+            imageUrl={heroNews.image || ""}
+            imageAlt={heroNews.title}
+            title={heroNews.title}
+            description={
+              heroNews.summary ||
+              heroNews.description ||
+              "No summary available."
+            }
+            author={heroNews.source?.name || heroNews.author || ""}
+            readTime="5 Min Read"
             buttonText="Read Full Story"
             onReadMore={handleReadHero}
           />
 
-          {/* Sidebar */}
           <aside className="dash-top-news-page__sidebar">
             <DashLanguageToggle
               label="Select Language"
-              selected="ENG"
+              selected={language === "Hindi" ? "HIN" : "ENG"}
               onChange={handleLanguageChange}
             />
+
             <DashTrending
               title="Trending Now"
-              topics={TRENDING_TOPICS}
+              topics={trendingTopics}
               onTopicClick={handleTopicClick}
             />
           </aside>
         </div>
 
-        {/* Divider */}
         <hr className="dash-top-news-page__divider" />
 
-        {/* Bottom Section: Briefings */}
-        <DashBriefingsGrid
-          heading="Essential Briefings"
-          briefings={BRIEFINGS}
-          buttonText="Read Summary"
-          onReadCard={handleReadBriefing}
-        />
+        {/* USER NEWS */}
+        <section className="dash-user-news">
+          <div className="dash-user-news__header">
+            <div>
+              <h2 className="dash-user-news__title">Your News</h2>
+
+              <p className="dash-user-news__count">{news.length} Articles</p>
+            </div>
+          </div>
+
+          {/* CATEGORY-WISE NEWS */}
+          <div className="dash-user-news__categories">
+            {Object.entries(groupedNews).map(([category, articles]) => (
+              <section key={category} className="dash-user-news__category">
+                <div className="dash-user-news__category-header">
+                  <h3>{category}</h3>
+
+                  <span>
+                    {articles.length}{" "}
+                    {articles.length === 1 ? "Article" : "Articles"}
+                  </span>
+                </div>
+
+                <div className="dash-user-news__grid">
+                  {articles.map((article) => (
+                    <article key={article.id} className="dash-user-news__card">
+                      {/* IMAGE */}
+                      {article.image && (
+                        <div className="dash-user-news__image-wrap">
+                          <img
+                            src={article.image}
+                            alt={"Image Not available"}
+                            className="dash-user-news__image"
+                            loading="lazy"
+                          />
+                        </div>
+                      )}
+
+                      <div className="dash-user-news__content">
+                        {/* SOURCE */}
+                        <span className="dash-user-news__source">
+                          {article.source?.shortName ||
+                            article.source?.name ||
+                            "NewsMint"}
+                        </span>
+
+                        {/* TITLE */}
+                        <h4 className="dash-user-news__card-title">
+                          {article.title}
+                        </h4>
+
+                        {/* SUMMARY */}
+                        <p className="dash-user-news__card-summary">
+                          {article.summary ||
+                            article.description ||
+                            "No summary available."}
+                        </p>
+
+                        {/* READ BUTTON */}
+                        <button
+                          type="button"
+                          className="dash-user-news__read-btn"
+                          onClick={() => handleReadBriefing(article)}
+                        >
+                          Read Summary
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
