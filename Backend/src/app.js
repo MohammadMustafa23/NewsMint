@@ -3,6 +3,7 @@ import AuthRouter from "./Feature/Auth/routes/auth.routes.js";
 import PreferenceRoute from "./Feature/Prefrence/routes/preference.route.js";
 import SourceRoute from "./Feature/NewsSource/routes/source.route.js";
 import TelegramRoute from "./TelegramBOT/routes/telegram.route.js";
+import NewsRoute from "./Feature/NewsForWeb/routes/news.route.js";
 import cookieParser from "cookie-parser";
 
 // import helmet from "helmet";
@@ -49,4 +50,5 @@ app.use("/api", AuthRouter);
 app.use("/api/preferences", PreferenceRoute);
 app.use('/api/sources',SourceRoute);
 app.use("/api/telegram", TelegramRoute);
+app.use("/api/news", NewsRoute);
 export default app;

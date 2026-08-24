@@ -164,19 +164,20 @@ const sources = [
 
     sortOrder: 5,
   },
-
   {
-    name: "The Guardian",
-    slug: "the-guardian",
-    shortName: "GUARD",
+    name: "Mediastack",
+    slug: "mediastack",
+    shortName: "MEDIA",
     description:
-      "The Guardian provides international news, technology, science, sports and environmental coverage.",
+      "Mediastack provides aggregated news from sources around the world.",
     logo: "",
-    website: "https://www.theguardian.com",
+    website: "https://mediastack.com",
 
     categories: [
       "Technology",
       "Artificial Intelligence",
+      "Business",
+      "Finance & Markets",
       "World",
       "Science",
       "Space",
@@ -190,12 +191,12 @@ const sources = [
     language: "English",
 
     fetchMethod: "api",
-    provider: "The Guardian",
-    apiIdentifier: "guardian",
+    provider: "Mediastack",
+    apiIdentifier: "mediastack",
 
     rssUrl: "",
 
-    articlesPerDay: 20,
+    articlesPerDay: 0,
 
     isActive: true,
     isVerified: true,

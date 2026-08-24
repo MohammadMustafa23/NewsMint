@@ -8,7 +8,7 @@ import { CATEGORY_SOURCES } from "../service/contents/categorySources.js";
 
 import { fetchGNews } from "../service/news/gnews.service.js";
 import { fetchNewsData } from "../service/news/newsdata.service.js";
-import { fetchGuardianNews } from "../service/news/guardian.service.js";
+import { fetchMediaStackNews } from "../service/news/mediastack.service.js";
 import { fetchRSSSource } from "../service/news/rss.service.js";
 
 const ARTICLES_PER_CATEGORY = 10;
@@ -25,7 +25,7 @@ const createContentHash = (url) => {
 const SOURCE_FETCHERS = {
   gnews: fetchGNews,
   "newsdata-io": fetchNewsData,
-  "the-guardian": fetchGuardianNews,
+  mediastack: fetchMediaStackNews,
   ndtv: fetchRSSSource,
   "hindustan-times": fetchRSSSource,
   "the-indian-express": fetchRSSSource,

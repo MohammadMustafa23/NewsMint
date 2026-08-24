@@ -18,7 +18,7 @@ export const EMAIL_USER = process.env.EMAIL_USER;
 
 
 // News Api's
-export const GUARDIAN_API_KEY=process.env.GUARDIAN_API_KEY;
+export const MEDIASTACK_API_KEY=process.env.MEDIASTACK_API_KEY;
 export const NEWSDATA_API_KEY=process.env.NEWSDATA_API_KEY;
 export const GNEWS_API_KEY=process.env.GNEWS_API_KEY;
 

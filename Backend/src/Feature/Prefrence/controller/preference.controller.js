@@ -353,3 +353,166 @@ export const checkMyPreferences = async (req, res) => {
     });
   }
 };
+
+export const updatePreferences = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const {
+      categories,
+      language,
+      deliveryTime,
+      phoneNumber,
+      telegram,
+      timezone = "Asia/Kolkata",
+    } = req.body;
+
+    // -----------------------------
+    // Check existing preference
+    // -----------------------------
+
+    const existingPreference = await Preference.findOne({
+      userId,
+    });
+
+    if (!existingPreference) {
+      return res.status(404).json({
+        success: false,
+        message: "Preferences not found. Please create your preferences first.",
+      });
+    }
+
+    // -----------------------------
+    // Basic validation
+    // -----------------------------
+
+    if (!Array.isArray(categories) || categories.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select at least one category.",
+      });
+    }
+
+    if (!language || !ALLOWED_LANGUAGES.includes(language)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select a valid language.",
+      });
+    }
+
+    if (!deliveryTime) {
+      return res.status(400).json({
+        success: false,
+        message: "Delivery time is required.",
+      });
+    }
+
+    if (!phoneNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "WhatsApp number is required.",
+      });
+    }
+
+    // -----------------------------
+    // Validate categories
+    // -----------------------------
+
+    const invalidCategories = categories.filter(
+      (category) => !ALLOWED_CATEGORIES.includes(category),
+    );
+
+    if (invalidCategories.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "One or more selected categories are invalid.",
+      });
+    }
+
+    // -----------------------------
+    // Validate phone
+    // -----------------------------
+
+    const cleanPhoneNumber = String(phoneNumber).replace(/\D/g, "");
+
+    if (!/^[6-9]\d{9}$/.test(cleanPhoneNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid Indian WhatsApp number.",
+      });
+    }
+
+    // -----------------------------
+    // Calculate next delivery
+    // -----------------------------
+
+    const nextDeliveryAt = getNextDeliveryAt(deliveryTime, timezone);
+
+    // -----------------------------
+    // Update preference
+    // -----------------------------
+
+    const preference = await Preference.findOneAndUpdate(
+      { userId },
+
+      {
+        categories,
+        language,
+        deliveryTime,
+        phoneNumber: cleanPhoneNumber,
+        timezone,
+
+        nextDeliveryAt,
+
+        telegram: {
+          chatId: telegram?.chatId || null,
+          connected: telegram?.connected || false,
+        },
+
+        isCompleted: true,
+      },
+
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+
+    // -----------------------------
+    // Response
+    // -----------------------------
+
+    return res.status(200).json({
+      success: true,
+      message: "Preferences updated successfully.",
+
+      preference: {
+        id: preference._id,
+
+        categories: preference.categories,
+
+        language: preference.language,
+
+        deliveryTime: preference.deliveryTime,
+
+        timezone: preference.timezone,
+
+        phoneNumber: preference.phoneNumber,
+
+        telegram: {
+          chatId: preference.telegram?.chatId || null,
+          connected: preference.telegram?.connected || false,
+        },
+
+        isCompleted: preference.isCompleted,
+      },
+    });
+  } catch (error) {
+    console.error("Update Preferences Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
+};

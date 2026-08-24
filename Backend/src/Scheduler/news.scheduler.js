@@ -26,25 +26,25 @@ export const processNewsScheduler = async () => {
     console.log(`💾 Saved: ${newsResult.totalSaved || 0}`);
     console.log("\n🤖 Starting AI News Worker...");
 
-    // startAINewsWorker()
-    //   .then((result) => {
-    //     if (result.success) {
-    //       console.log(
-    //         `✅ AI Worker Finished | ` +
-    //           `Processed: ${result.processed} | ` +
-    //           `Batches: ${result.batches}`,
-    //       );
-    //     } else {
-    //       console.error(
-    //         `⚠️ AI Worker Finished With Error: ${
-    //           result.message || "Unknown error"
-    //         }`,
-    //       );
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     console.error("❌ AI Worker Error:", error.message);
-    //   });
+    startAINewsWorker()
+      .then((result) => {
+        if (result.success) {
+          console.log(
+            `✅ AI Worker Finished | ` +
+              `Processed: ${result.processed} | ` +
+              `Batches: ${result.batches}`,
+          );
+        } else {
+          console.error(
+            `⚠️ AI Worker Finished With Error: ${
+              result.message || "Unknown error"
+            }`,
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("❌ AI Worker Error:", error.message);
+      });
 
     // Log completion details
     const completedAt = new Date();
@@ -76,7 +76,7 @@ export const processNewsScheduler = async () => {
 };
 
 const startNewsScheduler = () => {
-  cron.schedule("05 19 22 8 *", async () => {
+  cron.schedule("28 1 22 8 *", async () => {
     try {
       await processNewsScheduler();
     } catch (error) {

@@ -7,23 +7,23 @@ export const CATEGORY_SOURCES = {
     "gnews",
   ],
 
-  Technology: ["gnews", "the-guardian", "newsdata-io"],
+  Technology: ["gnews", "mediastack", "newsdata-io"],
 
-  "Artificial Intelligence": ["gnews", "the-guardian", "newsdata-io"],
+  "Artificial Intelligence": ["gnews", "mediastack", "newsdata-io"],
 
   Business: ["gnews", "newsdata-io", "hindustan-times"],
 
   "Finance & Markets": ["gnews", "newsdata-io", "hindustan-times"],
 
-  World: ["the-guardian", "gnews", "newsdata-io"],
+  World: ["mediastack", "gnews", "newsdata-io"],
 
-  Science: ["the-guardian", "gnews", "newsdata-io"],
+  Science: ["mediastack", "gnews", "newsdata-io"],
 
-  Space: ["the-guardian", "gnews", "newsdata-io"],
+  Space: ["mediastack", "gnews", "newsdata-io"],
 
-  Cybersecurity: ["gnews", "newsdata-io", "the-guardian"],
+  Cybersecurity: ["gnews", "newsdata-io", "mediastack"],
 
-  Startups: ["gnews", "newsdata-io", "the-guardian"],
+  Startups: ["gnews", "newsdata-io", "mediastack"],
 
   "Education & Careers": [
     "the-indian-express",
@@ -32,11 +32,11 @@ export const CATEGORY_SOURCES = {
     "newsdata-io",
   ],
 
-  Health: ["the-guardian", "gnews", "newsdata-io", "ndtv"],
+  Health: ["mediastack", "gnews", "newsdata-io", "ndtv"],
 
   Sports: ["ndtv", "gnews", "hindustan-times", "india-today", "newsdata-io"],
 
   Entertainment: ["ndtv", "hindustan-times", "gnews", "newsdata-io"],
 
-  "Environment & Climate": ["the-guardian", "gnews", "newsdata-io"],
+  "Environment & Climate": ["mediastack", "gnews", "newsdata-io"],
 };
