@@ -4,6 +4,7 @@ import DashLanguageToggle from "./DashLanguageToggle";
 import DashTrending from "./DashTrending";
 import { getMyNews } from "../../../services/news.service.js";
 import "./style/HomeTopNews.css";
+import SpinLoader from "../../../common/SpinLoader.jsx"; 
 
 const HomeTopNews = () => {
   const [news, setNews] = useState([]);
@@ -66,6 +67,7 @@ const HomeTopNews = () => {
     return (
       <div className="dash-top-news-page">
         <div className="dash-top-news-page__container">
+          <SpinLoader size="medium" />
           <p>Loading your news...</p>
         </div>
       </div>

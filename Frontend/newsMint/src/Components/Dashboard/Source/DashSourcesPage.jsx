@@ -336,7 +336,6 @@ const DashSourcesPage = () => {
       <div className="dash-sources-page">
         <div className="dash-sources-page__container dash-sources-page__container--loading">
           <SpinLoader size="medium" />
-
           <p>Loading sources...</p>
         </div>
       </div>

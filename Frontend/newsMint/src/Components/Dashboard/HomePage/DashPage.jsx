@@ -72,7 +72,7 @@ const DashPage = () => {
   // Error
   // =========================================================
 
-  if (error) {
+  if (!loading && error) {
     return (
       <div className="dash-page">
         <div className="dash-page__container">
