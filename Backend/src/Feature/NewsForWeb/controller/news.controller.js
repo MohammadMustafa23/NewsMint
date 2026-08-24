@@ -2,10 +2,23 @@ import Preference from "../../Prefrence/models/Preference.js";
 import NewsArticle from "../../../NewsArticle/models/NewsArticle.js";
 import Source from "../../NewsSource/models/source.models.js";
 
+import { redisClient } from "../../../config/redis.js";
+
 export const getMyNews = async (req, res) => {
   try {
     // 1. Logged-in user
     const userId = req.user._id;
+    const cacheKey = `news:user:${userId}`;
+
+    const cachedNews = await redisClient.get(cacheKey);
+
+    if (cachedNews) {
+      return res.status(200).json({
+        success: true,
+        data:cachedNews,
+        cached: true,
+      });
+    }
 
     // 2. Get user preference
     const preference = await Preference.findOne({ userId }).lean();
@@ -99,6 +112,16 @@ export const getMyNews = async (req, res) => {
           }
         : null,
     }));
+
+    const responseData = {
+      language,
+      categories,
+      news,
+    };
+
+    await redisClient.set(cacheKey, JSON.stringify(responseData), {
+        ex : 30 * 60, // 30 minutes
+    });
 
     // 8. Response
     return res.status(200).json({

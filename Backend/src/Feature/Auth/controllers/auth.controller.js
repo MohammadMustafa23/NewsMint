@@ -27,10 +27,10 @@ async function RegisterUser(req, res) {
   //   3. Generate OTP
   const otp = generateOTP();
 
-  console.log(otp);
 
   // Redis Key
   const cacheKey = `register:${email}`;
+  
   await redisClient.set(
     `register:${email}`,
     JSON.stringify({
@@ -40,7 +40,7 @@ async function RegisterUser(req, res) {
       otp,
     }),
     {
-      EX: 300,
+      ex : 300,
     },
   );
 

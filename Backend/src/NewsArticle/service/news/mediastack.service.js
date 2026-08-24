@@ -1,11 +1,63 @@
 import axios from "axios";
-
 import { MEDIASTACK_API_KEY } from "../../../config/env.js";
-import { CATEGORY_QUERIES } from "../contents/news.constants.js";
-
 const MEDIASTACK_URL = "https://api.mediastack.com/v1/news";
-
 const MAX_RESULTS = 10;
+
+// ==========================================
+// MEDIASTACK NATIVE CATEGORIES
+// ==========================================
+
+const MEDIASTACK_CATEGORY_MAP = {
+  India: "general",
+  Technology: "technology",
+  Business: "business",
+  Science: "science",
+  Health: "health",
+  Sports: "sports",
+  Entertainment: "entertainment",
+};
+
+// ==========================================
+// MEDIASTACK KEYWORDS
+// ==========================================
+
+const MEDIASTACK_KEYWORDS = {
+  India: "India",
+
+  Technology: "technology,software,gadgets",
+
+  "Artificial Intelligence":
+    "artificial intelligence,AI,machine learning,LLM,OpenAI,Gemini",
+
+  Business: "business,companies,economy",
+
+  "Finance & Markets": "stock market,finance,banking,NSE,BSE,Sensex,Nifty",
+
+  World: "world,international,global",
+
+  Science: "science,research,discovery",
+
+  Space: "space,NASA,ISRO,astronomy,SpaceX,satellite",
+
+  Cybersecurity: "cybersecurity,cyber attack,data breach,hacking,malware",
+
+  Startups: "startups,startup funding,entrepreneurship,venture capital",
+
+  "Education & Careers": "education,jobs,careers,students,recruitment",
+
+  Health: "health,medicine,healthcare",
+
+  Sports: "sports,cricket,football",
+
+  Entertainment: "entertainment,movies,music,OTT,television",
+
+  "Environment & Climate":
+    "climate,environment,sustainability,global warming,pollution",
+};
+
+// ==========================================
+// CLEAN TEXT
+// ==========================================
 
 const cleanText = (text = "") => {
   if (!text) return "";
@@ -19,6 +71,10 @@ const cleanText = (text = "") => {
     .replace(/\s+/g, " ")
     .trim();
 };
+
+// ==========================================
+// FETCH MEDIASTACK NEWS
+// ==========================================
 
 export const fetchMediaStackNews = async (category, source) => {
   try {
@@ -38,22 +94,20 @@ export const fetchMediaStackNews = async (category, source) => {
       throw new Error("Mediastack API key is not configured");
     }
 
-    const query = CATEGORY_QUERIES[category];
+    const query = MEDIASTACK_KEYWORDS[category];
 
     if (!query) {
-      throw new Error(`No Mediastack query configured for ${category}`);
+      throw new Error(`No MediaStack query configured for ${category}`);
     }
 
     console.log(`📡 Mediastack → ${category}`);
 
     // ==========================================
-    // 2. API PARAMETERS
+    // 2. BASE PARAMETERS
     // ==========================================
 
     const params = {
       access_key: MEDIASTACK_API_KEY,
-
-      keywords: query,
 
       countries: "in",
 
@@ -65,8 +119,28 @@ export const fetchMediaStackNews = async (category, source) => {
     };
 
     // ==========================================
-    // 3. API REQUEST
+    // 3. CATEGORY / KEYWORD FILTER
     // ==========================================
+
+    const mediaStackCategory = MEDIASTACK_CATEGORY_MAP[category];
+
+    if (mediaStackCategory) {
+      // MediaStack native category
+      params.categories = mediaStackCategory;
+
+      console.log(`🏷️ Mediastack category: ${mediaStackCategory}`);
+    } else {
+      // Custom NewsMint category
+      params.keywords = query;
+
+      console.log(`🔎 Mediastack keywords: ${query}`);
+    }
+
+    // ==========================================
+    // 4. API REQUEST
+    // ==========================================
+
+    console.log("📤 Mediastack params:", params);
 
     const response = await axios.get(MEDIASTACK_URL, {
       params,
@@ -74,7 +148,7 @@ export const fetchMediaStackNews = async (category, source) => {
     });
 
     // ==========================================
-    // 4. RESPONSE VALIDATION
+    // 5. RESPONSE VALIDATION
     // ==========================================
 
     if (response.data?.error) {
@@ -85,8 +159,10 @@ export const fetchMediaStackNews = async (category, source) => {
 
     const items = Array.isArray(response.data?.data) ? response.data.data : [];
 
+    console.log(`📦 Mediastack raw items: ${items.length}`);
+
     // ==========================================
-    // 5. NORMALIZE
+    // 6. NORMALIZE
     // ==========================================
 
     const articles = items
@@ -138,6 +214,10 @@ export const fetchMediaStackNews = async (category, source) => {
         };
       })
       .filter(Boolean);
+
+    // ==========================================
+    // 7. RESULT
+    // ==========================================
 
     console.log(`📰 Mediastack → ${category}: ${articles.length} candidates`);
 

@@ -162,6 +162,10 @@ export const savePreferences = async (req, res) => {
       },
     );
 
+    // Invalidate related caches
+    await redisClient.del(`preference:user:${userId}`);
+    await redisClient.del(`news:user:${userId}`);
+
     // -----------------------------
     // Delete temporary Telegram data
     // -----------------------------
@@ -262,31 +266,55 @@ const getNextDigestTime = (deliveryTime, timezone) => {
 
 export const getMyPreferences = async (req, res) => {
   try {
-    const [preference, user] = await Promise.all([
-      Preference.findOne({
-        userId: req.user._id,
-      }).lean(),
+    const userId = req.user._id;
+    const cacheKey = `preference:user:${userId}`;
 
-      User.findById(req.user._id).select("newsStreak lastNewsReadAt").lean(),
-    ]);
+    // 1. Check Redis cache first
+    const cachedPreference = await redisClient.get(cacheKey);
 
-    // User has never created preferences
-    if (!preference) {
+    if (cachedPreference) {
       return res.status(200).json({
         success: true,
-        hasPreferences: false,
-        preference: null,
+        ...cachedPreference,
+        cached: true,
       });
     }
 
+    // 2. Cache MISS → Get data from MongoDB
+    const [preference, user] = await Promise.all([
+      Preference.findOne({
+        userId,
+      }).lean(),
+      User.findById(userId).select("newsStreak lastNewsReadAt").lean(),
+    ]);
+
+    // 3. User has never created preferences
+    if (!preference) {
+      const responseData = {
+        hasPreferences: false,
+        preference: null,
+      };
+
+      // Cache this result too
+      await redisClient.set(cacheKey, JSON.stringify(responseData), {
+        ex: 30 * 60, // 30 minutes
+      });
+
+      return res.status(200).json({
+        success: true,
+        ...responseData,
+        cached: false,
+      });
+    }
+
+    // 4. Calculate next digest time
     const nextDigestTime = getNextDigestTime(
       preference.deliveryTime,
       preference.timezone,
     );
 
-    return res.status(200).json({
-      success: true,
-
+    // 5. Prepare response data
+    const responseData = {
       hasPreferences: Boolean(preference.isCompleted),
 
       preference: {
@@ -320,6 +348,18 @@ export const getMyPreferences = async (req, res) => {
         // Setup status
         isCompleted: preference.isCompleted,
       },
+    };
+
+    // 6. Save response in Redis
+    await redisClient.set(cacheKey, JSON.stringify(responseData), {
+      ex: 30 * 60, // 30 minutes
+    });
+
+    // 7. Response
+    return res.status(200).json({
+      success: true,
+      ...responseData,
+      cached: false,
     });
   } catch (error) {
     console.error("Get My Preferences Error:", error);
@@ -353,7 +393,6 @@ export const checkMyPreferences = async (req, res) => {
     });
   }
 };
-
 export const updatePreferences = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -363,7 +402,6 @@ export const updatePreferences = async (req, res) => {
       language,
       deliveryTime,
       phoneNumber,
-      telegram,
       timezone = "Asia/Kolkata",
     } = req.body;
 
@@ -450,6 +488,7 @@ export const updatePreferences = async (req, res) => {
 
     // -----------------------------
     // Update preference
+    // Telegram data is preserved
     // -----------------------------
 
     const preference = await Preference.findOneAndUpdate(
@@ -464,10 +503,8 @@ export const updatePreferences = async (req, res) => {
 
         nextDeliveryAt,
 
-        telegram: {
-          chatId: telegram?.chatId || null,
-          connected: telegram?.connected || false,
-        },
+        // Keep existing Telegram connection
+        telegram: existingPreference.telegram,
 
         isCompleted: true,
       },
@@ -479,6 +516,13 @@ export const updatePreferences = async (req, res) => {
     );
 
     // -----------------------------
+    // Invalidate related caches
+    // -----------------------------
+
+    await redisClient.del(`preference:user:${userId}`);
+    await redisClient.del(`news:user:${userId}`);
+
+    // -----------------------------
     // Response
     // -----------------------------
 
@@ -488,15 +532,10 @@ export const updatePreferences = async (req, res) => {
 
       preference: {
         id: preference._id,
-
         categories: preference.categories,
-
         language: preference.language,
-
         deliveryTime: preference.deliveryTime,
-
         timezone: preference.timezone,
-
         phoneNumber: preference.phoneNumber,
 
         telegram: {

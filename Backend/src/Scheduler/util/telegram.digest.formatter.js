@@ -5,6 +5,17 @@ const CATEGORY_CONFIG = {
   World: "🌍 WORLD",
   Entertainment: "🎬 ENTERTAINMENT",
   General: "📰 GENERAL",
+
+  AI: "🤖 AI",
+  Business: "💼 BUSINESS",
+  Finance: "💰 FINANCE",
+  Science: "🔬 SCIENCE",
+  Space: "🚀 SPACE",
+  Cybersecurity: "🔐 CYBERSECURITY",
+  Startups: "🚀 STARTUPS",
+  Education: "🎓 EDUCATION",
+  Health: "🏥 HEALTH",
+  Environment: "🌱 ENVIRONMENT",
 };
 
 const getGreeting = () => {
@@ -44,11 +55,22 @@ export const formatTelegramDigest = ({ digestNews, language }) => {
     groupedNews[category].push(article);
   }
 
+  // Display order for all supported categories
   const categoryOrder = [
     "India",
-    "Technology",
-    "Sports",
     "World",
+    "Technology",
+    "Business",
+    "Finance",
+    "AI",
+    "Science",
+    "Space",
+    "Cybersecurity",
+    "Startups",
+    "Education",
+    "Health",
+    "Environment",
+    "Sports",
     "Entertainment",
     "General",
   ];
@@ -57,6 +79,7 @@ export const formatTelegramDigest = ({ digestNews, language }) => {
 
   lines.push("📰 NEWSMINT DAILY DIGEST");
   lines.push("");
+
   lines.push(getGreeting());
   lines.push("");
 
@@ -72,6 +95,7 @@ export const formatTelegramDigest = ({ digestNews, language }) => {
 
   let articleNumber = 1;
 
+  // First process all known categories in defined order
   for (const category of categoryOrder) {
     const news = groupedNews[category];
 
@@ -81,7 +105,48 @@ export const formatTelegramDigest = ({ digestNews, language }) => {
 
     lines.push("━━━━━━━━━━━━━━");
     lines.push("");
+
     lines.push(CATEGORY_CONFIG[category] || `📰 ${category.toUpperCase()}`);
+
+    lines.push("");
+
+    for (const article of news) {
+      lines.push(`${articleNumber}. ${article.title}`);
+      lines.push("");
+
+      if (article.summary) {
+        lines.push(article.summary);
+        lines.push("");
+      }
+
+      if (article.url) {
+        lines.push(`🔗 Read More: ${article.url}`);
+        lines.push("");
+      }
+
+      articleNumber++;
+    }
+  }
+
+  // Safety fallback:
+  // If a new category is added in the future but not added
+  // to categoryOrder, it will still be included.
+  for (const category of Object.keys(groupedNews)) {
+    if (categoryOrder.includes(category)) {
+      continue;
+    }
+
+    const news = groupedNews[category];
+
+    if (!news?.length) {
+      continue;
+    }
+
+    lines.push("━━━━━━━━━━━━━━");
+    lines.push("");
+
+    lines.push(CATEGORY_CONFIG[category] || `📰 ${category.toUpperCase()}`);
+
     lines.push("");
 
     for (const article of news) {

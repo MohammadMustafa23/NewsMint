@@ -1,6 +1,4 @@
 import User from "../models/user.model.js";
-import { redisClient } from "../../../config/redis.js";
-
 async function VerifyOTP(req, res) {
   try {
     const { email, otp } = req.body;
@@ -17,10 +15,8 @@ async function VerifyOTP(req, res) {
       });
     }
 
-    
-
-    // 2. Parse Redis Data
-    const userData = cachedData;
+    // 2. Parse Redis JSON string
+    const userData = JSON.parse(cachedData);
 
     // 3. Compare OTP
     if (userData.otp !== otp) {
@@ -43,10 +39,10 @@ async function VerifyOTP(req, res) {
     // 6. Success
     return res.status(201).json({
       success: true,
-      message: "User Registration successfully."
+      message: "User Registration successfully.",
     });
   } catch (error) {
-    console.error(error);
+    console.error("VerifyOTP Error:", error);
 
     return res.status(500).json({
       success: false,

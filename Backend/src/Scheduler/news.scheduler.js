@@ -2,6 +2,7 @@ import cron from "node-cron";
 
 import { fetchAllNews } from "../NewsArticle/ActualNewsFetchwork/news-fetch.service.js";
 import { startAINewsWorker } from "./service/news-ai.worker.js";
+import { cleanupOldNews } from "./cleanUp/cleanupNews.service.js";
 
 export const processNewsScheduler = async () => {
   const startedAt = new Date();
@@ -26,35 +27,45 @@ export const processNewsScheduler = async () => {
     console.log(`💾 Saved: ${newsResult.totalSaved || 0}`);
     console.log("\n🤖 Starting AI News Worker...");
 
-    startAINewsWorker()
-      .then((result) => {
-        if (result.success) {
-          console.log(
-            `✅ AI Worker Finished | ` +
-              `Processed: ${result.processed} | ` +
-              `Batches: ${result.batches}`,
-          );
-        } else {
-          console.error(
-            `⚠️ AI Worker Finished With Error: ${
-              result.message || "Unknown error"
-            }`,
-          );
-        }
-      })
-      .catch((error) => {
-        console.error("❌ AI Worker Error:", error.message);
-      });
+    try {
+      const result = await startAINewsWorker();
+
+      if (result.success) {
+        console.log(
+          `✅ AI Worker Finished | ` +
+            `Processed: ${result.processed} | ` +
+            `Batches: ${result.batches}`,
+        );
+      } else {
+        console.error(
+          `⚠️ AI Worker Finished With Error: ${
+            result.message || "Unknown error"
+          }`,
+        );
+      }
+    } catch (error) {
+      console.error("❌ AI Worker Error:", error.message);
+    }
+
+    // ==========================================
+    // CLEAN OLD NEWS
+    // ==========================================
+
+    console.log("\n🗑️ Starting Old News Cleanup...");
+    await cleanupOldNews();
+    console.log("✅ Old News Cleanup Completed");
 
     // Log completion details
     const completedAt = new Date();
+
     console.log("\n========================================");
     console.log("✅ NewsMint Daily News Scheduler Completed");
     console.log("========================================");
     console.log(`📰 New articles saved: ${newsResult.totalSaved || 0}`);
     console.log(`⏱️ Started: ${startedAt.toISOString()}`);
     console.log(`⏱️ Finished: ${completedAt.toISOString()}`);
-    console.log("🤖 AI Worker is running independently");
+    console.log("🤖 AI Worker Completed");
+    console.log("🗑️ Old News Cleanup Completed");
     console.log("========================================\n");
 
     return {
@@ -76,7 +87,7 @@ export const processNewsScheduler = async () => {
 };
 
 const startNewsScheduler = () => {
-  cron.schedule("28 1 22 8 *", async () => {
+  cron.schedule("03 17 24 8 *", async () => {
     try {
       await processNewsScheduler();
     } catch (error) {

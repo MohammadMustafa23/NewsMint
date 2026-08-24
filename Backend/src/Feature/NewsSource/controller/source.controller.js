@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import Source from "../models/source.models.js";
 import Preference from "../../Prefrence/models/Preference.js";
+import { redisClient } from "../../../config/redis.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,18 @@ import Preference from "../../Prefrence/models/Preference.js";
 */
 export const getAllSources = async (req, res) => {
   try {
+    const cacheKey = "sources:all";
+    // 1. Check Redis
+    const cachedSources = await redisClient.get(cacheKey);
+
+    if (cachedSources) {
+      return res.status(200).json({
+        success: true,
+        ...cachedSources,
+        cached: true,
+      });
+    }
+
     const sources = await Source.find({
       isActive: true,
     })
@@ -26,9 +39,20 @@ export const getAllSources = async (req, res) => {
       })
       .lean();
 
+    // 2. Prepare response data
+    const responseData = {
+      count: sources.length,
+      sources,
+    };
+
+    // 3. Save in Redis
+    await redisClient.set(cacheKey,responseData, {
+      ex : 60 * 60, // 1 hour
+    });
+
     return res.status(200).json({
       success: true,
-      count: sources.length,
+      ...responseData,
       sources,
     });
   } catch (error) {
@@ -40,21 +64,25 @@ export const getAllSources = async (req, res) => {
     });
   }
 };
-
-
-/*
-|--------------------------------------------------------------------------
-| GET MY SELECTED SOURCES
-|--------------------------------------------------------------------------
-| Returns the sources selected by the logged-in user.
-|
-| GET /sources/me
-|
-*/
 export const getMySources = async (req, res) => {
   try {
+    const userId = req.user._id;
+    const cacheKey = `sources:user:${userId}`;
+
+    // 1. Check Redis
+    const cachedSources = await redisClient.get(cacheKey);
+
+    if (cachedSources) {
+      return res.status(200).json({
+        success: true,
+        ...cachedSources,
+        cached: true,
+      });
+    }
+
+    // 2. Redis MISS → MongoDB
     const preference = await Preference.findOne({
-      userId: req.user._id,
+      userId,
     })
       .select("sources")
       .populate({
@@ -65,19 +93,38 @@ export const getMySources = async (req, res) => {
       .lean();
 
     if (!preference) {
-      return res.status(200).json({
-        success: true,
+      const responseData = {
         selectedSources: [],
         count: 0,
         limit: 3,
+      };
+
+      await redisClient.set(cacheKey, JSON.stringify(responseData), {
+        ex : 30 * 60, // 30 minutes
+      });
+
+      return res.status(200).json({
+        success: true,
+        ...responseData,
+        cached: false,
       });
     }
 
-    return res.status(200).json({
-      success: true,
+    const responseData = {
       selectedSources: preference.sources || [],
       count: preference.sources?.length || 0,
       limit: 3,
+    };
+
+    // 3. Save in Redis
+    await redisClient.set(cacheKey, JSON.stringify(responseData), {
+      ex : 30 * 60, // 30 minutes
+    });
+
+    return res.status(200).json({
+      success: true,
+      ...responseData,
+      cached: false,
     });
   } catch (error) {
     console.error("Get My Sources Error:", error);
@@ -89,21 +136,6 @@ export const getMySources = async (req, res) => {
   }
 };
 
-
-/*
-|--------------------------------------------------------------------------
-| ADD SOURCE
-|--------------------------------------------------------------------------
-| Adds a source to the logged-in user's preferences.
-|
-| POST /sources/select
-|
-| Body:
-| {
-|   "sourceId": "SOURCE_ID"
-| }
-|
-*/
 export const addSource = async (req, res) => {
   try {
     const { sourceId } = req.body;
@@ -172,6 +204,11 @@ export const addSource = async (req, res) => {
 
     await preference.save();
 
+    // Invalidate related caches
+    await redisClient.del(`sources:user:${req.user._id}`);
+    await redisClient.del(`news:user:${req.user._id}`);
+    await redisClient.del(`preference:user:${req.user._id}`);
+
     return res.status(200).json({
       success: true,
       message: `${source.name} added successfully.`,
@@ -193,16 +230,6 @@ export const addSource = async (req, res) => {
   }
 };
 
-
-/*
-|--------------------------------------------------------------------------
-| REMOVE SOURCE
-|--------------------------------------------------------------------------
-| Removes a selected source from the user's preferences.
-|
-| DELETE /sources/select/:sourceId
-|
-*/
 export const removeSource = async (req, res) => {
   try {
     const { sourceId } = req.params;
@@ -241,6 +268,11 @@ export const removeSource = async (req, res) => {
     );
 
     await preference.save();
+
+    // Invalidate related caches
+    await redisClient.del(`sources:user:${req.user._id}`);
+    await redisClient.del(`news:user:${req.user._id}`);
+    await redisClient.del(`preference:user:${req.user._id}`);
 
     return res.status(200).json({
       success: true,

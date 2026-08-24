@@ -64,7 +64,7 @@ export const getTelegramConnectUrl = async (req, res) => {
 
     // Store token -> NewsMint user ID
     await redisClient.set(`telegram:connect:${token}`, userId, {
-      EX: 10 * 60,
+      ex : 10 * 60,
     });
 
     const botUsername = process.env.TELEGRAM_BOT_USERNAME;

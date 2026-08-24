@@ -206,7 +206,7 @@ const handleStart = async (message) => {
       ...telegramData,
     }),
     {
-      EX: 15 * 60,
+      ex : 15 * 60,
     },
   );
 
