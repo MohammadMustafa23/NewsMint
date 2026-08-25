@@ -32,7 +32,14 @@ const preferenceSchema = new mongoose.Schema(
         message: "You can select a maximum of 3 sources.",
       },
     },
-
+    digestProcessing: {
+      type: Boolean,
+      default: false,
+    },
+    digestProcessingAt: {
+      type: Date,
+      default: null,
+    },
     language: {
       type: String,
       enum: ["English", "Hindi"],

@@ -87,7 +87,7 @@ export const processNewsScheduler = async () => {
 };
 
 const startNewsScheduler = () => {
-  cron.schedule("03 17 24 8 *", async () => {
+  cron.schedule("0 6,18 * * *", async () => {
     try {
       await processNewsScheduler();
     } catch (error) {
