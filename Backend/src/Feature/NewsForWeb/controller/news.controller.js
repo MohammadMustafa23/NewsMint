@@ -4,13 +4,29 @@ import Source from "../../NewsSource/models/source.models.js";
 
 import { redisClient } from "../../../config/redis.js";
 
+const parseCachedObject = (cachedValue) => {
+  if (!cachedValue) {
+    return null;
+  }
+
+  if (typeof cachedValue === "string") {
+    try {
+      return JSON.parse(cachedValue);
+    } catch {
+      return null;
+    }
+  }
+
+  return cachedValue;
+};
+
 export const getMyNews = async (req, res) => {
   try {
     // 1. Logged-in user
     const userId = req.user._id;
     const cacheKey = `news:user:${userId}`;
 
-    const cachedNews = await redisClient.get(cacheKey);
+    const cachedNews = parseCachedObject(await redisClient.get(cacheKey));
 
     if (cachedNews) {
       return res.status(200).json({
@@ -119,7 +135,7 @@ export const getMyNews = async (req, res) => {
       news,
     };
 
-    await redisClient.set(cacheKey, JSON.stringify(responseData), {
+    await redisClient.set(cacheKey, responseData, {
         ex : 30 * 60, // 30 minutes
     });
 

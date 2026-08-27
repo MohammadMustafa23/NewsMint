@@ -6,6 +6,14 @@ export const startAINewsWorker = async () => {
 
     const result = await processAllPendingNews();
 
+    if (!result.success) {
+      console.log(
+        `AI News Worker Paused | Processed: ${result.processed} | Batches: ${result.batches}`,
+      );
+
+      return result;
+    }
+
     console.log(
       `✅ AI News Worker Finished | Processed: ${result.processed} | Batches: ${result.batches}`,
     );

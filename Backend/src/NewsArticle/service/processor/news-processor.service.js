@@ -3,24 +3,78 @@ import { summarizeNewsBatch } from "../ai/summarizer.service.js";
 
 const BATCH_SIZE = 5;
 const RETRY_DELAY = 10 * 60 * 1000;
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const PROCESSING_TIMEOUT = 15 * 60 * 1000;
+const MAX_AI_ATTEMPTS = 3;
 
 export const processNewsBatch = async () => {
   try {
     const now = new Date();
+    const staleProcessingBefore = new Date(now.getTime() - PROCESSING_TIMEOUT);
+
+    await NewsArticle.updateMany(
+      {
+        "ai.processed": false,
+        "ai.status": "processing",
+        updatedAt: {
+          $lte: staleProcessingBefore,
+        },
+      },
+      {
+        $set: {
+          "ai.status": "failed",
+          "ai.nextRetryAt": now,
+        },
+      },
+    );
 
     const articles = await NewsArticle.find({
       "ai.processed": false,
       $or: [
         {
           "ai.status": "pending",
+          $or: [
+            {
+              "ai.attempts": {
+                $lt: MAX_AI_ATTEMPTS,
+              },
+            },
+            {
+              "ai.attempts": {
+                $exists: false,
+              },
+            },
+          ],
         },
         {
           "ai.status": "failed",
-          "ai.nextRetryAt": {
-            $lte: now,
-          },
+          $and: [
+            {
+              $or: [
+                {
+                  "ai.attempts": {
+                    $lt: MAX_AI_ATTEMPTS,
+                  },
+                },
+                {
+                  "ai.attempts": {
+                    $exists: false,
+                  },
+                },
+              ],
+            },
+            {
+              $or: [
+                {
+                  "ai.nextRetryAt": null,
+                },
+                {
+                  "ai.nextRetryAt": {
+                    $lte: now,
+                  },
+                },
+              ],
+            },
+          ],
         },
       ],
     })
@@ -113,6 +167,20 @@ export const processNewsBatch = async () => {
     }
 
     if (!Array.isArray(results) || results.length !== articles.length) {
+      await NewsArticle.updateMany(
+        {
+          _id: {
+            $in: articleIds,
+          },
+        },
+        {
+          $set: {
+            "ai.status": "failed",
+            "ai.nextRetryAt": new Date(Date.now() + RETRY_DELAY),
+          },
+        },
+      );
+
       throw new Error(
         `Invalid AI result count. Expected ${articles.length}, received ${
           results?.length || 0
@@ -143,6 +211,7 @@ export const processNewsBatch = async () => {
           {
             $set: {
               "ai.status": "failed",
+              "ai.nextRetryAt": new Date(Date.now() + RETRY_DELAY),
             },
           },
         );
@@ -192,11 +261,18 @@ export const processAllPendingNews = async () => {
     const result = await processNewsBatch();
 
     if (result.retryable && result.nextRetryAt) {
-      console.log("⏳ Waiting 10 minutes before retrying...");
+      console.log(
+        `⏳ AI worker paused. Next retry is scheduled at ${result.nextRetryAt.toISOString()}`,
+      );
 
-      await sleep(RETRY_DELAY);
-
-      continue;
+      return {
+        success: false,
+        retryable: true,
+        processed: totalProcessed,
+        batches: batchNumber,
+        nextRetryAt: result.nextRetryAt,
+        message: result.message,
+      };
     }
 
     if (!result.success) {

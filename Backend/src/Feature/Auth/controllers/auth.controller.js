@@ -6,7 +6,7 @@ import sendOTP from "../utils/sendOTPEmail.js";
 import jwt from "jsonwebtoken";
 import googleClient from "../utils/googleAuth.js";
 import Preference from "../../Prefrence/models/Preference.js";
-// import crypto from "crypto";
+import crypto from "crypto";
 
 async function RegisterUser(req, res) {
   const { userName, email, password } = req.body;
@@ -30,15 +30,15 @@ async function RegisterUser(req, res) {
 
   // Redis Key
   const cacheKey = `register:${email}`;
-  
+
   await redisClient.set(
-    `register:${email}`,
-    JSON.stringify({
+    cacheKey,
+    {
       userName,
       email,
       password: hashedPassword,
       otp,
-    }),
+    },
     {
       ex : 300,
     },
@@ -134,7 +134,23 @@ const LogoutUser = async (req, res) => {
 
 async function GetUserProfile(req, res) {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const userId = req.user?._id || req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized. Please login.",
+      });
+    }
+
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
 
     return res.status(200).json({
       success: true,

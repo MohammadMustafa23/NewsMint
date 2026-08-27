@@ -1,4 +1,22 @@
 import User from "../models/user.model.js";
+import { redisClient } from "../../../config/redis.js";
+
+const parseRegistrationData = (cachedData) => {
+  if (!cachedData) {
+    return null;
+  }
+
+  if (typeof cachedData === "string") {
+    try {
+      return JSON.parse(cachedData);
+    } catch {
+      return null;
+    }
+  }
+
+  return cachedData;
+};
+
 async function VerifyOTP(req, res) {
   try {
     const { email, otp } = req.body;
@@ -15,8 +33,17 @@ async function VerifyOTP(req, res) {
       });
     }
 
-    // 2. Parse Redis JSON string
-    const userData = JSON.parse(cachedData);
+    // 2. Parse Redis data
+    const userData = parseRegistrationData(cachedData);
+
+    if (!userData) {
+      await redisClient.del(cacheKey);
+
+      return res.status(400).json({
+        success: false,
+        message: "Registration session is invalid. Please register again.",
+      });
+    }
 
     // 3. Compare OTP
     if (userData.otp !== otp) {

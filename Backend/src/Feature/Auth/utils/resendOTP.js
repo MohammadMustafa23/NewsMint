@@ -2,6 +2,22 @@ import { redisClient } from "../../../config/redis.js";
 import generateOTP from "../utils/generateOTP.js";
 import sendOTP from "../utils/sendOTPEmail.js";
 
+const parseRegistrationData = (cachedData) => {
+  if (!cachedData) {
+    return null;
+  }
+
+  if (typeof cachedData === "string") {
+    try {
+      return JSON.parse(cachedData);
+    } catch {
+      return null;
+    }
+  }
+
+  return cachedData;
+};
+
 async function ResendOTP(req, res) {
   try {
     const { email } = req.body;
@@ -25,14 +41,25 @@ async function ResendOTP(req, res) {
       });
     }
 
+    const registrationData = parseRegistrationData(cachedData);
+
+    if (!registrationData) {
+      await redisClient.del(cacheKey);
+
+      return res.status(400).json({
+        success: false,
+        message: "Registration session is invalid. Please register again.",
+      });
+    }
+
     // Generate New OTP
     const otp = generateOTP();
 
     // Update OTP
-    cachedData.otp = otp;
+    registrationData.otp = otp;
 
     // Save Again (Reset 5 min expiry)
-    await redisClient.set(cacheKey, JSON.stringify(cachedData), {
+    await redisClient.set(cacheKey, registrationData, {
       ex : 300,
     });
 

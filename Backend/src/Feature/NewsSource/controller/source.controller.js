@@ -4,6 +4,22 @@ import Source from "../models/source.models.js";
 import Preference from "../../Prefrence/models/Preference.js";
 import { redisClient } from "../../../config/redis.js";
 
+const parseCachedObject = (cachedValue) => {
+  if (!cachedValue) {
+    return null;
+  }
+
+  if (typeof cachedValue === "string") {
+    try {
+      return JSON.parse(cachedValue);
+    } catch {
+      return null;
+    }
+  }
+
+  return cachedValue;
+};
+
 /*
 |--------------------------------------------------------------------------
 | GET ALL SOURCES
@@ -17,7 +33,7 @@ export const getAllSources = async (req, res) => {
   try {
     const cacheKey = "sources:all";
     // 1. Check Redis
-    const cachedSources = await redisClient.get(cacheKey);
+    const cachedSources = parseCachedObject(await redisClient.get(cacheKey));
 
     if (cachedSources) {
       return res.status(200).json({
@@ -70,7 +86,7 @@ export const getMySources = async (req, res) => {
     const cacheKey = `sources:user:${userId}`;
 
     // 1. Check Redis
-    const cachedSources = await redisClient.get(cacheKey);
+    const cachedSources = parseCachedObject(await redisClient.get(cacheKey));
 
     if (cachedSources) {
       return res.status(200).json({
@@ -99,7 +115,7 @@ export const getMySources = async (req, res) => {
         limit: 3,
       };
 
-      await redisClient.set(cacheKey, JSON.stringify(responseData), {
+      await redisClient.set(cacheKey, responseData, {
         ex : 30 * 60, // 30 minutes
       });
 
@@ -117,7 +133,7 @@ export const getMySources = async (req, res) => {
     };
 
     // 3. Save in Redis
-    await redisClient.set(cacheKey, JSON.stringify(responseData), {
+    await redisClient.set(cacheKey, responseData, {
       ex : 30 * 60, // 30 minutes
     });
 

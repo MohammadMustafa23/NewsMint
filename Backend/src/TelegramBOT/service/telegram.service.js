@@ -201,10 +201,10 @@ const handleStart = async (message) => {
 
   await redisClient.set(
     `telegram:pending:${userId}`,
-    JSON.stringify({
+    {
       userId,
       ...telegramData,
-    }),
+    },
     {
       ex : 15 * 60,
     },

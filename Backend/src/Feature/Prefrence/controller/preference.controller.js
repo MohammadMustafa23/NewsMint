@@ -23,6 +23,22 @@ const ALLOWED_CATEGORIES = [
 
 const ALLOWED_LANGUAGES = ["English", "Hindi"];
 
+const parseCachedObject = (cachedValue) => {
+  if (!cachedValue) {
+    return null;
+  }
+
+  if (typeof cachedValue === "string") {
+    try {
+      return JSON.parse(cachedValue);
+    } catch {
+      return null;
+    }
+  }
+
+  return cachedValue;
+};
+
 export const savePreferences = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -32,7 +48,6 @@ export const savePreferences = async (req, res) => {
       language,
       deliveryTime,
       phoneNumber,
-      telegram,
       timezone = "Asia/Kolkata",
     } = req.body;
     // -----------------------------
@@ -101,22 +116,32 @@ export const savePreferences = async (req, res) => {
     // Get Telegram data from Redis
     // -----------------------------
 
+    const existingPreference = await Preference.findOne({
+      userId,
+    })
+      .select("telegram")
+      .lean();
+
     const telegramKey = `telegram:pending:${userId}`;
 
     const telegramRedisData = await redisClient.get(telegramKey);
 
     let telegramData = {
-      chatId: null,
+      chatId: existingPreference?.telegram?.chatId || null,
       telegramUserId: null,
       username: null,
       firstName: null,
       lastName: null,
-      connected: false,
+      connected: existingPreference?.telegram?.connected || false,
     };
 
     if (telegramRedisData) {
       try {
-        const parsedTelegramData = telegramRedisData;
+        const parsedTelegramData = parseCachedObject(telegramRedisData);
+
+        if (!parsedTelegramData) {
+          throw new Error("Telegram cache payload is invalid.");
+        }
 
         telegramData = {
           chatId: parsedTelegramData.chatId || null,
@@ -148,8 +173,8 @@ export const savePreferences = async (req, res) => {
         nextDeliveryAt,
 
         telegram: {
-          chatId: telegram?.chatId || null,
-          connected: telegram?.connected || false,
+          chatId: telegramData.chatId,
+          connected: telegramData.connected,
         },
 
         isCompleted: true,
@@ -270,7 +295,7 @@ export const getMyPreferences = async (req, res) => {
     const cacheKey = `preference:user:${userId}`;
 
     // 1. Check Redis cache first
-    const cachedPreference = await redisClient.get(cacheKey);
+    const cachedPreference = parseCachedObject(await redisClient.get(cacheKey));
 
     if (cachedPreference) {
       return res.status(200).json({
@@ -296,7 +321,7 @@ export const getMyPreferences = async (req, res) => {
       };
 
       // Cache this result too
-      await redisClient.set(cacheKey, JSON.stringify(responseData), {
+      await redisClient.set(cacheKey, responseData, {
         ex: 30 * 60, // 30 minutes
       });
 
@@ -351,7 +376,7 @@ export const getMyPreferences = async (req, res) => {
     };
 
     // 6. Save response in Redis
-    await redisClient.set(cacheKey, JSON.stringify(responseData), {
+    await redisClient.set(cacheKey, responseData, {
       ex: 30 * 60, // 30 minutes
     });
 

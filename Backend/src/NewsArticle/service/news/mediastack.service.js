@@ -140,7 +140,13 @@ export const fetchMediaStackNews = async (category, source) => {
     // 4. API REQUEST
     // ==========================================
 
-    console.log("📤 Mediastack params:", params);
+    console.log("📤 Mediastack request prepared:", {
+      category,
+      hasNativeCategory: Boolean(mediaStackCategory),
+      hasKeywords: Boolean(params.keywords),
+      limit: params.limit,
+      sort: params.sort,
+    });
 
     const response = await axios.get(MEDIASTACK_URL, {
       params,

@@ -250,68 +250,67 @@ const storeArticle = async (article) => {
 
   const contentHash = createContentHash(normalizedUrl);
 
-  /*
-   * Check if this article already exists.
-   */
+  const result = await NewsArticle.updateOne(
+    {
+      contentHash,
+    },
+    {
+      $setOnInsert: {
+        source: article.source,
 
-  const existingArticle = await NewsArticle.exists({
-    contentHash,
-  });
+        title: article.title,
 
-  if (existingArticle) {
+        description: article.description || "",
+
+        url: article.url,
+
+        image: article.image || "",
+
+        author: article.author || "",
+
+        publishedAt: article.publishedAt,
+
+        category: article.category,
+
+        tags: Array.isArray(article.tags) ? article.tags : [],
+
+        fetchMethod: article.fetchMethod,
+
+        contentHash,
+
+        /*
+         * Actual publication date.
+         */
+
+        newsDate: article.publishedAt || new Date(),
+
+        /*
+         * AI worker will pick this article later.
+         */
+
+        ai: {
+          processed: false,
+
+          status: "pending",
+
+          attempts: 0,
+
+          nextRetryAt: null,
+        },
+      },
+    },
+    {
+      upsert: true,
+      runValidators: true,
+    },
+  );
+
+  if (!result.upsertedCount && !result.upsertedId) {
     return {
       saved: false,
       reason: "duplicate",
     };
   }
-
-  /*
-   * Store article.
-   */
-
-  await NewsArticle.create({
-    source: article.source,
-
-    title: article.title,
-
-    description: article.description || "",
-
-    url: article.url,
-
-    image: article.image || "",
-
-    author: article.author || "",
-
-    publishedAt: article.publishedAt,
-
-    category: article.category,
-
-    tags: Array.isArray(article.tags) ? article.tags : [],
-
-    fetchMethod: article.fetchMethod,
-
-    contentHash,
-
-    /*
-     * Actual publication date.
-     */
-
-    newsDate: article.publishedAt || new Date(),
-
-    /*
-     * AI worker will pick this article later.
-     */
-
-    ai: {
-      processed: false,
-
-      status: "pending",
-
-      attempts: 0,
-
-      nextRetryAt: null,
-    },
-  });
 
   return {
     saved: true,

@@ -12,7 +12,9 @@ import { redisClient } from "./config/redis.js";
 import cors from "cors";
 
 const app = express();
-const allowedOrigins = process.env.FRONTEND_CLIENT_ID.split(",");
+const allowedOrigins = process.env.FRONTEND_CLIENT_ID
+  ? process.env.FRONTEND_CLIENT_ID.split(",").map((origin) => origin.trim())
+  : [];
 
 // // Trust Render's reverse proxy so req.ip / X-Forwarded-For
 // app.set("trust proxy", 1);
