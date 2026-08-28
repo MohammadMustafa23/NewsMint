@@ -45,7 +45,7 @@ const DigestSetupForm = ({
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTelegramConnecting, setIsTelegramConnecting] = useState(false);
-  const telegramPollTimeoutRef = useRef(null);
+  const telegramAbortControllerRef = useRef(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Controls only whether the custom time input is visible.
@@ -328,9 +328,8 @@ const DigestSetupForm = ({
 
   useEffect(() => {
     return () => {
-      if (telegramPollTimeoutRef.current) {
-        clearTimeout(telegramPollTimeoutRef.current);
-      }
+      telegramAbortControllerRef.current?.abort();
+      telegramAbortControllerRef.current = null;
     };
   }, []);
 
@@ -343,26 +342,54 @@ const DigestSetupForm = ({
   const handleTelegramConnect = async () => {
     if (isTelegramConnecting) return;
 
+    // Cancel any previous connection attempt
+    telegramAbortControllerRef.current?.abort();
+
+    // Create a new controller for this connection attempt
+    const controller = new AbortController();
+
+    telegramAbortControllerRef.current = controller;
+
     setIsTelegramConnecting(true);
     setSubmitError("");
 
     try {
       await connectTelegram({
+        signal: controller.signal,
+
         onConnected: (status) => {
+          if (controller.signal.aborted) return;
+
           onTelegramConnect?.({
             chatId: status?.telegram?.chatId || null,
             connected: true,
           });
 
           setIsTelegramConnecting(false);
+
+          telegramAbortControllerRef.current = null;
         },
 
         onTimeout: () => {
+          if (controller.signal.aborted) return;
+
           setIsTelegramConnecting(false);
+
           setSubmitError("Telegram connection timed out. Please try again.");
+
+          telegramAbortControllerRef.current = null;
         },
       });
     } catch (error) {
+      // Expected when component unmounts or connection is cancelled
+      if (
+        controller.signal.aborted ||
+        error?.name === "CanceledError" ||
+        error?.code === "ERR_CANCELED"
+      ) {
+        return;
+      }
+
       console.error("Telegram connection failed:", error);
 
       setIsTelegramConnecting(false);
@@ -372,9 +399,10 @@ const DigestSetupForm = ({
           error?.message ||
           "Unable to connect Telegram.",
       );
+
+      telegramAbortControllerRef.current = null;
     }
   };
-
   return (
     <div className="digest-setup-form">
       {/* Heading */}

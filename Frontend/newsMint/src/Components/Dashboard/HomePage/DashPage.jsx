@@ -129,6 +129,35 @@ const DashPage = () => {
   // =========================================================
 
   const handleUpdate = async (updatedPreferences) => {
+    const handleUpdate = async (updatedPreferences) => {
+  // Telegram status refresh only
+  if (updatedPreferences?.refreshTelegram) {
+    try {
+      setError("");
+
+      const data = await getMyPreferences();
+
+      if (!data?.success || !data?.preference) {
+        throw new Error("Unable to refresh Telegram status.");
+      }
+
+      setPreferences(data.preference);
+
+      console.log("✅ Telegram status refreshed");
+    } catch (error) {
+      console.error("Telegram Refresh Error:", error);
+
+      setError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to refresh Telegram status.",
+      );
+    }
+
+    return;
+  }
+
+  // Existing save logic continues here...
     try {
       setUpdating(true);
       setError("");

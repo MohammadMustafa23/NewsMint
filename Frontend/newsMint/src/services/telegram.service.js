@@ -8,9 +8,10 @@ export const getTelegramConnectUrl = async () => {
   return response.data;
 };
 
-export const getTelegramStatus = async () => {
+export const getTelegramStatus = async (signal) => {
   const response = await api.get("/telegram/status", {
     withCredentials: true,
+    signal,
   });
 
   return response.data;
@@ -21,8 +22,19 @@ export const connectTelegram = async ({
   onTimeout,
   timeout = 2 * 60 * 1000,
   interval = 2000,
+  signal,
 }) => {
+  // Already cancelled before starting
+  if (signal?.aborted) {
+    return;
+  }
+
   const response = await getTelegramConnectUrl();
+
+  // Component/service cancelled while getting URL
+  if (signal?.aborted) {
+    return;
+  }
 
   const telegramUrl = response?.telegramUrl;
 
@@ -34,21 +46,62 @@ export const connectTelegram = async ({
 
   const startTime = Date.now();
 
-  const check = async () => {
-    const status = await getTelegramStatus();
+  let timeoutId = null;
 
-    if (status?.connected) {
-      onConnected?.(status);
-      return;
+  const cleanup = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
     }
-
-    if (Date.now() - startTime >= timeout) {
-      onTimeout?.();
-      return;
-    }
-
-    setTimeout(check, interval);
   };
 
-  setTimeout(check, interval);
+  const check = async () => {
+    // Stop polling if cancelled
+    if (signal?.aborted) {
+      cleanup();
+      return;
+    }
+
+    try {
+      const status = await getTelegramStatus(signal);
+
+      // Request may have completed after cancellation
+      if (signal?.aborted) {
+        cleanup();
+        return;
+      }
+
+      if (status?.connected) {
+        cleanup();
+        onConnected?.(status);
+        return;
+      }
+
+      if (Date.now() - startTime >= timeout) {
+        cleanup();
+        onTimeout?.();
+        return;
+      }
+
+      timeoutId = setTimeout(check, interval);
+    } catch (error) {
+      // AbortController cancellation is expected
+      if (signal?.aborted) {
+        cleanup();
+        return;
+      }
+
+      console.error("Telegram status check failed:", error);
+
+      // Continue polling for normal request errors
+      timeoutId = setTimeout(check, interval);
+    }
+  };
+
+  // Cleanup polling when AbortController is triggered
+  signal?.addEventListener("abort", cleanup, {
+    once: true,
+  });
+
+  timeoutId = setTimeout(check, interval);
 };
