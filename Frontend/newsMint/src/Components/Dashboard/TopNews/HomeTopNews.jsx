@@ -4,13 +4,33 @@ import DashLanguageToggle from "./DashLanguageToggle";
 import DashTrending from "./DashTrending";
 import { getMyNews } from "../../../services/news.service.js";
 import "./style/HomeTopNews.css";
-import SpinLoader from "../../../common/SpinLoader.jsx"; 
+import SpinLoader from "../../../common/SpinLoader.jsx";
 
 const HomeTopNews = () => {
+  // ======================================================
+  // NEWS STATE
+  // ======================================================
+
   const [news, setNews] = useState([]);
+
   const [language, setLanguage] = useState("English");
+
+  // Pagination
+  const [page, setPage] = useState(1);
+
+  const [hasMore, setHasMore] = useState(false);
+
+  // Initial loading
   const [loading, setLoading] = useState(true);
+
+  // Load More loading
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const [error, setError] = useState("");
+
+  // ======================================================
+  // INITIAL NEWS FETCH
+  // ======================================================
 
   useEffect(() => {
     const fetchMyNews = async () => {
@@ -18,18 +38,30 @@ const HomeTopNews = () => {
         setLoading(true);
         setError("");
 
-        const response = await getMyNews();
+        const response = await getMyNews(1, 10);
 
-        if (response.success) {
-          setNews(response.data.news || []);
-          setLanguage(response.data.language || "English");
-        } else {
-          setError(response.message || "Failed to load your news.");
+        if (!response.success) {
+          setError(response.message || "We couldn't load your daily news.");
+
+          return;
         }
+
+        // First 10 articles
+        setNews(response.data.news || []);
+
+        // Language
+        setLanguage(response.data.language || "English");
+
+        // Pagination
+        setHasMore(response.data.pagination?.hasMore || false);
+
+        setPage(response.data.pagination?.nextPage || 2);
       } catch (error) {
         console.error("Failed to fetch user news:", error);
 
-        setError(error.response?.data?.message || "Failed to load your news.");
+        setError(
+          error.response?.data?.message || "We couldn't load your daily news.",
+        );
       } finally {
         setLoading(false);
       }
@@ -38,74 +70,170 @@ const HomeTopNews = () => {
     fetchMyNews();
   }, []);
 
-  const handleLanguageChange = (lang) => {
-    console.log("Language changed:", lang);
+  // ======================================================
+  // LOAD MORE
+  // ======================================================
+
+  const handleLoadMore = async () => {
+    // Prevent duplicate requests
+    if (loadingMore || !hasMore) {
+      return;
+    }
+
+    try {
+      setLoadingMore(true);
+
+      const response = await getMyNews(page, 10);
+
+      if (!response.success) {
+        console.error(response.message || "Failed to load more news.");
+
+        return;
+      }
+
+      const newNews = response.data.news || [];
+
+      // Append new articles
+      setNews((previousNews) => [...previousNews, ...newNews]);
+
+      // Update pagination
+      setHasMore(response.data.pagination?.hasMore || false);
+
+      setPage(response.data.pagination?.nextPage || page + 1);
+    } catch (error) {
+      console.error("Failed to load more news:", error);
+    } finally {
+      setLoadingMore(false);
+    }
   };
+
+  // ======================================================
+  // LANGUAGE
+  // ======================================================
+
+  const handleLanguageChange = (lang) => {
+    const nextLanguage = lang === "HIN" ? "Hindi" : "English";
+
+    setLanguage(nextLanguage);
+
+    // Language switching should later
+    // request news in the selected language.
+  };
+
+  // ======================================================
+  // TRENDING
+  // ======================================================
 
   const handleTopicClick = (topic) => {
     console.log("Clicked topic:", topic);
   };
 
-  const handleReadHero = () => {
-    if (!news[0]) return;
+  // ======================================================
+  // OPEN ARTICLE
+  // ======================================================
 
-    if (news[0].url) {
-      window.open(news[0].url, "_blank", "noopener,noreferrer");
-    }
-  };
-
-  const handleReadBriefing = (article) => {
+  const openArticle = (article) => {
     if (!article?.url) {
-      console.log("Article URL not available");
       return;
     }
 
     window.open(article.url, "_blank", "noopener,noreferrer");
   };
 
+  // ======================================================
+  // CATEGORY CLASS
+  // ======================================================
+
+  const getCategoryClass = (category) => {
+    return String(category || "general")
+      .toLowerCase()
+      .replace(/\s+/g, "-");
+  };
+
+  // ======================================================
+  // SUMMARY
+  // ======================================================
+
+  const getArticleSummary = (article) => {
+    return (
+      article.summary ||
+      article.description ||
+      "A quick look at today's latest developments."
+    );
+  };
+
+  // ======================================================
+  // INITIAL LOADING
+  // ======================================================
+
   if (loading) {
     return (
       <div className="dash-top-news-page">
-        <div className="dash-top-news-page__container">
+        <div className="dash-top-news-page__container dash-top-news-page__container--state">
           <SpinLoader size="medium" />
-          <p>Loading your news...</p>
+
+          <p>Preparing your daily briefing...</p>
         </div>
       </div>
     );
   }
+
+  // ======================================================
+  // ERROR
+  // ======================================================
 
   if (error) {
     return (
       <div className="dash-top-news-page">
-        <div className="dash-top-news-page__container">
-          <p>{error}</p>
+        <div className="dash-top-news-page__container dash-top-news-page__container--state">
+          <div className="dash-news-state">
+            <span className="dash-news-state__label">NEWSMINT</span>
+
+            <h2>Your briefing couldn't load</h2>
+
+            <p>{error}</p>
+          </div>
         </div>
       </div>
     );
   }
+
+  // ======================================================
+  // EMPTY NEWS
+  // ======================================================
 
   if (!news.length) {
     return (
       <div className="dash-top-news-page">
-        <div className="dash-top-news-page__container">
-          <p>No news available for your selected preferences.</p>
+        <div className="dash-top-news-page__container dash-top-news-page__container--state">
+          <div className="dash-news-state">
+            <span className="dash-news-state__label">NEWSMINT</span>
+
+            <h2>Nothing new for you yet</h2>
+
+            <p>We're not seeing stories that match your interests right now.</p>
+          </div>
         </div>
       </div>
     );
   }
 
-  // First article = Hero
+  // ======================================================
+  // HERO
+  // ======================================================
+
   const heroNews = news[0];
 
-  /*
-   * Remove hero from remaining news.
-   * All remaining articles will be shown.
-   */
+  // ======================================================
+  // REMAINING NEWS
+  // ======================================================
+
   const remainingNews = news.slice(1);
 
-  /*
-   * Group articles by category
-   */
+  // ======================================================
+  // GROUP BY CATEGORY
+  // ======================================================
+
   const groupedNews = remainingNews.reduce((groups, article) => {
     const category = article.category || "General";
 
@@ -118,9 +246,10 @@ const HomeTopNews = () => {
     return groups;
   }, {});
 
-  /*
-   * Trending topics
-   */
+  // ======================================================
+  // TRENDING
+  // ======================================================
+
   const trendingTopics = [
     ...new Map(
       news.flatMap((article) =>
@@ -128,7 +257,9 @@ const HomeTopNews = () => {
           tag,
           {
             category: article.category || "General",
+
             tag: tag.startsWith("#") ? tag : `#${tag}`,
+
             mentions: "Trending",
           },
         ]),
@@ -136,117 +267,199 @@ const HomeTopNews = () => {
     ).values(),
   ].slice(0, 4);
 
+  // ======================================================
+  // UI
+  // ======================================================
+
   return (
     <div className="dash-top-news-page">
       <div className="dash-top-news-page__container">
-        {/* HERO + SIDEBAR */}
+        {/* ==================================================
+            HERO + SIDEBAR
+            ================================================== */}
+
         <div className="dash-top-news-page__top">
           <DashHeroArticle
-            label="Headline of the Day"
+            label="Top Story Today"
             imageUrl={heroNews.image || ""}
-            imageAlt={heroNews.title}
+            imageAlt={heroNews.title || "Top news"}
             title={heroNews.title}
-            description={
-              heroNews.summary ||
-              heroNews.description ||
-              "No summary available."
-            }
-            author={heroNews.source?.name || heroNews.author || ""}
-            readTime="5 Min Read"
-            buttonText="Read Full Story"
-            onReadMore={handleReadHero}
+            description={getArticleSummary(heroNews)}
+            author={heroNews.source?.name || heroNews.author || "NewsMint"}
+            readTime={heroNews.readTime || "5 Min Read"}
+            buttonText="Read the Story →"
+            onReadMore={() => openArticle(heroNews)}
           />
 
           <aside className="dash-top-news-page__sidebar">
             <DashLanguageToggle
-              label="Select Language"
+              label="Read In"
               selected={language === "Hindi" ? "HIN" : "ENG"}
               onChange={handleLanguageChange}
             />
 
             <DashTrending
-              title="Trending Now"
+              title="What's Trending"
               topics={trendingTopics}
               onTopicClick={handleTopicClick}
             />
           </aside>
         </div>
 
-        <hr className="dash-top-news-page__divider" />
+        <div className="dash-top-news-page__divider" />
 
-        {/* USER NEWS */}
+        {/* ==================================================
+            USER NEWS
+            ================================================== */}
+
         <section className="dash-user-news">
-          <div className="dash-user-news__header">
+          <header className="dash-user-news__header">
             <div>
-              <h2 className="dash-user-news__title">Your News</h2>
+              <span className="dash-user-news__eyebrow">YOUR DAILY BRIEF</span>
 
-              <p className="dash-user-news__count">{news.length} Articles</p>
+              <h2 className="dash-user-news__title">Stories For You</h2>
+
+              <p className="dash-user-news__subtitle">
+                News selected around your interests
+              </p>
             </div>
-          </div>
 
-          {/* CATEGORY-WISE NEWS */}
+            <div className="dash-user-news__total">
+              <strong>{news.length}</strong>
+
+              <span>Stories</span>
+            </div>
+          </header>
+
+          {/* ==================================================
+              CATEGORY NEWS
+              ================================================== */}
+
           <div className="dash-user-news__categories">
-            {Object.entries(groupedNews).map(([category, articles]) => (
-              <section key={category} className="dash-user-news__category">
-                <div className="dash-user-news__category-header">
-                  <h3>{category}</h3>
+            {Object.entries(groupedNews).map(([category, articles]) => {
+              const categoryClass = getCategoryClass(category);
 
-                  <span>
-                    {articles.length}{" "}
-                    {articles.length === 1 ? "Article" : "Articles"}
-                  </span>
-                </div>
+              return (
+                <section
+                  key={category}
+                  className={`dash-user-news__category dash-user-news__category--${categoryClass}`}
+                >
+                  <div className="dash-user-news__category-header">
+                    <div className="dash-user-news__category-title-wrap">
+                      <span className="dash-user-news__category-dot" />
 
-                <div className="dash-user-news__grid">
-                  {articles.map((article) => (
-                    <article key={article.id} className="dash-user-news__card">
-                      {/* IMAGE */}
-                      {article.image && (
-                        <div className="dash-user-news__image-wrap">
-                          <img
-                            src={article.image}
-                            alt={"Image Not available"}
-                            className="dash-user-news__image"
-                            loading="lazy"
-                          />
-                        </div>
-                      )}
+                      <h3>{category}</h3>
+                    </div>
 
-                      <div className="dash-user-news__content">
-                        {/* SOURCE */}
-                        <span className="dash-user-news__source">
-                          {article.source?.shortName ||
-                            article.source?.name ||
-                            "NewsMint"}
-                        </span>
+                    <span className="dash-user-news__category-count">
+                      {articles.length}{" "}
+                      {articles.length === 1 ? "Story" : "Stories"}
+                    </span>
+                  </div>
 
-                        {/* TITLE */}
-                        <h4 className="dash-user-news__card-title">
-                          {article.title}
-                        </h4>
+                  <div className="dash-user-news__grid">
+                    {articles.map((article, index) => {
+                      const source =
+                        article.source?.shortName ||
+                        article.source?.name ||
+                        "NewsMint";
 
-                        {/* SUMMARY */}
-                        <p className="dash-user-news__card-summary">
-                          {article.summary ||
-                            article.description ||
-                            "No summary available."}
-                        </p>
-
-                        {/* READ BUTTON */}
-                        <button
-                          type="button"
-                          className="dash-user-news__read-btn"
-                          onClick={() => handleReadBriefing(article)}
+                      return (
+                        <article
+                          key={article.id}
+                          className={`dash-user-news__card ${
+                            index === 0 ? "dash-user-news__card--featured" : ""
+                          }`}
+                          onClick={() => openArticle(article)}
+                          role="link"
+                          tabIndex={0}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              openArticle(article);
+                            }
+                          }}
                         >
-                          Read Summary
-                        </button>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </section>
-            ))}
+                          {article.image && (
+                            <div className="dash-user-news__image-wrap">
+                              <img
+                                src={article.image}
+                                alt={article.title || "News"}
+                                className="dash-user-news__image"
+                                loading="lazy"
+                              />
+                            </div>
+                          )}
+
+                          <div className="dash-user-news__content">
+                            <div className="dash-user-news__meta">
+                              <span className="dash-user-news__source">
+                                {source}
+                              </span>
+
+                              <span className="dash-user-news__separator">
+                                •
+                              </span>
+
+                              <span className="dash-user-news__category-name">
+                                {category}
+                              </span>
+                            </div>
+
+                            <h4 className="dash-user-news__card-title">
+                              {article.title}
+                            </h4>
+
+                            <p className="dash-user-news__card-summary">
+                              {getArticleSummary(article)}
+                            </p>
+
+                            <div className="dash-user-news__card-footer">
+                              <span className="dash-user-news__read-time">
+                                {article.readTime || "4 Min Read"}
+                              </span>
+
+                              <span className="dash-user-news__arrow">→</span>
+                            </div>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })}
           </div>
+
+          {/* ==================================================
+              LOAD MORE
+              ================================================== */}
+
+          {hasMore && (
+            <div className="dash-user-news__load-more">
+              <button
+                type="button"
+                className="dash-user-news__load-more-btn"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+              >
+                {loadingMore ? (
+                  <>
+                    <span className="dash-user-news__load-spinner" />
+                    Loading stories...
+                  </>
+                ) : (
+                  <>
+                    Load More Stories
+                    <span>↓</span>
+                  </>
+                )}
+              </button>
+
+              <p className="dash-user-news__load-more-hint">
+                More stories are waiting for you
+              </p>
+            </div>
+          )}
         </section>
       </div>
     </div>
