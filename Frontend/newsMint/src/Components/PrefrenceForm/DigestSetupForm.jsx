@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "./style/DigestSetupForm.css";
 import SpinLoader from "../../common/SpinLoader";
 import { connectTelegram } from "../../services/telegram.service";
+
 const CATEGORIES = [
   "India",
   "Technology",
@@ -20,17 +21,7 @@ const CATEGORIES = [
   "Environment & Climate",
 ];
 
-const DELIVERY_TIMES = [
-  "06:00 AM (IST)",
-  "06:30 AM (IST)",
-  "07:00 AM (IST)",
-  "07:30 AM (IST)",
-  "08:00 AM (IST)",
-  "08:30 AM (IST)",
-  "09:00 AM (IST)",
-  "09:30 AM (IST)",
-  "10:00 AM (IST)",
-];
+const DELIVERY_TIMES = ["07:00 AM (IST)", "07:30 AM (IST)", "08:00 AM (IST)"];
 
 const DigestSetupForm = ({
   userName = "Jayesh",
@@ -56,6 +47,12 @@ const DigestSetupForm = ({
   const [isTelegramConnecting, setIsTelegramConnecting] = useState(false);
   const telegramPollTimeoutRef = useRef(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Controls only whether the custom time input is visible.
+  // The actual selected time is still stored in deliveryTime.
+  const [isCustomTime, setIsCustomTime] = useState(
+    deliveryTime !== "" && !DELIVERY_TIMES.includes(deliveryTime),
+  );
 
   /*
    * --------------------------------
@@ -149,6 +146,24 @@ const DigestSetupForm = ({
   const handleTimeChange = (event) => {
     const value = event.target.value;
 
+    // User selected Custom Time
+    if (value === "CUSTOM") {
+      setIsCustomTime(true);
+
+      setErrors((prev) => ({
+        ...prev,
+        deliveryTime: "",
+      }));
+
+      setSubmitSuccess(false);
+      setSubmitError("");
+
+      return;
+    }
+
+    // User selected one of the 3 preset times
+    setIsCustomTime(false);
+
     onTimeChange?.(value);
 
     setErrors((prev) => ({
@@ -158,6 +173,77 @@ const DigestSetupForm = ({
 
     setSubmitSuccess(false);
     setSubmitError("");
+  };
+
+  /*
+   * --------------------------------
+   * Custom Delivery Time
+   * --------------------------------
+   */
+
+  const handleCustomTimeChange = (event) => {
+    const value = event.target.value;
+
+    if (!value) return;
+
+    const [hours, minutes] = value.split(":");
+    const hour = Number(hours);
+
+    const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+
+    const period = hour >= 12 ? "PM" : "AM";
+
+    const formattedTime = `${String(displayHour).padStart(
+      2,
+      "0",
+    )}:${minutes} ${period} (IST)`;
+
+    onTimeChange?.(formattedTime);
+
+    setErrors((prev) => ({
+      ...prev,
+      deliveryTime: "",
+    }));
+
+    setSubmitSuccess(false);
+    setSubmitError("");
+  };
+
+  /*
+   * --------------------------------
+   * Convert saved time to input value
+   * --------------------------------
+   */
+
+  const getCustomTimeValue = () => {
+    if (!deliveryTime) return "";
+
+    const match = deliveryTime.match(/^(\d{2}):(\d{2})/);
+
+    if (!match) return "";
+
+    let hour = Number(match[1]);
+    const minutes = match[2];
+
+    // Existing format is already 12-hour based.
+    // Convert AM/PM display back to 24-hour format.
+    const periodMatch = deliveryTime.match(/\b(AM|PM)\b/i);
+
+    if (periodMatch) {
+      const period = periodMatch[1].toUpperCase();
+
+      if (period === "AM") {
+        if (hour === 12) {
+          hour = 0;
+        }
+      } else if (period === "PM") {
+        if (hour !== 12) {
+          hour += 12;
+        }
+      }
+    }
+
+    return `${String(hour).padStart(2, "0")}:${minutes}`;
   };
 
   /*
@@ -189,8 +275,10 @@ const DigestSetupForm = ({
    * Submit
    * --------------------------------
    */
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     if (isSubmitting) return;
 
     setSubmitError("");
@@ -232,6 +320,12 @@ const DigestSetupForm = ({
     }
   };
 
+  /*
+   * --------------------------------
+   * Telegram cleanup
+   * --------------------------------
+   */
+
   useEffect(() => {
     return () => {
       if (telegramPollTimeoutRef.current) {
@@ -239,6 +333,12 @@ const DigestSetupForm = ({
       }
     };
   }, []);
+
+  /*
+   * --------------------------------
+   * Telegram
+   * --------------------------------
+   */
 
   const handleTelegramConnect = async () => {
     if (isTelegramConnecting) return;
@@ -253,6 +353,7 @@ const DigestSetupForm = ({
             chatId: status?.telegram?.chatId || null,
             connected: true,
           });
+
           setIsTelegramConnecting(false);
         },
 
@@ -273,6 +374,7 @@ const DigestSetupForm = ({
       );
     }
   };
+
   return (
     <div className="digest-setup-form">
       {/* Heading */}
@@ -352,40 +454,56 @@ const DigestSetupForm = ({
             </label>
 
             <div
-              className={`dropdown ${
+              className={`delivery-time-wrapper ${
                 errors.deliveryTime ? "dropdown--error" : ""
               }`}
             >
-              <select
-                id="delivery-time"
-                value={deliveryTime}
-                onChange={handleTimeChange}
-                className="time-select"
-              >
-                <option value="" disabled>
-                  Select delivery time
-                </option>
-
-                {DELIVERY_TIMES.map((time) => (
-                  <option key={time} value={time}>
-                    {time}
+              {/* Preset / Custom selector */}
+              <div className="dropdown">
+                <select
+                  id="delivery-time"
+                  value={isCustomTime ? "CUSTOM" : deliveryTime}
+                  onChange={handleTimeChange}
+                  className="time-select"
+                >
+                  <option value="" disabled>
+                    Select delivery time
                   </option>
-                ))}
-              </select>
 
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#888"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="dropdown-icon"
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
+                  {DELIVERY_TIMES.map((time) => (
+                    <option key={time} value={time}>
+                      {time}
+                    </option>
+                  ))}
+
+                  <option value="CUSTOM">Custom time</option>
+                </select>
+
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#888"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="dropdown-icon"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </div>
+
+              {/* Custom time picker */}
+              {isCustomTime && (
+                <input
+                  type="time"
+                  className="custom-time-input"
+                  value={getCustomTimeValue()}
+                  onChange={handleCustomTimeChange}
+                  aria-label="Custom delivery time"
+                />
+              )}
             </div>
 
             {errors.deliveryTime && (

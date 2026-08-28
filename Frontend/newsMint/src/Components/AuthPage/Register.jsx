@@ -7,7 +7,7 @@ import GoogleAuthButton from "./GoogleAuthButton.jsx";
 
 const Register = ({ setPage, setAuthEmail }) => {
   const [formData, setFormData] = useState({
-    userName : "",
+    userName: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -79,7 +79,7 @@ const Register = ({ setPage, setAuthEmail }) => {
       newErrors.confirmPassword = "Password must be at least 6 characters.";
     }
 
-    if(confirmPassword !== password) {
+    if (confirmPassword !== password) {
       newErrors.confirmPassword = "Both Password Not Match";
     }
     setErrors(newErrors);
@@ -239,19 +239,20 @@ const Register = ({ setPage, setAuthEmail }) => {
                 <span className="register__error">{errors.password}</span>
               )}
             </div>
+            {/* Confirm Password */}
             <div className="register__field">
-              <label htmlFor="password" className="register__label">
+              <label htmlFor="confirmPassword" className="register__label">
                 Confirm Password
               </label>
 
               <input
                 id="confirmPassword"
                 name="confirmPassword"
-                type="confirmPassword"
+                type="password"
                 className={`register__input ${
                   errors.confirmPassword ? "register__input--error" : ""
                 }`}
-                placeholder="confirm Password"
+                placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 autoComplete="new-password"
@@ -286,7 +287,7 @@ const Register = ({ setPage, setAuthEmail }) => {
             </div>
 
             {/* Google */}
-            <GoogleAuthButton/>
+            <GoogleAuthButton />
           </form>
         </div>
 

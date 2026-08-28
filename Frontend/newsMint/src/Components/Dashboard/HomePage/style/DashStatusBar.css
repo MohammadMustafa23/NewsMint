@@ -99,7 +99,7 @@
 }
 
 .dash-status-bar__toggle--paused {
- background: #22c55e;
+  background: #22c55e;
 }
 
 .dash-status-bar__toggle-knob {
@@ -147,4 +147,13 @@
     width: 100%;
     justify-content: space-between;
   }
+}
+
+.dash-status-bar__badge--paused {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.dash-status-bar__badge--paused .dash-status-bar__dot {
+  background: #999;
 }

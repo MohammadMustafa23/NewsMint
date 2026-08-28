@@ -3,6 +3,7 @@ import api from "../../../services/axois.js";
 import SpinLoader from "../../../common/SpinLoader.jsx";
 import "./style/DashPreferences.css";
 import { connectTelegram } from "../../../services/telegram.service.js";
+
 const TOPICS = [
   "India",
   "Technology",
@@ -22,6 +23,27 @@ const TOPICS = [
 ];
 
 const LANGUAGES = ["English", "Hindi"];
+
+// ======================================================
+// DELIVERY TIME
+// ======================================================
+
+const DELIVERY_TIMES = [
+  {
+    value: "07:00 AM (IST)",
+    label: "7:00 AM (IST)",
+  },
+  {
+    value: "07:30 AM (IST)",
+    label: "7:30 AM (IST)",
+  },
+  {
+    value: "08:00 AM (IST)",
+    label: "8:00 AM (IST)",
+  },
+];
+
+const CUSTOM_TIME_VALUE = "CUSTOM";
 
 const DashPreferences = ({
   selectedTopics = [],
@@ -43,6 +65,19 @@ const DashPreferences = ({
   const [language, setLanguage] = useState(selectedLanguage);
   const [phone, setPhone] = useState(phoneNumber);
 
+  // ======================================================
+  // CUSTOM TIME STATE
+  // ======================================================
+
+  const [isCustomTime, setIsCustomTime] = useState(
+    deliveryTime !== "" &&
+      !DELIVERY_TIMES.some((time) => time.value === deliveryTime),
+  );
+
+  // ======================================================
+  // TOPICS
+  // ======================================================
+
   const toggleTopic = (topic) => {
     if (!isEditing) return;
 
@@ -54,12 +89,102 @@ const DashPreferences = ({
     onTopicToggle?.(next);
   };
 
+  // ======================================================
+  // LANGUAGE
+  // ======================================================
+
   const handleLanguage = (lang) => {
     if (!isEditing) return;
 
     setLanguage(lang);
     onLanguageChange?.(lang);
   };
+
+  // ======================================================
+  // DELIVERY TIME
+  // ======================================================
+
+  const handleTimeChange = (value) => {
+    if (!isEditing) return;
+
+    // Custom time selected
+    if (value === CUSTOM_TIME_VALUE) {
+      setIsCustomTime(true);
+      return;
+    }
+
+    // Preset time selected
+    setIsCustomTime(false);
+
+    onTimeChange?.(value);
+  };
+
+  // ======================================================
+  // CUSTOM DELIVERY TIME
+  // ======================================================
+
+  const handleCustomTimeChange = (event) => {
+    if (!isEditing) return;
+
+    const value = event.target.value;
+
+    if (!value) return;
+
+    const [hours, minutes] = value.split(":");
+
+    let hour = Number(hours);
+
+    const period = hour >= 12 ? "PM" : "AM";
+
+    if (hour === 0) {
+      hour = 12;
+    } else if (hour > 12) {
+      hour -= 12;
+    }
+
+    const formattedTime = `${String(hour).padStart(
+      2,
+      "0",
+    )}:${minutes} ${period} (IST)`;
+
+    onTimeChange?.(formattedTime);
+  };
+
+  // ======================================================
+  // CUSTOM TIME → INPUT VALUE
+  // ======================================================
+
+  const getCustomTimeValue = () => {
+    if (!deliveryTime || !isCustomTime) {
+      return "";
+    }
+
+    const match = deliveryTime.match(/^(\d{2}):(\d{2})\s+(AM|PM)/);
+
+    if (!match) {
+      return "";
+    }
+
+    let hour = Number(match[1]);
+    const minutes = match[2];
+    const period = match[3];
+
+    if (period === "AM") {
+      if (hour === 12) {
+        hour = 0;
+      }
+    } else if (period === "PM") {
+      if (hour !== 12) {
+        hour += 12;
+      }
+    }
+
+    return `${String(hour).padStart(2, "0")}:${minutes}`;
+  };
+
+  // ======================================================
+  // UPDATE
+  // ======================================================
 
   const handleUpdateClick = () => {
     if (!isEditing) {
@@ -68,7 +193,6 @@ const DashPreferences = ({
       return;
     }
 
-    // Later we'll connect this to update API
     onUpdate?.({
       categories: topics,
       language,
@@ -79,6 +203,10 @@ const DashPreferences = ({
     setIsEditing(false);
   };
 
+  // ======================================================
+  // TELEGRAM
+  // ======================================================
+
   const handleTelegramConnect = async () => {
     if (isTelegramConnecting) return;
 
@@ -88,6 +216,7 @@ const DashPreferences = ({
       await connectTelegram({
         onConnected: () => {
           setIsTelegramConnecting(false);
+
           // Parent should refresh preferences here
           onUpdate?.({
             refreshTelegram: true,
@@ -105,6 +234,7 @@ const DashPreferences = ({
       setIsTelegramConnecting(false);
     }
   };
+
   return (
     <div className="dash-preferences">
       {/* Topics */}
@@ -206,26 +336,40 @@ const DashPreferences = ({
             <span>Delivery Time</span>
           </div>
 
-          <div
-            className={`dash-pref-dropdown ${
-              !isEditing ? "dash-pref-dropdown--readonly" : ""
-            }`}
-            onClick={isEditing ? onTimeChange : undefined}
-          >
-            <span>{deliveryTime}</span>
-
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#888"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          <div className="dash-pref-time-wrapper">
+            {/* Time Select */}
+            <select
+              value={isCustomTime ? CUSTOM_TIME_VALUE : deliveryTime}
+              onChange={(e) => handleTimeChange(e.target.value)}
+              disabled={!isEditing}
+              className={`dash-pref-dropdown ${
+                !isEditing ? "dash-pref-dropdown--readonly" : ""
+              }`}
             >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
+              <option value="" disabled>
+                Select delivery time
+              </option>
+
+              {DELIVERY_TIMES.map((time) => (
+                <option key={time.value} value={time.value}>
+                  {time.label}
+                </option>
+              ))}
+
+              <option value={CUSTOM_TIME_VALUE}>Custom time</option>
+            </select>
+
+            {/* Custom Time Picker */}
+            {isCustomTime && (
+              <input
+                type="time"
+                value={getCustomTimeValue()}
+                onChange={handleCustomTimeChange}
+                disabled={!isEditing}
+                className="dash-pref-custom-time"
+                aria-label="Custom delivery time"
+              />
+            )}
           </div>
 
           <p className="dash-pref-timezone">{timeZoneText}</p>
