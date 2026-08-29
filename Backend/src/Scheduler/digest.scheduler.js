@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import Preference from "../Feature/Prefrence/models/Preference.js";
+import Preference from "../Feature/Preference/models/Preference.js";
 import NewsArticle from "../NewsArticle/models/NewsArticle.js";
 import { formatTelegramDigest } from "./util/telegram.digest.formatter.js";
 import { getNextDeliveryAt } from "./util/digestTime.util.js";

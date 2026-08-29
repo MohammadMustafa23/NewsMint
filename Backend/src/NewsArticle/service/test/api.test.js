@@ -16,7 +16,7 @@ const run = async () => {
     console.log("NEWS API INGESTION TEST START");
     console.log("=================================\n");
 
-    await mongoose.connect("mongodb+srv://mohammd_mustafa:kKBD%40dy4.rK3rT6@project01.m1alapz.mongodb.net/NewsMint");
+    await mongoose.connect(process.env.MONGO_URI);
 
     console.log("MongoDB connected\n");
 

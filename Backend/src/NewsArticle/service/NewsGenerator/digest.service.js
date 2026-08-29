@@ -1,5 +1,5 @@
 import NewsArticle from "../../models/NewsArticle.js";
-import Preference from "../../../Feature/Prefrence/models/Preference.js";
+import Preference from "../../../Feature/Preference/models/Preference.js";
 
 const MAX_NEWS = 10;
 

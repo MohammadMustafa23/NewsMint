@@ -1,6 +1,6 @@
 import express, { json } from "express";
 import AuthRouter from "./Feature/Auth/routes/auth.routes.js";
-import PreferenceRoute from "./Feature/Prefrence/routes/preference.route.js";
+import PreferenceRoute from "./Feature/Preference/routes/preference.route.js";
 import SourceRoute from "./Feature/NewsSource/routes/source.route.js";
 import TelegramRoute from "./TelegramBOT/routes/telegram.route.js";
 import NewsRoute from "./Feature/NewsForWeb/routes/news.route.js";
@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import { redisClient } from "./config/redis.js";
 
-// import helmet from "helmet";
+import helmet from "helmet";
 import cors from "cors";
 
 const app = express();
@@ -16,17 +16,17 @@ const allowedOrigins = process.env.FRONTEND_CLIENT_ID
   ? process.env.FRONTEND_CLIENT_ID.split(",").map((origin) => origin.trim())
   : [];
 
-// // Trust Render's reverse proxy so req.ip / X-Forwarded-For
-// app.set("trust proxy", 1);
+// Trust Render's reverse proxy so req.ip / X-Forwarded-For
+app.set("trust proxy", 1);
 
-// app.use(
-//   helmet({
-//     crossOriginOpenerPolicy: false,
-//     crossOriginResourcePolicy: {
-//       policy: "cross-origin",
-//     },
-//   }),
-// );
+app.use(
+  helmet({
+    crossOriginOpenerPolicy: false,
+    crossOriginResourcePolicy: {
+      policy: "cross-origin",
+    },
+  }),
+);
 
 app.use(
   cors({
@@ -36,7 +36,7 @@ app.use(
   }),
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 
 // That is For Check IsServer Alive

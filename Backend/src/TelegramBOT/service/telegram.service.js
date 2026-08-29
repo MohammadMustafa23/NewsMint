@@ -1,6 +1,6 @@
 import { TELEGRAM_BOT_TOKEN } from "../../config/env.js";
 import { redisClient } from "../../config/redis.js";
-import Preference from "../../Feature/Prefrence/models/Preference.js";
+import Preference from "../../Feature/Preference/models/Preference.js";
 import { sendTelegramMessage } from "./telegram.message.service.js";
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;

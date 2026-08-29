@@ -1,7 +1,7 @@
 import { TELEGRAM_BOT_USERNAME } from "../../config/env.js";
 import crypto from "crypto";
 import { redisClient } from "../../config/redis.js";
-import Preference from "../../Feature/Prefrence/models/Preference.js";
+import Preference from "../../Feature/Preference/models/Preference.js";
 
 const parseCachedObject = (cachedValue) => {
   if (!cachedValue) {
@@ -19,19 +19,6 @@ const parseCachedObject = (cachedValue) => {
   return cachedValue;
 };
 
-export const handleTelegramWebhook = async (req, res) => {
-  try {
-    console.log("========== TELEGRAM UPDATE ==========");
-    console.log(JSON.stringify(req.body, null, 2));
-    console.log("=====================================");
-
-    return res.sendStatus(200);
-  } catch (error) {
-    console.error("Telegram Webhook Error:", error);
-
-    return res.sendStatus(200);
-  }
-};
 
 export const getTelegramStatus = async (req, res) => {
   try {

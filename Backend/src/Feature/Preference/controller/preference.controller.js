@@ -418,6 +418,7 @@ export const checkMyPreferences = async (req, res) => {
     });
   }
 };
+
 export const updatePreferences = async (req, res) => {
   try {
     const userId = req.user._id;

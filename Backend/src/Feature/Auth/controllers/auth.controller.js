@@ -5,7 +5,7 @@ import { redisClient } from "../../../config/redis.js";
 import sendOTP from "../utils/sendOTPEmail.js";
 import jwt from "jsonwebtoken";
 import googleClient from "../utils/googleAuth.js";
-import Preference from "../../Prefrence/models/Preference.js";
+import Preference from "../../Preference/models/Preference.js";
 import crypto from "crypto";
 
 async function RegisterUser(req, res) {

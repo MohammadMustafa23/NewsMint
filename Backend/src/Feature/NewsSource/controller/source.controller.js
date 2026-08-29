@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 import Source from "../models/source.models.js";
-import Preference from "../../Prefrence/models/Preference.js";
+import Preference from "../../Preference/models/Preference.js";
 import { redisClient } from "../../../config/redis.js";
 
 const parseCachedObject = (cachedValue) => {
