@@ -102,7 +102,7 @@ const ResetPassword = ({ setPage, email, clearAuthSession }) => {
           confirmPassword: formData.confirmPassword,
         });
 
-      console.log("Reset Password Response:", data);
+      ("Reset Password Response:", data);
 
       // --------------------------------
       // API Failed

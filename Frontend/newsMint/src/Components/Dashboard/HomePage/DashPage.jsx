@@ -30,9 +30,6 @@ export default function DashPage() {
         setError("");
 
         const data = await getMyPreferences();
-
-        console.log("My Preferences:", data);
-
         if (!data?.success || !data?.preference) {
           setError("Unable to load your preferences.");
           return;
@@ -91,15 +88,11 @@ export default function DashPage() {
   // =========================================================
 
   const handlePauseToggle = (paused) => {
-    console.log("Digest paused:", paused);
-
     // Later:
     // API for pause/resume digest
   };
 
   const handleTopicToggle = (topics) => {
-    console.log("Topics changed:", topics);
-
     setPreferences((prev) => ({
       ...prev,
       categories: topics,
@@ -107,8 +100,6 @@ export default function DashPage() {
   };
 
   const handleLanguageChange = (lang) => {
-    console.log("Language changed:", lang);
-
     setPreferences((prev) => ({
       ...prev,
       language: lang,
@@ -116,8 +107,6 @@ export default function DashPage() {
   };
 
   const handleTimeChange = (time) => {
-    console.log("Delivery time changed:", time);
-
     setPreferences((prev) => ({
       ...prev,
       deliveryTime: time,
@@ -138,10 +127,7 @@ export default function DashPage() {
         if (!data?.success || !data?.preference) {
           throw new Error("Unable to refresh Telegram status.");
         }
-
         setPreferences(data.preference);
-
-        console.log("✅ Telegram status refreshed");
       } catch (error) {
         console.error("Telegram Refresh Error:", error);
 
@@ -159,9 +145,6 @@ export default function DashPage() {
     try {
       setUpdating(true);
       setError("");
-
-      console.log("Updating Preferences:", updatedPreferences);
-
       const response = await updatePreferences({
         categories: updatedPreferences.categories ?? preferences.categories,
 
@@ -177,9 +160,6 @@ export default function DashPage() {
 
         telegram: updatedPreferences.telegram ?? preferences.telegram,
       });
-
-      console.log("Updated Preferences Response:", response);
-
       if (!response?.success) {
         throw new Error(response?.message || "Failed to update preferences.");
       }
@@ -195,8 +175,6 @@ export default function DashPage() {
           ...response.preference?.telegram,
         },
       }));
-
-      console.log("✅ Preferences updated successfully");
     } catch (error) {
       console.error("Update Preferences Error:", error);
 

@@ -41,13 +41,9 @@ const DigestPage = ({ userName }) => {
 
       toast.success(response.message || "Preferences saved successfully!");
 
-      console.log("Current Path:", window.location.pathname);
-
       navigate("/home-page", {
         replace: true,
       });
-
-      console.log("After Navigate:", window.location.pathname);
 
       return response;
     } catch (error) {

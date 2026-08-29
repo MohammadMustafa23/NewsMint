@@ -55,10 +55,6 @@ const DashSourcesPage = () => {
           [getAllSources(), getMySources(), getMyPreferences()],
         );
 
-        console.log("All Sources:", sourcesData);
-        console.log("My Sources:", mySourcesData);
-        console.log("My Preferences:", preferencesData);
-
         if (!sourcesData?.success) {
           throw new Error("Failed to load sources.");
         }
@@ -245,7 +241,6 @@ const DashSourcesPage = () => {
       setError("");
       setSuccessMessage("");
 
-      console.log("Saving Sources:", selectedSourceIds);
 
       /*
        * IMPORTANT:
@@ -271,9 +266,6 @@ const DashSourcesPage = () => {
           chatId: null,
         },
       });
-
-      console.log("Update Preferences Response:", response);
-
       if (!response?.success) {
         throw new Error(response?.message || "Failed to update preferences.");
       }
@@ -291,8 +283,6 @@ const DashSourcesPage = () => {
       }));
 
       setSuccessMessage("Sources updated successfully.");
-
-      console.log("✅ Sources updated successfully");
     } catch (error) {
       console.error("Save Sources Error:", error);
 
@@ -324,7 +314,6 @@ const DashSourcesPage = () => {
   ========================================================= */
 
   const handleLoadMore = () => {
-    console.log("Load more sources");
   };
 
   /* =========================================================

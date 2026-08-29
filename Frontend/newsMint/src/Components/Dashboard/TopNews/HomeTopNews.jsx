@@ -125,7 +125,6 @@ const HomeTopNews = () => {
   // ======================================================
 
   const handleTopicClick = (topic) => {
-    console.log("Clicked topic:", topic);
   };
 
   // ======================================================

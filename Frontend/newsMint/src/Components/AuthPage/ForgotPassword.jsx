@@ -58,9 +58,6 @@ const ForgotPassword = ({ setPage, setAuthEmail }) => {
       const data = await forgetPassword({
         email: normalizedEmail,
       });
-
-      console.log("Forgot Password Response:", data);
-
       if (!data?.success) {
         toast.error(
           data?.message || "Unable to process your request. Please try again.",

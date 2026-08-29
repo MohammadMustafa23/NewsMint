@@ -139,8 +139,6 @@ const OTPVerification = ({
         otp: code,
       });
 
-      console.log("OTP Verification Response:", data);
-
       // --------------------------------
       // API Failed
       // --------------------------------
@@ -216,7 +214,7 @@ const OTPVerification = ({
         email,
       });
 
-      console.log("Resend OTP Response:", data);
+      ("Resend OTP Response:", data);
 
       // --------------------------------
       // API Failed

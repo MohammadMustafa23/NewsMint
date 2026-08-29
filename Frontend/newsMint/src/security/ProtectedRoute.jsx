@@ -20,11 +20,7 @@ const ProtectedRoute = ({
       try {
         setLoading(true);
 
-        console.log("🔥 checkAccess STARTED");
-
         const userResponse = await getCurrentUser();
-
-        console.log("ProtectedRoute User:", userResponse);
 
         if (!userResponse?.success) {
           setIsAuthenticated(false);
@@ -37,9 +33,6 @@ const ProtectedRoute = ({
         setIsAuthenticated(true);
 
         const preferenceResponse = await checkMyPreferences();
-
-        console.log("ProtectedRoute Preferences:", preferenceResponse);
-
         setHasPreferences(Boolean(preferenceResponse?.hasPreferences));
       } catch (error) {
         console.error("Protected Route Error:", error);

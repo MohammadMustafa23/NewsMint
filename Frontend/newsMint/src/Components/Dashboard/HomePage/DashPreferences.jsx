@@ -225,7 +225,6 @@ const DashPreferences = ({
 
         onTimeout: () => {
           setIsTelegramConnecting(false);
-          console.log("Telegram connection timed out.");
         },
       });
     } catch (error) {

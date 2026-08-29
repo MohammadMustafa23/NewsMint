@@ -11,7 +11,6 @@ export default function DashBoard() {
     const fetchUser = async () => {
       try {
         const data = await getCurrentUser();
-        console.log("Current User:", data);
         if (data?.success) {
           setUser(data.user);
         }

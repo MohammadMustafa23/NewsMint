@@ -113,7 +113,6 @@ const Register = ({ setPage, setAuthEmail }) => {
         confirmPassword: formData.confirmPassword,
       });
 
-      console.log("Register Success:", data);
 
       // Store email for Verify Email page
       setAuthEmail(formData.email);
