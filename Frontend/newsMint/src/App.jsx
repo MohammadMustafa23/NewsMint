@@ -1,21 +1,71 @@
+import React, { lazy, Suspense } from "react";
 import "./App.css";
 
-import LandingPage from "./Components/Pages/LandingPage";
-import AuthPages from "./Components/Pages/AuthPages";
-import Preference from "./Components/Pages/Preference";
-import DashBoard from "./Components/Pages/Dashboard";
 import ProtectedRoute from "./security/ProtectedRoute";
-
-import HomeDash from "./Components/Dashboard/HomePage/HomeDash";
-import HomeSource from "./Components/Dashboard/Source/HomeSource";
-import HomeTopNews from "./Components/Dashboard/TopNews/HomeTopNews";
-
-
-import PrivacyPolicy from "./Components/HeroCTAPAGE/Footer/PrivacyPolicy";
-import TermsOfService from "./Components/HeroCTAPAGE/Footer/TermsOfService";
 
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
+
+// =========================================================
+// LAZY LOADED PAGES
+// =========================================================
+
+const LandingPage = lazy(() => import("./Components/Pages/LandingPage"));
+
+const AuthPages = lazy(() => import("./Components/Pages/AuthPages"));
+
+const Preference = lazy(() => import("./Components/Pages/Preference"));
+
+const DashBoard = lazy(() => import("./Components/Pages/Dashboard"));
+
+// =========================================================
+// LAZY LOADED DASHBOARD PAGES
+// =========================================================
+
+const HomeDash = lazy(() => import("./Components/Dashboard/HomePage/HomeDash"));
+
+const HomeSource = lazy(
+  () => import("./Components/Dashboard/Source/HomeSource"),
+);
+
+const HomeTopNews = lazy(
+  () => import("./Components/Dashboard/TopNews/HomeTopNews"),
+);
+
+// =========================================================
+// LAZY LOADED LEGAL PAGES
+// =========================================================
+
+const PrivacyPolicy = lazy(
+  () => import("./Components/HeroCTAPAGE/Footer/PrivacyPolicy"),
+);
+
+const TermsOfService = lazy(
+  () => import("./Components/HeroCTAPAGE/Footer/TermsOfService"),
+);
+
+// =========================================================
+// LAZY LOADED NOT FOUND
+// =========================================================
+
+const NotFound = lazy(() => import("./common/NotFound"));
+
+// =========================================================
+// PAGE LOADER
+// =========================================================
+
+const PageLoader = () => {
+  return (
+    <div className="app-page-loader">
+      <div className="app-page-loader__spinner" />
+      <p>Loading...</p>
+    </div>
+  );
+};
+
+// =========================================================
+// APP
+// =========================================================
 
 function App() {
   return (
@@ -39,38 +89,63 @@ function App() {
         }}
       />
 
-      <Routes>
-        {/* Public */}
-        <Route path="/" element={<LandingPage />} />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* =================================================
+              PUBLIC
+          ================================================= */}
 
-        <Route path="/authentication-page" element={<AuthPages />} />
+          <Route path="/" element={<LandingPage />} />
 
-        {/* User Setup */}
-        <Route
-          path="/preference"
-          element={
-            <ProtectedRoute requireNoPreferences>
-              <Preference />
-            </ProtectedRoute>
-          }
-        />
+          <Route path="/authentication-page" element={<AuthPages />} />
 
-        <Route
-          path="/home-page"
-          element={
-            <ProtectedRoute requirePreferences>
-              <DashBoard />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<HomeDash />} />
-          <Route path="source" element={<HomeSource />} />
-          <Route path="top-news" element={<HomeTopNews />} />
-        </Route>
+          {/* =================================================
+              USER SETUP
+          ================================================= */}
 
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms-of-service" element={<TermsOfService />} />
-      </Routes>
+          <Route
+            path="/preference"
+            element={
+              <ProtectedRoute requireNoPreferences>
+                <Preference />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* =================================================
+              DASHBOARD
+          ================================================= */}
+
+          <Route
+            path="/home-page"
+            element={
+              <ProtectedRoute requirePreferences>
+                <DashBoard />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<HomeDash />} />
+
+            <Route path="source" element={<HomeSource />} />
+
+            <Route path="top-news" element={<HomeTopNews />} />
+          </Route>
+
+          {/* =================================================
+              LEGAL
+          ================================================= */}
+
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+
+          {/* =================================================
+              NOT FOUND
+          ================================================= */}
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
     </>
   );
 }

@@ -73,16 +73,18 @@ const Register = ({ setPage, setAuthEmail }) => {
       newErrors.password = "Password must be at least 6 characters.";
     }
 
+    // Confirm Password
     if (!confirmPassword) {
-      newErrors.confirmPassword = "Password is required.";
-    } else if (password.length < 6) {
-      newErrors.confirmPassword = "Password must be at least 6 characters.";
+      newErrors.confirmPassword = "Confirm password is required.";
+    } else if (confirmPassword.length < 6) {
+      newErrors.confirmPassword =
+        "Confirm password must be at least 6 characters.";
+    } else if (confirmPassword !== password) {
+      newErrors.confirmPassword = "Both passwords do not match.";
     }
 
-    if (confirmPassword !== password) {
-      newErrors.confirmPassword = "Both Password Not Match";
-    }
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -100,13 +102,17 @@ const Register = ({ setPage, setAuthEmail }) => {
 
     // Frontend validation
     const isValid = validateForm();
-
     if (!isValid) return;
-
     setLoading(true);
 
     try {
-      const data = await registerUser(formData);
+      const data = await registerUser({
+        userName: formData.userName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+      });
+
       console.log("Register Success:", data);
 
       // Store email for Verify Email page

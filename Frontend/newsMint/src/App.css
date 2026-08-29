@@ -150,3 +150,49 @@
   background: #f8fbff !important;
   border-color: #bfdbfe !important;
 }
+
+/* =========================================================
+   APP PAGE LOADER
+   ========================================================= */
+
+.app-page-loader {
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  background: #f9fafc;
+  color: #172238;
+}
+
+.app-page-loader__spinner {
+  width: 34px;
+  height: 34px;
+
+  border: 3px solid #e8edf3;
+  border-top-color: #e5ae14;
+
+  border-radius: 50%;
+
+  animation: appLoaderSpin 0.8s linear infinite;
+}
+
+.app-page-loader p {
+  margin: 0;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #68778d;
+}
+
+@keyframes appLoaderSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
