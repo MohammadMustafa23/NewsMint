@@ -100,7 +100,7 @@ export const fetchMediaStackNews = async (category, source) => {
       throw new Error(`No MediaStack query configured for ${category}`);
     }
 
-    console.log(`📡 Mediastack → ${category}`);
+   
 
     // ==========================================
     // 2. BASE PARAMETERS
@@ -127,26 +127,11 @@ export const fetchMediaStackNews = async (category, source) => {
     if (mediaStackCategory) {
       // MediaStack native category
       params.categories = mediaStackCategory;
-
-      console.log(`🏷️ Mediastack category: ${mediaStackCategory}`);
     } else {
       // Custom NewsMint category
       params.keywords = query;
-
-      console.log(`🔎 Mediastack keywords: ${query}`);
     }
 
-    // ==========================================
-    // 4. API REQUEST
-    // ==========================================
-
-    console.log("📤 Mediastack request prepared:", {
-      category,
-      hasNativeCategory: Boolean(mediaStackCategory),
-      hasKeywords: Boolean(params.keywords),
-      limit: params.limit,
-      sort: params.sort,
-    });
 
     const response = await axios.get(MEDIASTACK_URL, {
       params,
@@ -164,8 +149,6 @@ export const fetchMediaStackNews = async (category, source) => {
     }
 
     const items = Array.isArray(response.data?.data) ? response.data.data : [];
-
-    console.log(`📦 Mediastack raw items: ${items.length}`);
 
     // ==========================================
     // 6. NORMALIZE
@@ -224,9 +207,6 @@ export const fetchMediaStackNews = async (category, source) => {
     // ==========================================
     // 7. RESULT
     // ==========================================
-
-    console.log(`📰 Mediastack → ${category}: ${articles.length} candidates`);
-
     return articles;
   } catch (error) {
     console.error(

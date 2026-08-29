@@ -46,8 +46,6 @@ const setTelegramCommands = async () => {
         data.description || "Failed to register Telegram commands",
       );
     }
-
-    console.log("✅ Telegram bot commands registered");
   } catch (error) {
     console.error("❌ Telegram command setup failed:", error.message);
   }
@@ -170,12 +168,6 @@ const handleStart = async (message) => {
     return;
   }
 
-  console.log("🔗 Telegram connection request:", {
-    telegramUserId: message.from?.id,
-    chatId,
-    userId,
-  });
-
   await redisClient.del(`telegram:connect:${token}`);
 
   const telegramData = {
@@ -191,9 +183,6 @@ const handleStart = async (message) => {
     preference.telegram = telegramData;
 
     await preference.save();
-
-    console.log("✅ Telegram connection saved:", userId);
-
     await sendConnectionSuccessMessage(chatId);
 
     return;
@@ -206,12 +195,9 @@ const handleStart = async (message) => {
       ...telegramData,
     },
     {
-      ex : 15 * 60,
+      ex: 15 * 60,
     },
   );
-
-  console.log("📦 Telegram connection stored temporarily:", userId);
-
   await sendConnectionSuccessMessage(chatId);
 };
 
@@ -396,6 +382,7 @@ const handleTelegramCommand = async (message) => {
   }
 };
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const getUpdates = async () => {
   try {
     const response = await fetch(
@@ -423,8 +410,12 @@ const getUpdates = async () => {
         console.error("❌ Telegram command failed:", error.message);
       }
     }
+
+    return true;
   } catch (error) {
     console.error("❌ Telegram polling error:", error.message);
+
+    return false;
   }
 };
 
@@ -437,10 +428,20 @@ const startTelegramPolling = async () => {
 
   await setTelegramCommands();
 
-  console.log("🤖 Telegram polling started");
+  let retryDelay = 2000;
+  const MAX_RETRY_DELAY = 60000;
 
   while (isPolling) {
-    await getUpdates();
+    const success = await getUpdates();
+
+    if (success) {
+      // Telegram working normally
+      retryDelay = 2000;
+      continue;
+    }
+    await sleep(retryDelay);
+
+    retryDelay = Math.min(retryDelay * 2, MAX_RETRY_DELAY);
   }
 };
 

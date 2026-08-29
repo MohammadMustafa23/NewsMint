@@ -92,8 +92,6 @@ export const processNewsBatch = async () => {
       };
     }
 
-    console.log(`🤖 Found ${articles.length} pending articles`);
-
     const articleIds = articles.map((article) => article._id);
 
     await NewsArticle.updateMany(
@@ -134,10 +132,6 @@ export const processNewsBatch = async () => {
               "ai.nextRetryAt": nextRetryAt,
             },
           },
-        );
-
-        console.log(
-          `⏳ AI limit/error detected. Retry after 10 minutes: ${nextRetryAt.toISOString()}`,
         );
 
         return {
@@ -236,7 +230,6 @@ export const processNewsBatch = async () => {
       processed++;
     }
 
-    console.log(`✅ AI Batch Completed: ${processed}/${articles.length}`);
 
     return {
       success: true,
@@ -252,8 +245,6 @@ export const processNewsBatch = async () => {
 };
 
 export const processAllPendingNews = async () => {
-  console.log("\n🤖 AI News Worker Started");
-
   let totalProcessed = 0;
   let batchNumber = 0;
 
@@ -261,9 +252,6 @@ export const processAllPendingNews = async () => {
     const result = await processNewsBatch();
 
     if (result.retryable && result.nextRetryAt) {
-      console.log(
-        `⏳ AI worker paused. Next retry is scheduled at ${result.nextRetryAt.toISOString()}`,
-      );
 
       return {
         success: false,
@@ -286,14 +274,7 @@ export const processAllPendingNews = async () => {
     batchNumber++;
 
     totalProcessed += result.processed;
-
-    console.log(
-      `🤖 Batch ${batchNumber} | Processed: ${result.processed} | Total: ${totalProcessed}`,
-    );
   }
-
-  console.log(`✅ AI News Worker Completed | Total: ${totalProcessed}`);
-
   return {
     success: true,
     processed: totalProcessed,

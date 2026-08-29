@@ -82,7 +82,7 @@ const createPreferenceSignature = ({
 const getUserPreference = async (userId) => {
   const cacheKey = `preference:user:${userId}`;
 
-  const cachedPreference = parseCachedObject(await redisClient.get(cacheKey));
+  const cachedPreference = await redisClient.get(cacheKey);
 
   if (cachedPreference) {
     return cachedPreference;
@@ -290,7 +290,7 @@ export const getMyNews = async (req, res) => {
     const shouldCache = page <= 3;
 
     if (shouldCache) {
-      const cachedNews = parseCachedObject(await redisClient.get(cacheKey));
+      const cachedNews = await redisClient.get(cacheKey);
 
       if (cachedNews) {
         return res.status(200).json({

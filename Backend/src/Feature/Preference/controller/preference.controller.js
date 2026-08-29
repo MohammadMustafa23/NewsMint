@@ -137,7 +137,7 @@ export const savePreferences = async (req, res) => {
 
     if (telegramRedisData) {
       try {
-        const parsedTelegramData = parseCachedObject(telegramRedisData);
+        const parsedTelegramData = telegramRedisData;
 
         if (!parsedTelegramData) {
           throw new Error("Telegram cache payload is invalid.");
@@ -291,17 +291,19 @@ const getNextDigestTime = (deliveryTime, timezone) => {
 
 export const getMyPreferences = async (req, res) => {
   try {
+    
     const userId = req.user._id;
     const cacheKey = `preference:user:${userId}`;
 
     // 1. Check Redis cache first
-    const cachedPreference = parseCachedObject(await redisClient.get(cacheKey));
+    const cachedPreference = await redisClient.get(cacheKey);
 
     if (cachedPreference) {
       return res.status(200).json({
         success: true,
-        ...cachedPreference,
-        cached: true,
+        preference : {
+          ...cachedPreference
+        }
       });
     }
 
@@ -327,8 +329,7 @@ export const getMyPreferences = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        ...responseData,
-        cached: false,
+        ...responseData
       });
     }
 
@@ -380,6 +381,8 @@ export const getMyPreferences = async (req, res) => {
       ex: 30 * 60, // 30 minutes
     });
 
+    console.log(responseData);
+    
     // 7. Response
     return res.status(200).json({
       success: true,

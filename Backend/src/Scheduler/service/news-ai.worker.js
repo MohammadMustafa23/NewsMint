@@ -2,21 +2,12 @@ import { processAllPendingNews } from "../../NewsArticle/service/processor/news-
 
 export const startAINewsWorker = async () => {
   try {
-    console.log("🤖 AI News Worker Started");
-
+   
     const result = await processAllPendingNews();
 
     if (!result.success) {
-      console.log(
-        `AI News Worker Paused | Processed: ${result.processed} | Batches: ${result.batches}`,
-      );
-
       return result;
     }
-
-    console.log(
-      `✅ AI News Worker Finished | Processed: ${result.processed} | Batches: ${result.batches}`,
-    );
 
     return result;
   } catch (error) {

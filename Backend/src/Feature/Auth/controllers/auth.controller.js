@@ -27,7 +27,6 @@ async function RegisterUser(req, res) {
   //   3. Generate OTP
   const otp = generateOTP();
 
-
   // Redis Key
   const cacheKey = `register:${email}`;
 
@@ -40,7 +39,7 @@ async function RegisterUser(req, res) {
       otp,
     },
     {
-      ex : 300,
+      ex: 300,
     },
   );
 
@@ -62,7 +61,7 @@ const LoginUser = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({
+      return res.status(401).json({
         success: false,
         message: "Invalid email or password",
       });
@@ -84,7 +83,7 @@ const LoginUser = async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "3d",
+        expiresIn: "7d",
       },
     );
 
@@ -178,9 +177,9 @@ async function ForgotPassword(req, res) {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "No account found with this email.",
+      return res.status(200).json({
+        success: true,
+        message: "If an account exists, a password reset OTP has been sent.",
       });
     }
 
@@ -201,8 +200,9 @@ async function ForgotPassword(req, res) {
 
     return res.status(200).json({
       success: true,
-      message: "Password reset OTP sent successfully.",
+      message: "If an account exists, a password reset OTP has been sent.",
     });
+    
   } catch (error) {
     console.log(error);
 
@@ -254,7 +254,6 @@ async function VerifyResetOTP(req, res) {
       expiresIn: "10m",
     });
 
-
     res.cookie("resetToken", resetToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -264,7 +263,7 @@ async function VerifyResetOTP(req, res) {
 
     return res.status(200).json({
       success: true,
-      message: "OTP verified successfully."
+      message: "OTP verified successfully.",
     });
   } catch (error) {
     console.error("VerifyResetOTP Error:", error);
@@ -294,7 +293,7 @@ async function ResetPassword(req, res) {
     }
 
     const resetToken = req.cookies.resetToken;
-    
+
     if (!resetToken) {
       return res.status(401).json({
         success: false,
@@ -344,7 +343,6 @@ async function ResetPassword(req, res) {
       message:
         "Password reset successfully. Please sign in with your new password.",
     });
-
   } catch (error) {
     console.error("ResetPassword Error:", error);
     return res.status(500).json({
@@ -462,7 +460,6 @@ const GetCurrentUser = async (req, res) => {
       user: req.user,
       hasPreferences: Boolean(preference?.isCompleted),
     });
-    
   } catch (error) {
     console.error("Get Current User Error:", error);
 

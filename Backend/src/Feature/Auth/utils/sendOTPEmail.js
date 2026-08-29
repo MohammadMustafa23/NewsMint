@@ -1,10 +1,10 @@
 import transporter from "../../../config/mail.js";
-import { EMAIL_USER } from "../../../config/env.js";
+import { SMTP_USER } from "../../../config/env.js";
 
 const sendOTPEmail = async (email, otp) => {
   try {
     await transporter.sendMail({
-      from: `"NewsMint" <${EMAIL_USER}>`,
+      from: `"NewsMint" <${SMTP_USER}>`,
       to: email,
       subject: "Your NewsMint Verification Code",
 
@@ -251,8 +251,6 @@ If you did not request this code, you can safely ignore this email.
         </html>
       `,
     });
-
-    console.log(`OTP email sent to ${email}`);
   } catch (err) {
     console.error("Send OTP Email Error:", err);
     throw err;

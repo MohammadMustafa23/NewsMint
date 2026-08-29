@@ -294,22 +294,10 @@ const sources = [
 const seedSources = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-
-    console.log("MongoDB connected.");
-
     await Source.deleteMany({});
-
     const createdSources = await Source.insertMany(sources);
 
-    console.log(`✅ ${createdSources.length} sources inserted successfully.`);
-
-    createdSources.forEach((source) => {
-      console.log(`${source.name} → ${source._id}`);
-    });
-
     await mongoose.disconnect();
-
-    console.log("MongoDB disconnected.");
     process.exit(0);
   } catch (error) {
     console.error("❌ Source Seed Error:", error);

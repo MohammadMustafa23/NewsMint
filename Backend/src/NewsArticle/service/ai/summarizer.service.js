@@ -328,15 +328,11 @@ export const summarizeNewsBatch = async (articles) => {
 
   for (const config of configurations) {
     try {
-      console.log(`🤖 Trying ${config.keyName} | ${config.model}`);
-
       const model = createModel(config.apiKey, config.model);
 
       const result = await model.generateContent(prompt);
 
       const validated = parseAndValidateResponse(result, articles);
-
-      console.log(`✅ SUCCESS | ${config.keyName} | ${config.model}`);
 
       // FIRST SUCCESS
       return validated;
@@ -351,9 +347,6 @@ export const summarizeNewsBatch = async (articles) => {
       if (!isRetryableError(error)) {
         throw error;
       }
-
-      // Move to next configuration.
-      console.log(`➡️ Moving to next Gemini configuration`);
     }
   }
 

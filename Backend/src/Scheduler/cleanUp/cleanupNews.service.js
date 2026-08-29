@@ -13,10 +13,6 @@ export const cleanupOldNews = async () => {
       },
     });
 
-    console.log(
-      `🗑️ News Cleanup → Deleted ${result.deletedCount} old articles`,
-    );
-
     return result.deletedCount;
   } catch (error) {
     console.error("❌ News Cleanup Failed:", error.message);

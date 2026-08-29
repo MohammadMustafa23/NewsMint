@@ -53,8 +53,7 @@ export const fetchRSSSource = async (category, source) => {
       throw new Error(`RSS URL not configured for ${source.name}`);
     }
 
-    console.log(`📡 RSS → ${source.name} → ${category}`);
-
+  
     // ==========================================
     // 2. FETCH RSS
     // ==========================================
@@ -150,11 +149,7 @@ export const fetchRSSSource = async (category, source) => {
         };
       })
       .filter(Boolean);
-
-    console.log(
-      `📰 ${source.name} → ${category}: ${articles.length} candidates`,
-    );
-
+    
     return articles;
   } catch (error) {
     console.error(

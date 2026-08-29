@@ -13,7 +13,6 @@ const run = async () => {
       depth: null,
     });
   } catch (error) {
-    console.error(error.response?.data || error.message);
   }
 };
 

@@ -61,12 +61,6 @@ export const processDueUsers = async () => {
     return;
   }
 
-  console.log(`📨 ${duePreferences.length} digest(s) are due`);
-
-  // -----------------------------------------
-  // Process users
-  // -----------------------------------------
-
   for (const preference of duePreferences) {
     try {
       // -----------------------------------------
@@ -95,8 +89,6 @@ export const processDueUsers = async () => {
 
       // Another scheduler already claimed it
       if (!claim) {
-        console.log(`⏭️ Digest already claimed: ${preference.userId}`);
-
         continue;
       }
 
@@ -105,8 +97,6 @@ export const processDueUsers = async () => {
       // -----------------------------------------
 
       if (!claim.telegram?.connected || !claim.telegram?.chatId) {
-        console.log(`⏭️ Telegram not connected: ${claim.userId}`);
-
         const nextDeliveryAt = getNextDeliveryAt(
           claim.deliveryTime,
           claim.timezone,
@@ -167,16 +157,11 @@ export const processDueUsers = async () => {
         })
         .limit(20)
         .lean();
-
-      console.log(`📰 News found for ${claim.userId}: ${newsArticles.length}`);
-
       // -----------------------------------------
       // No news
       // -----------------------------------------
 
       if (!newsArticles.length) {
-        console.log(`⚠️ No matching news found: ${claim.userId}`);
-
         const nextDeliveryAt = getNextDeliveryAt(
           claim.deliveryTime,
           claim.timezone,
@@ -234,8 +219,6 @@ export const processDueUsers = async () => {
       });
 
       if (!telegramMessage) {
-        console.log(`⚠️ Empty digest: ${claim.userId}`);
-
         const nextDeliveryAt = getNextDeliveryAt(
           claim.deliveryTime,
           claim.timezone,
@@ -263,9 +246,6 @@ export const processDueUsers = async () => {
       // -----------------------------------------
 
       const messageChunks = splitTelegramMessage(telegramMessage);
-
-      console.log(`📨 Digest split into ${messageChunks.length} message(s)`);
-
       // -----------------------------------------
       // Send Telegram chunks
       // -----------------------------------------
@@ -275,10 +255,7 @@ export const processDueUsers = async () => {
       try {
         for (let i = 0; i < messageChunks.length; i++) {
           await sendTelegramMessage(claim.telegram.chatId, messageChunks[i]);
-
           sentChunks++;
-
-          console.log(`📤 Message ${i + 1}/${messageChunks.length} sent`);
         }
       } catch (telegramError) {
         console.error(
@@ -348,8 +325,6 @@ export const processDueUsers = async () => {
           },
         },
       );
-
-      console.log(`📱 Digest sent successfully: ${claim.userId}`);
     } catch (error) {
       console.error(`❌ Digest processing failed: ${preference.userId}`, error);
 
@@ -398,8 +373,6 @@ const startDigestScheduler = () => {
       console.error("❌ Digest Scheduler Error:", error.message);
     }
   });
-
-  console.log("📅 Digest scheduler started");
 };
 
 export default startDigestScheduler;

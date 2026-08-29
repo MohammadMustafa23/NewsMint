@@ -172,8 +172,6 @@ const fetchSourceForCategory = async (sourceKey, category) => {
   });
 
   if (!source) {
-    console.warn(`⚠️ Source not found/inactive: ${sourceKey}`);
-
     return [];
   }
 
@@ -377,15 +375,6 @@ export const fetchCategoryNews = async (category) => {
       duplicates: 0,
     };
   }
-
-  console.log("\n==========================================");
-
-  console.log(`📰 Fetching Category: ${category}`);
-
-  console.log(`📡 Sources: ${configuredSources.join(", ")}`);
-
-  console.log("==========================================");
-
   let candidates = [];
 
   /*
@@ -408,8 +397,6 @@ export const fetchCategoryNews = async (category) => {
     await sleep(SOURCE_DELAY);
   }
 
-  console.log(`📦 ${category}: ${candidates.length} candidates`);
-
   /*
    * ==========================================
    * SORT BY LATEST
@@ -431,8 +418,6 @@ export const fetchCategoryNews = async (category) => {
    */
 
   const uniqueArticles = deduplicateArticles(candidates);
-
-  console.log(`🔍 ${category}: ${uniqueArticles.length} unique`);
 
   /*
    * ==========================================
@@ -461,15 +446,6 @@ export const fetchCategoryNews = async (category) => {
       duplicates++;
     }
   }
-
-  console.log(
-    `✅ ${category} | ` +
-      `Candidates: ${candidates.length} | ` +
-      `Unique: ${uniqueArticles.length} | ` +
-      `Selected: ${selectedArticles.length} | ` +
-      `Saved: ${saved} | ` +
-      `Existing: ${duplicates}`,
-  );
 
   return {
     success: true,
@@ -501,9 +477,6 @@ export const fetchCategoryNews = async (category) => {
  */
 
 export const fetchAllNews = async () => {
-  console.log("\n🚀 =====================================");
-  console.log("🚀 NewsMint Daily News Fetch Started");
-  console.log("🚀 =====================================\n");
   const results = [];
 
   /*
@@ -554,19 +527,6 @@ export const fetchAllNews = async () => {
     (total, result) => total + (result.saved || 0),
     0,
   );
-
-  console.log("\n🎉 =====================================");
-
-  console.log("🎉 NewsMint Daily News Fetch Completed");
-
-  console.log(`📰 Candidates: ${totalCandidates}`);
-
-  console.log(`🎯 Selected: ${totalSelected}`);
-
-  console.log(`💾 Saved: ${totalSaved}`);
-
-  console.log("🎉 =====================================\n");
-
   return {
     success: true,
 

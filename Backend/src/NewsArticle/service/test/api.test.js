@@ -12,14 +12,7 @@ dotenv.config();
 
 const run = async () => {
   try {
-    console.log("\n=================================");
-    console.log("NEWS API INGESTION TEST START");
-    console.log("=================================\n");
-
     await mongoose.connect(process.env.MONGO_URI);
-
-    console.log("MongoDB connected\n");
-
     // =================================
     // NewsData.io
     // =================================
@@ -34,13 +27,8 @@ const run = async () => {
       throw new Error("NewsData.io source not found");
     }
 
-    console.log("Fetching NewsData.io...");
 
     const newsDataResult = await fetchNewsData(newsDataSource);
-
-    console.log("NewsData.io Result:");
-    console.log(newsDataResult);
-
     // =================================
     // Guardian
     // =================================
@@ -80,17 +68,9 @@ const run = async () => {
 
     const gnewsResult = await fetchGNews(gnewsSource);
 
-    console.log("GNews Result:");
-    console.log(gnewsResult);
-
     // =================================
     // FINAL SUMMARY
     // =================================
-
-    console.log("\n=================================");
-    console.log("NEWS API INGESTION SUMMARY");
-    console.log("=================================");
-
     console.table([
       {
         provider: "NewsData.io",

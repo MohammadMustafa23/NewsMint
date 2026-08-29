@@ -61,8 +61,6 @@ export const fetchNewsData = async (category, source) => {
       throw new Error(`No NewsData query configured for ${category}`);
     }
 
-    console.log(`📡 NewsData → ${category}`);
-
     // ==========================================
     // 2. BUILD PARAMETERS
     // ==========================================
@@ -113,8 +111,6 @@ export const fetchNewsData = async (category, source) => {
     const items = Array.isArray(response.data?.results)
       ? response.data.results
       : [];
-
-    console.log(`📰 NewsData → ${category}: ${items.length} raw candidates`);
 
     // ==========================================
     // 4. NORMALIZE
@@ -191,10 +187,6 @@ export const fetchNewsData = async (category, source) => {
         };
       })
       .filter(Boolean);
-
-    console.log(
-      `📰 NewsData → ${category}: ${articles.length} valid candidates`,
-    );
 
     return articles;
   } catch (error) {

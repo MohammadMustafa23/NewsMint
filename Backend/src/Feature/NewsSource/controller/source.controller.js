@@ -33,7 +33,7 @@ export const getAllSources = async (req, res) => {
   try {
     const cacheKey = "sources:all";
     // 1. Check Redis
-    const cachedSources = parseCachedObject(await redisClient.get(cacheKey));
+    const cachedSources = await redisClient.get(cacheKey);
 
     if (cachedSources) {
       return res.status(200).json({
@@ -86,13 +86,12 @@ export const getMySources = async (req, res) => {
     const cacheKey = `sources:user:${userId}`;
 
     // 1. Check Redis
-    const cachedSources = parseCachedObject(await redisClient.get(cacheKey));
+    const cachedSources = await redisClient.get(cacheKey);
 
     if (cachedSources) {
       return res.status(200).json({
         success: true,
         ...cachedSources,
-        cached: true,
       });
     }
 
@@ -121,8 +120,7 @@ export const getMySources = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        ...responseData,
-        cached: false,
+        ...responseData
       });
     }
 

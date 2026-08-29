@@ -39,9 +39,6 @@ export const fetchGNews = async (category, source) => {
     if (!query) {
       throw new Error(`No GNews query configured for ${category}`);
     }
-
-    console.log(`📡 GNews → ${category}`);
-
     const response = await axios.get(GNEWS_URL, {
       params: {
         apikey: GNEWS_API_KEY,
@@ -97,9 +94,6 @@ export const fetchGNews = async (category, source) => {
         };
       })
       .filter(Boolean);
-
-    console.log(`📰 GNews → ${category}: ${articles.length} candidates`);
-
     return articles;
   } catch (error) {
     console.error(

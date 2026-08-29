@@ -13,7 +13,6 @@ export const connectRedis = async () => {
   try {
     // Test the connection
     await redisClient.ping();
-    console.log("Redis Connected Sucessfully 👁️");
     return true;
   } catch (error) {
     console.error(error.message);

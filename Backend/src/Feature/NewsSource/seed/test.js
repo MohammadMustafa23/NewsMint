@@ -6,9 +6,6 @@ const URL = "https://content.guardianapis.com/search";
 
 const testGuardian = async () => {
   try {
-    console.log("🔑 API Key exists:", Boolean(API_KEY));
-    console.log("📡 Testing Guardian API...");
-
     const response = await axios.get(URL, {
       params: {
         "api-key": API_KEY,
@@ -18,16 +15,8 @@ const testGuardian = async () => {
       },
       timeout: 15000,
     });
-
-    console.log("✅ Guardian API SUCCESS");
-
-    console.log("Results:", response.data?.response?.results?.length);
   } catch (error) {
-    console.log("❌ Guardian API FAILED");
-
-    console.log("Status:", error.response?.status);
-
-    console.log("Response:", error.response?.data);
+    console.error("Response:", error.response?.data);
   }
 };
 

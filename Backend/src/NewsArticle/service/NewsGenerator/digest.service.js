@@ -22,7 +22,6 @@ export const generateUserDigest = async (userId) => {
       };
     }
 
-    console.log("Preference found");
 
     // =================================
     // 2. EXTRACT USER PREFERENCES
@@ -32,9 +31,6 @@ export const generateUserDigest = async (userId) => {
 
     const language =
       preference.language?.toLowerCase() === "english" ? "english" : "hindi";
-
-    console.log("User Categories:", categories);
-    console.log("User Language:", language);
 
     if (!categories.length) {
       return {
@@ -68,8 +64,6 @@ export const generateUserDigest = async (userId) => {
       })
       .limit(MAX_NEWS)
       .lean();
-
-    console.log(`Matching news found: ${articles.length}`);
 
     // =================================
     // 4. NO NEWS
