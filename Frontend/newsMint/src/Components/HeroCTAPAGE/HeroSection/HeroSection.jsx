@@ -19,10 +19,10 @@ const HeroSection = () => {
             project.
           </p>
           <div className="hero-section__buttons">
-            <button className="hero-section__btn hero-section__btn--primary" onClick={()=>{navigate('/authantication-page')}} > 
+            <button className="hero-section__btn hero-section__btn--primary" onClick={()=>{navigate('/authentication-page')}} > 
               Get Started for Free
             </button>
-            <button className="hero-section__btn hero-section__btn--secondary" onClick={()=>{navigate('/authantication-page')}} >
+            <button className="hero-section__btn hero-section__btn--secondary" onClick={()=>{navigate('/authentication-page')}} >
               View Sample Digest
             </button>
           </div>

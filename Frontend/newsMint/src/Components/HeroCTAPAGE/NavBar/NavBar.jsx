@@ -146,7 +146,7 @@ const NavBar = () => {
         </div>
 
         {/* CTA */}
-        <Link to="/authantication-page" className="nm-nav__cta">
+        <Link to="/authentication-page" className="nm-nav__cta">
           Get Started
           <span>→</span>
         </Link>
@@ -183,7 +183,7 @@ const NavBar = () => {
           ))}
 
           <Link
-            to="/authantication-page"
+            to="/authentication-page"
             className="nm-nav__mobile-cta"
             onClick={() => setMenuOpen(false)}
           >

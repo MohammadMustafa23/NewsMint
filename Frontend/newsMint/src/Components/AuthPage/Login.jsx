@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import GoogleAuthButton from "./GoogleAuthButton.jsx";
 import "./style/Login.css";
-import { getMyPreferences } from "../../services/prefrence.service.js";
+import { getMyPreferences } from "../../services/preference.service.js";
 import SpinLoader from "../../common/SpinLoader.jsx";
 import { loginUser } from "../../services/auth.service.js";
 

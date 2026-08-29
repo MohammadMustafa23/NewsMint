@@ -9,11 +9,11 @@ import SpinLoader from "../../../common/SpinLoader";
 import {
   getMyPreferences,
   updatePreferences,
-} from "../../../services/prefrence.service";
+} from "../../../services/preference.service.js";
 
 import "./style/DashPage.css";
 
-const DashPage = () => {
+export default function DashPage() {
   const [preferences, setPreferences] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -127,37 +127,35 @@ const DashPage = () => {
   // =========================================================
   // UPDATE PREFERENCES
   // =========================================================
-
   const handleUpdate = async (updatedPreferences) => {
-    const handleUpdate = async (updatedPreferences) => {
-  // Telegram status refresh only
-  if (updatedPreferences?.refreshTelegram) {
-    try {
-      setError("");
+    // Telegram status refresh only
+    if (updatedPreferences?.refreshTelegram) {
+      try {
+        setError("");
 
-      const data = await getMyPreferences();
+        const data = await getMyPreferences();
 
-      if (!data?.success || !data?.preference) {
-        throw new Error("Unable to refresh Telegram status.");
+        if (!data?.success || !data?.preference) {
+          throw new Error("Unable to refresh Telegram status.");
+        }
+
+        setPreferences(data.preference);
+
+        console.log("✅ Telegram status refreshed");
+      } catch (error) {
+        console.error("Telegram Refresh Error:", error);
+
+        setError(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Failed to refresh Telegram status.",
+        );
       }
 
-      setPreferences(data.preference);
-
-      console.log("✅ Telegram status refreshed");
-    } catch (error) {
-      console.error("Telegram Refresh Error:", error);
-
-      setError(
-        error?.response?.data?.message ||
-          error?.message ||
-          "Failed to refresh Telegram status.",
-      );
+      return;
     }
 
-    return;
-  }
-
-  // Existing save logic continues here...
+    // Existing save logic continues here...
     try {
       setUpdating(true);
       setError("");
@@ -267,6 +265,4 @@ const DashPage = () => {
       </div>
     </div>
   );
-};
-
-export default DashPage;
+}

@@ -2,7 +2,7 @@ import "./App.css";
 
 import LandingPage from "./Components/Pages/LandingPage";
 import AuthPages from "./Components/Pages/AuthPages";
-import Prefrence from "./Components/Pages/Prefrence";
+import Preference from "./Components/Pages/Preference";
 import DashBoard from "./Components/Pages/Dashboard";
 import ProtectedRoute from "./security/ProtectedRoute";
 
@@ -43,14 +43,14 @@ function App() {
         {/* Public */}
         <Route path="/" element={<LandingPage />} />
 
-        <Route path="/authantication-page" element={<AuthPages />} />
+        <Route path="/authentication-page" element={<AuthPages />} />
 
         {/* User Setup */}
         <Route
           path="/preference"
           element={
             <ProtectedRoute requireNoPreferences>
-              <Prefrence />
+              <Preference />
             </ProtectedRoute>
           }
         />

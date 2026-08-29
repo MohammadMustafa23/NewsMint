@@ -92,7 +92,7 @@ const DashNav = ({
 
       setShowLogoutModal(false);
 
-      navigate("/authantication-page");
+      navigate("/authentication-page");
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import SpinLoader from "../../common/SpinLoader";
 import { loginwithGoogle } from "../../services/auth.service";
-import { getMyPreferences } from "../../services/prefrence.service";
+import { getMyPreferences } from "../../services/preference.service";
 
 import "./style/GoogleAuthButton.css";
 

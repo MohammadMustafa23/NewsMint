@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import DigestSetupForm from "./DigestSetupForm";
 import LivePreview from "./LivePreview";
 
-import { savePreferences } from "../../services/prefrence.service";
+import { savePreferences } from "../../services/preference.service";
 import SpinLoader from "../../common/SpinLoader";
 
 import "./style/DigestPage.css";

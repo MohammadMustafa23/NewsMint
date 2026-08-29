@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import PrevNavBar from "../PrefrenceForm/PrevNavBar";
-import DigestPage from "../PrefrenceForm/DigestPage";
+import PrevNavBar from "../PreferenceForm/PrevNavBar";
+import DigestPage from "../PreferenceForm/DigestPage";
 import Footer from "../HeroCTAPAGE/Footer/Footer";
 import ConfirmModal from "../../common/ConfirmModal.jsx";
 
 import { logOutUser } from "../../services/auth.service.js";
 
-export default function Prefrence({ user }) {
+export default function Preference({ user }) {
   const navigate = useNavigate();
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -39,7 +39,7 @@ export default function Prefrence({ user }) {
 
       setShowLogoutModal(false);
 
-      navigate("/authantication-page", {
+      navigate("/authentication-page", {
         replace: true,
       });
     } catch (error) {

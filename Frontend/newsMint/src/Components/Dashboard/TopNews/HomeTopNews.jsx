@@ -366,7 +366,7 @@ const HomeTopNews = () => {
 
                       return (
                         <article
-                          key={article.id}
+                          key={article._id || article.id}
                           className={`dash-user-news__card ${
                             index === 0 ? "dash-user-news__card--featured" : ""
                           }`}

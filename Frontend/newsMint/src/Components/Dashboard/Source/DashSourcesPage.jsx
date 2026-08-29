@@ -10,7 +10,7 @@ import { getAllSources, getMySources } from "../../../services/source.service";
 import {
   getMyPreferences,
   updatePreferences,
-} from "../../../services/prefrence.service";
+} from "../../../services/preference.service";
 
 import "./style/DashSourcesPage.css";
 

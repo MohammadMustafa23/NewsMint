@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 import { getCurrentUser } from "../services/auth.service.js";
-import { checkMyPreferences } from "../services/prefrence.service.js";
+import { checkMyPreferences } from "../services/preference.service.js";
 import SpinLoader from "../common/SpinLoader";
 
 const ProtectedRoute = ({
@@ -61,7 +61,7 @@ const ProtectedRoute = ({
 
   // Not authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/authantication-page" replace />;
+    return <Navigate to="/authentication-page" replace />;
   }
 
   // Preferences required
