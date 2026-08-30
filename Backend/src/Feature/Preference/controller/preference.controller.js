@@ -288,105 +288,115 @@ const getNextDigestTime = (deliveryTime, timezone) => {
     return null;
   }
 };
-
 export const getMyPreferences = async (req, res) => {
   try {
-    
     const userId = req.user._id;
     const cacheKey = `preference:user:${userId}`;
 
-    // 1. Check Redis cache first
+    // =========================================================
+    // 1. Check Redis
+    // =========================================================
+
     const cachedPreference = await redisClient.get(cacheKey);
 
     if (cachedPreference) {
-      return res.status(200).json({
-        success: true,
-        preference : {
-          ...cachedPreference
-        }
-      });
+      const parsed = parseCachedObject(cachedPreference);
+
+      if (parsed) {
+        return res.status(200).json({
+          success: true,
+          message: "Preferences fetched successfully.",
+          preference: parsed.preference,
+          cached: true,
+        });
+      }
     }
 
-    // 2. Cache MISS → Get data from MongoDB
+    // =========================================================
+    // 2. MongoDB
+    // =========================================================
+
     const [preference, user] = await Promise.all([
       Preference.findOne({
         userId,
       }).lean(),
+
       User.findById(userId).select("newsStreak lastNewsReadAt").lean(),
     ]);
 
-    // 3. User has never created preferences
+    // =========================================================
+    // 3. No Preferences
+    // =========================================================
+
     if (!preference) {
-      const responseData = {
-        hasPreferences: false,
-        preference: null,
-      };
-
-      // Cache this result too
-      await redisClient.set(cacheKey, responseData, {
-        ex: 30 * 60, // 30 minutes
-      });
-
       return res.status(200).json({
         success: true,
-        ...responseData
+        message: "Preferences not found.",
+        preference: null,
+        hasPreferences: false,
+        cached: false,
       });
     }
 
-    // 4. Calculate next digest time
+    // =========================================================
+    // 4. Calculate Next Digest
+    // =========================================================
+
     const nextDigestTime = getNextDigestTime(
       preference.deliveryTime,
       preference.timezone,
     );
 
-    // 5. Prepare response data
-    const responseData = {
-      hasPreferences: Boolean(preference.isCompleted),
+    // =========================================================
+    // 5. Build ONE clean preference object
+    // =========================================================
 
-      preference: {
-        id: preference._id,
+    const preferenceData = {
+      id: preference._id,
 
-        // News preferences
-        categories: preference.categories,
-        sources: preference.sources,
+      categories: preference.categories || [],
 
-        // Language
-        language: preference.language,
+      sources: preference.sources || [],
 
-        // Delivery
-        deliveryTime: preference.deliveryTime,
-        timezone: preference.timezone,
+      language: preference.language,
 
-        // WhatsApp
-        phoneNumber: preference.phoneNumber,
+      deliveryTime: preference.deliveryTime,
 
-        // Telegram
-        telegram: {
-          connected: preference.telegram?.connected || false,
-        },
+      timezone: preference.timezone || "Asia/Kolkata",
 
-        // User activity
-        readStreak: user?.newsStreak || 0,
+      phoneNumber: preference.phoneNumber,
 
-        // Calculated by backend
-        nextDigestTime,
-
-        // Setup status
-        isCompleted: preference.isCompleted,
+      telegram: {
+        connected: preference.telegram?.connected || false,
       },
+
+      readStreak: user?.newsStreak || 0,
+
+      nextDigestTime,
+
+      isCompleted: Boolean(preference.isCompleted),
     };
 
-    // 6. Save response in Redis
-    await redisClient.set(cacheKey, responseData, {
-      ex: 30 * 60, // 30 minutes
+    // =========================================================
+    // 6. Cache
+    // =========================================================
+
+    const cacheData = {
+      preference: preferenceData,
+    };
+
+    await redisClient.set(cacheKey, cacheData, {
+      ex: 30 * 60,
     });
 
-    console.log(responseData);
-    
+    // =========================================================
     // 7. Response
+    // =========================================================
+
     return res.status(200).json({
       success: true,
-      ...responseData,
+      message: "Preferences fetched successfully.",
+      preference: preferenceData,
       cached: false,
     });
   } catch (error) {
@@ -421,7 +431,6 @@ export const checkMyPreferences = async (req, res) => {
     });
   }
 };
-
 export const updatePreferences = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -434,9 +443,9 @@ export const updatePreferences = async (req, res) => {
       timezone = "Asia/Kolkata",
     } = req.body;
 
-    // -----------------------------
-    // Check existing preference
-    // -----------------------------
+    // =========================================================
+    // 1. Get existing preference
+    // =========================================================
 
     const existingPreference = await Preference.findOne({
       userId,
@@ -449,9 +458,9 @@ export const updatePreferences = async (req, res) => {
       });
     }
 
-    // -----------------------------
-    // Basic validation
-    // -----------------------------
+    // =========================================================
+    // 2. Validate categories
+    // =========================================================
 
     if (!Array.isArray(categories) || categories.length === 0) {
       return res.status(400).json({
@@ -459,31 +468,6 @@ export const updatePreferences = async (req, res) => {
         message: "Please select at least one category.",
       });
     }
-
-    if (!language || !ALLOWED_LANGUAGES.includes(language)) {
-      return res.status(400).json({
-        success: false,
-        message: "Please select a valid language.",
-      });
-    }
-
-    if (!deliveryTime) {
-      return res.status(400).json({
-        success: false,
-        message: "Delivery time is required.",
-      });
-    }
-
-    if (!phoneNumber) {
-      return res.status(400).json({
-        success: false,
-        message: "WhatsApp number is required.",
-      });
-    }
-
-    // -----------------------------
-    // Validate categories
-    // -----------------------------
 
     const invalidCategories = categories.filter(
       (category) => !ALLOWED_CATEGORIES.includes(category),
@@ -496,9 +480,38 @@ export const updatePreferences = async (req, res) => {
       });
     }
 
-    // -----------------------------
-    // Validate phone
-    // -----------------------------
+    // =========================================================
+    // 3. Validate language
+    // =========================================================
+
+    if (!language || !ALLOWED_LANGUAGES.includes(language)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select a valid language.",
+      });
+    }
+
+    // =========================================================
+    // 4. Validate delivery time
+    // =========================================================
+
+    if (!deliveryTime) {
+      return res.status(400).json({
+        success: false,
+        message: "Delivery time is required.",
+      });
+    }
+
+    // =========================================================
+    // 5. Validate phone
+    // =========================================================
+
+    if (!phoneNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "WhatsApp number is required.",
+      });
+    }
 
     const cleanPhoneNumber = String(phoneNumber).replace(/\D/g, "");
 
@@ -509,16 +522,15 @@ export const updatePreferences = async (req, res) => {
       });
     }
 
-    // -----------------------------
-    // Calculate next delivery
-    // -----------------------------
+    // =========================================================
+    // 6. Calculate next delivery
+    // =========================================================
 
     const nextDeliveryAt = getNextDeliveryAt(deliveryTime, timezone);
 
-    // -----------------------------
-    // Update preference
-    // Telegram data is preserved
-    // -----------------------------
+    // =========================================================
+    // 7. Update preference
+    // =========================================================
 
     const preference = await Preference.findOneAndUpdate(
       { userId },
@@ -532,8 +544,11 @@ export const updatePreferences = async (req, res) => {
 
         nextDeliveryAt,
 
-        // Keep existing Telegram connection
+        // Preserve Telegram connection
         telegram: existingPreference.telegram,
+
+        // Sources are NOT modified here
+        // They are managed by /sources/select
 
         isCompleted: true,
       },
@@ -542,38 +557,83 @@ export const updatePreferences = async (req, res) => {
         new: true,
         runValidators: true,
       },
+    ).lean();
+
+    // =========================================================
+    // 8. Get user activity
+    // =========================================================
+
+    const user = await User.findById(userId).select("newsStreak").lean();
+
+    // =========================================================
+    // 9. Calculate next digest
+    // =========================================================
+
+    const nextDigestTime = getNextDigestTime(
+      preference.deliveryTime,
+      preference.timezone,
     );
 
-    // -----------------------------
-    // Invalidate related caches
-    // -----------------------------
+    // =========================================================
+    // 10. Invalidate old caches
+    // =========================================================
 
     await redisClient.del(`preference:user:${userId}`);
     await redisClient.del(`news:user:${userId}`);
 
-    // -----------------------------
-    // Response
-    // -----------------------------
+    // =========================================================
+    // 11. Build SAME response object as GET
+    // =========================================================
+
+    const preferenceData = {
+      id: preference._id,
+
+      categories: preference.categories || [],
+
+      sources: preference.sources || [],
+
+      language: preference.language,
+
+      deliveryTime: preference.deliveryTime,
+
+      timezone: preference.timezone || "Asia/Kolkata",
+
+      phoneNumber: preference.phoneNumber,
+
+      telegram: {
+        connected: preference.telegram?.connected || false,
+      },
+
+      readStreak: user?.newsStreak || 0,
+
+      nextDigestTime,
+
+      isCompleted: Boolean(preference.isCompleted),
+    };
+
+    // =========================================================
+    // 12. Cache fresh preference
+    // =========================================================
+
+    await redisClient.set(
+      `preference:user:${userId}`,
+      {
+        preference: preferenceData,
+      },
+      {
+        ex: 30 * 60,
+      },
+    );
+
+    // =========================================================
+    // 13. Final response
+    // =========================================================
 
     return res.status(200).json({
       success: true,
       message: "Preferences updated successfully.",
-
-      preference: {
-        id: preference._id,
-        categories: preference.categories,
-        language: preference.language,
-        deliveryTime: preference.deliveryTime,
-        timezone: preference.timezone,
-        phoneNumber: preference.phoneNumber,
-
-        telegram: {
-          chatId: preference.telegram?.chatId || null,
-          connected: preference.telegram?.connected || false,
-        },
-
-        isCompleted: preference.isCompleted,
-      },
+      preference: preferenceData,
+      cached: false,
     });
   } catch (error) {
     console.error("Update Preferences Error:", error);

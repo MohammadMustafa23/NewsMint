@@ -479,10 +479,6 @@ export const fetchCategoryNews = async (category) => {
 export const fetchAllNews = async () => {
   const results = [];
 
-  /*
-   * Process categories sequentially.
-   */
-
   for (const category of ALLOWED_CATEGORIES) {
     try {
       const result = await fetchCategoryNews(category);

@@ -10,13 +10,11 @@ import NewsArticle from "../NewsArticle/models/NewsArticle.js";
 // ======================================================
 
 export const processNewsFetchScheduler = async () => {
+  console.log("News Fetch scheduler Start ✅");
   const startedAt = new Date();
   try {
     const newsResult = await fetchAllNews();
-    // ==================================================
-    // START AI ONLY IF NEW NEWS WAS SAVED
-    // ==================================================
-
+    
     if (newsResult.totalSaved > 0) {
       try {
         const result = await startAINewsWorker();
@@ -118,7 +116,7 @@ const startNewsScheduler = () => {
   // DAILY NEWS FETCH
   // ====================================================
 
-  cron.schedule("0 6,18 * * *", async () => {
+  cron.schedule("36 18 * * *", async () => {
     try {
       await processNewsFetchScheduler();
     } catch (error) {

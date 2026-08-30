@@ -39,7 +39,6 @@ export const getAllSources = async (req, res) => {
       return res.status(200).json({
         success: true,
         ...cachedSources,
-        cached: true,
       });
     }
 
@@ -62,8 +61,8 @@ export const getAllSources = async (req, res) => {
     };
 
     // 3. Save in Redis
-    await redisClient.set(cacheKey,responseData, {
-      ex : 60 * 60, // 1 hour
+    await redisClient.set(cacheKey, responseData, {
+      ex: 60 * 60, // 1 hour
     });
 
     return res.status(200).json({
@@ -73,7 +72,6 @@ export const getAllSources = async (req, res) => {
     });
   } catch (error) {
     console.error("Get All Sources Error:", error);
-
     return res.status(500).json({
       success: false,
       message: "Internal server error.",
@@ -115,12 +113,12 @@ export const getMySources = async (req, res) => {
       };
 
       await redisClient.set(cacheKey, responseData, {
-        ex : 30 * 60, // 30 minutes
+        ex: 30 * 60, // 30 minutes
       });
 
       return res.status(200).json({
         success: true,
-        ...responseData
+        ...responseData,
       });
     }
 
@@ -132,7 +130,7 @@ export const getMySources = async (req, res) => {
 
     // 3. Save in Redis
     await redisClient.set(cacheKey, responseData, {
-      ex : 30 * 60, // 30 minutes
+      ex: 30 * 60, // 30 minutes
     });
 
     return res.status(200).json({
@@ -150,41 +148,85 @@ export const getMySources = async (req, res) => {
   }
 };
 
-export const addSource = async (req, res) => {
+export const updateMySources = async (req, res) => {
   try {
-    const { sourceId } = req.body;
+    const userId = req.user._id;
+    const { sources } = req.body;
 
-    if (!sourceId) {
+    // -----------------------------
+    // Validate array
+    // -----------------------------
+
+    if (!Array.isArray(sources)) {
       return res.status(400).json({
         success: false,
-        message: "Source ID is required.",
+        message: "Sources must be an array.",
       });
     }
 
-    // Validate ObjectId
-    if (!mongoose.Types.ObjectId.isValid(sourceId)) {
+    // -----------------------------
+    // Maximum 3 sources
+    // -----------------------------
+
+    if (sources.length > 3) {
       return res.status(400).json({
         success: false,
-        message: "Invalid source ID.",
+        message: "You can select a maximum of 3 sources.",
       });
     }
 
-    // Check source exists and is active
-    const source = await Source.findOne({
-      _id: sourceId,
+    // -----------------------------
+    // Remove duplicate IDs
+    // -----------------------------
+
+    const uniqueSources = [...new Set(sources.map(String))];
+
+    if (uniqueSources.length !== sources.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Duplicate sources are not allowed.",
+      });
+    }
+
+    // -----------------------------
+    // Validate ObjectIds
+    // -----------------------------
+
+    const invalidIds = uniqueSources.filter(
+      (id) => !mongoose.Types.ObjectId.isValid(id),
+    );
+
+    if (invalidIds.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "One or more source IDs are invalid.",
+      });
+    }
+
+    // -----------------------------
+    // Check sources exist + active
+    // -----------------------------
+
+    const validSources = await Source.find({
+      _id: { $in: uniqueSources },
       isActive: true,
-    }).lean();
+    })
+      .select("_id")
+      .lean();
 
-    if (!source) {
-      return res.status(404).json({
+    if (validSources.length !== uniqueSources.length) {
+      return res.status(400).json({
         success: false,
-        message: "Source not found.",
+        message: "One or more selected sources are unavailable.",
       });
     }
 
-    // Get user's preferences
+    // -----------------------------
+    // Get user preference
+    // -----------------------------
+
     const preference = await Preference.findOne({
-      userId: req.user._id,
+      userId,
     });
 
     if (!preference) {
@@ -194,48 +236,39 @@ export const addSource = async (req, res) => {
       });
     }
 
-    // Check duplicate
-    const alreadySelected = preference.sources.some(
-      (id) => id.toString() === sourceId,
+    // -----------------------------
+    // Save source IDs
+    // -----------------------------
+
+    preference.sources = uniqueSources.map(
+      (id) => new mongoose.Types.ObjectId(id),
     );
-
-    if (alreadySelected) {
-      return res.status(409).json({
-        success: false,
-        message: "Source is already selected.",
-      });
-    }
-
-    // Maximum 3 sources
-    if (preference.sources.length >= 3) {
-      return res.status(400).json({
-        success: false,
-        message: "You can select a maximum of 3 sources.",
-      });
-    }
-
-    preference.sources.push(source._id);
 
     await preference.save();
 
-    // Invalidate related caches
-    await redisClient.del(`sources:user:${req.user._id}`);
-    await redisClient.del(`news:user:${req.user._id}`);
-    await redisClient.del(`preference:user:${req.user._id}`);
+    // -----------------------------
+    // Invalidate caches
+    // -----------------------------
+
+    await Promise.all([
+      redisClient.del(`sources:user:${userId}`),
+      redisClient.del(`news:user:${userId}`),
+      redisClient.del(`preference:user:${userId}`),
+    ]);
+
+    // -----------------------------
+    // Response
+    // -----------------------------
 
     return res.status(200).json({
       success: true,
-      message: `${source.name} added successfully.`,
-      source: {
-        _id: source._id,
-        name: source.name,
-        shortName: source.shortName,
-      },
+      message: "Sources updated successfully.",
+      sources: preference.sources,
       count: preference.sources.length,
       limit: 3,
     });
   } catch (error) {
-    console.error("Add Source Error:", error);
+    console.error("Update My Sources Error:", error);
 
     return res.status(500).json({
       success: false,
