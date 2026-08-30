@@ -402,6 +402,7 @@ const DashPreferences = ({
           <input
             type="text"
             value={phone}
+            maxLength={10}
             onChange={(e) => setPhone(e.target.value)}
             className="dash-pref-phone__input"
             readOnly={!isEditing}

@@ -10,18 +10,15 @@ export const getMySources = async () => {
   return response.data;
 };
 
-export const addSource = async (sourceId) => {
+export const updateMySources = async (sources) => {
   const response = await api.post("/sources/select", {
-    sourceId,
+    sources,
   });
-
   return response.data;
 };
 
 export const removeSource = async (sourceId) => {
-  const response = await api.delete(
-    `/sources/select/${sourceId}`,
-  );
+  const response = await api.delete(`/sources/select/${sourceId}`);
 
   return response.data;
 };

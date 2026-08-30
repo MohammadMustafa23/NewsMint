@@ -30,9 +30,9 @@ export default function DashPage() {
         setError("");
 
         const data = await getMyPreferences();
+
         if (!data?.success || !data?.preference) {
-          setError("Unable to load your preferences.");
-          return;
+          throw new Error("Unable to load your preferences.");
         }
 
         setPreferences(data.preference);
@@ -40,7 +40,9 @@ export default function DashPage() {
         console.error("Get Preferences Error:", error);
 
         setError(
-          error?.response?.data?.message || "Failed to load your preferences.",
+          error?.response?.data?.message ||
+            error?.message ||
+            "Failed to load your preferences.",
         );
       } finally {
         setLoading(false);
@@ -69,7 +71,7 @@ export default function DashPage() {
   // Error
   // =========================================================
 
-  if (!loading && error) {
+  if (error) {
     return (
       <div className="dash-page">
         <div className="dash-page__container">
@@ -84,12 +86,11 @@ export default function DashPage() {
   }
 
   // =========================================================
-  // Local UI handlers
+  // Local UI Handlers
   // =========================================================
 
   const handlePauseToggle = (paused) => {
-    // Later:
-    // API for pause/resume digest
+    // Pause/resume API can be added later.
   };
 
   const handleTopicToggle = (topics) => {
@@ -99,25 +100,29 @@ export default function DashPage() {
     }));
   };
 
-  const handleLanguageChange = (lang) => {
+  const handleLanguageChange = (language) => {
     setPreferences((prev) => ({
       ...prev,
-      language: lang,
+      language,
     }));
   };
 
-  const handleTimeChange = (time) => {
+  const handleTimeChange = (deliveryTime) => {
     setPreferences((prev) => ({
       ...prev,
-      deliveryTime: time,
+      deliveryTime,
     }));
   };
 
   // =========================================================
-  // UPDATE PREFERENCES
+  // Update Preferences
   // =========================================================
+
   const handleUpdate = async (updatedPreferences) => {
-    // Telegram status refresh only
+    // =======================================================
+    // Telegram Refresh
+    // =======================================================
+
     if (updatedPreferences?.refreshTelegram) {
       try {
         setError("");
@@ -127,6 +132,7 @@ export default function DashPage() {
         if (!data?.success || !data?.preference) {
           throw new Error("Unable to refresh Telegram status.");
         }
+
         setPreferences(data.preference);
       } catch (error) {
         console.error("Telegram Refresh Error:", error);
@@ -141,40 +147,43 @@ export default function DashPage() {
       return;
     }
 
-    // Existing save logic continues here...
+    // =======================================================
+    // Update Preferences
+    // =======================================================
+
     try {
       setUpdating(true);
       setError("");
-      const response = await updatePreferences({
-        categories: updatedPreferences.categories ?? preferences.categories,
 
-        language: updatedPreferences.language ?? preferences.language,
+      const payload = {
+        categories: updatedPreferences?.categories ?? preferences.categories,
+
+        language: updatedPreferences?.language ?? preferences.language,
 
         deliveryTime:
-          updatedPreferences.deliveryTime ?? preferences.deliveryTime,
+          updatedPreferences?.deliveryTime ?? preferences.deliveryTime,
 
-        phoneNumber: updatedPreferences.phoneNumber ?? preferences.phoneNumber,
+        phoneNumber: updatedPreferences?.phoneNumber ?? preferences.phoneNumber,
 
         timezone:
-          updatedPreferences.timezone ?? preferences.timezone ?? "Asia/Kolkata",
+          updatedPreferences?.timezone ??
+          preferences.timezone ??
+          "Asia/Kolkata",
+      };
 
-        telegram: updatedPreferences.telegram ?? preferences.telegram,
-      });
-      if (!response?.success) {
+      const response = await updatePreferences(payload);
+
+      if (!response?.success || !response?.preference) {
         throw new Error(response?.message || "Failed to update preferences.");
       }
 
-      // Update UI with backend response
-      setPreferences((prev) => ({
-        ...prev,
+      // =======================================================
+      // Backend UPDATE now returns the COMPLETE preference
+      // =======================================================
 
-        ...response.preference,
+      setPreferences(response.preference);
 
-        telegram: {
-          ...prev.telegram,
-          ...response.preference?.telegram,
-        },
-      }));
+      setError("");
     } catch (error) {
       console.error("Update Preferences Error:", error);
 
@@ -206,6 +215,7 @@ export default function DashPage() {
 
         {/* Main Grid */}
         <div className="dash-page__grid">
+          {/* Preferences */}
           <DashPreferences
             selectedTopics={preferences.categories}
             selectedLanguage={preferences.language}
@@ -214,7 +224,9 @@ export default function DashPage() {
             isTelegramConnected={preferences.telegram?.connected || false}
             sourcesText={
               preferences.sources?.length
-                ? `via ${preferences.sources.join(", ")}`
+                ? `${preferences.sources.length} source${
+                    preferences.sources.length > 1 ? "s" : ""
+                  } selected`
                 : "No sources selected"
             }
             timeZoneText={`All times shown in ${
@@ -228,6 +240,7 @@ export default function DashPage() {
             updating={updating}
           />
 
+          {/* Live Preview */}
           <DashLivePreview
             time={preferences.deliveryTime}
             tags={preferences.categories}

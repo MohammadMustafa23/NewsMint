@@ -5,32 +5,24 @@ import DashSourceToolbar from "./DashSourceToolbar";
 import DashSourceGrid from "./DashSourceGrid";
 import SpinLoader from "../../../common/SpinLoader";
 
-import { getAllSources, getMySources } from "../../../services/source.service";
-
 import {
-  getMyPreferences,
-  updatePreferences,
-} from "../../../services/preference.service";
+  getAllSources,
+  getMySources,
+  updateMySources,
+} from "../../../services/source.service";
 
 import "./style/DashSourcesPage.css";
 
 const SOURCE_LIMIT = 3;
 
 const DashSourcesPage = () => {
-  /* =========================================================
-     State
-  ========================================================= */
+  // ---------------------------------------------------------
+  // State
+  // ---------------------------------------------------------
 
   const [sources, setSources] = useState([]);
-
-  // Currently saved sources from backend
   const [savedSourceIds, setSavedSourceIds] = useState([]);
-
-  // Temporary local selection
   const [selectedSourceIds, setSelectedSourceIds] = useState([]);
-
-  // Existing preference data required by PUT /preference
-  const [preferences, setPreferences] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
@@ -41,19 +33,20 @@ const DashSourcesPage = () => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  /* =========================================================
-     Fetch Data
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Fetch Sources
+  // ---------------------------------------------------------
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSources = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const [sourcesData, mySourcesData, preferencesData] = await Promise.all(
-          [getAllSources(), getMySources(), getMyPreferences()],
-        );
+        const [sourcesData, mySourcesData] = await Promise.all([
+          getAllSources(),
+          getMySources(),
+        ]);
 
         if (!sourcesData?.success) {
           throw new Error("Failed to load sources.");
@@ -63,22 +56,10 @@ const DashSourcesPage = () => {
           throw new Error("Failed to load your selected sources.");
         }
 
-        if (!preferencesData?.success || !preferencesData?.preference) {
-          throw new Error("Failed to load your preferences.");
-        }
+        // All available sources
+        setSources(sourcesData.sources || []);
 
-        /* -----------------------------------------------------
-           All sources
-        ----------------------------------------------------- */
-
-        const allSources = sourcesData.sources || [];
-
-        setSources(allSources);
-
-        /* -----------------------------------------------------
-           Selected sources
-        ----------------------------------------------------- */
-
+        // User's selected sources
         const selected = mySourcesData.selectedSources || [];
 
         const selectedIds = selected
@@ -87,12 +68,6 @@ const DashSourcesPage = () => {
 
         setSavedSourceIds(selectedIds);
         setSelectedSourceIds(selectedIds);
-
-        /* -----------------------------------------------------
-           Existing preferences
-        ----------------------------------------------------- */
-
-        setPreferences(preferencesData.preference);
       } catch (error) {
         console.error("Load Sources Error:", error);
 
@@ -106,12 +81,12 @@ const DashSourcesPage = () => {
       }
     };
 
-    fetchData();
+    fetchSources();
   }, []);
 
-  /* =========================================================
-     Check Unsaved Changes
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Unsaved Changes
+  // ---------------------------------------------------------
 
   const hasUnsavedChanges = useMemo(() => {
     if (selectedSourceIds.length !== savedSourceIds.length) {
@@ -123,9 +98,9 @@ const DashSourcesPage = () => {
     return selectedSourceIds.some((id) => !savedSet.has(id));
   }, [selectedSourceIds, savedSourceIds]);
 
-  /* =========================================================
-     Available Filters
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Filters
+  // ---------------------------------------------------------
 
   const filters = useMemo(() => {
     const categories = new Set();
@@ -139,9 +114,9 @@ const DashSourcesPage = () => {
     return ["All", ...Array.from(categories)];
   }, [sources]);
 
-  /* =========================================================
-     Search + Filter
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Search + Filter
+  // ---------------------------------------------------------
 
   const filteredSources = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -159,38 +134,35 @@ const DashSourcesPage = () => {
     });
   }, [sources, searchQuery, activeFilter]);
 
-  /* =========================================================
-     Search
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Search
+  // ---------------------------------------------------------
 
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
 
-  /* =========================================================
-     Filter
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Filter
+  // ---------------------------------------------------------
 
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
   };
 
-  /* =========================================================
-     Add Source
-     ONLY LOCAL STATE
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Add Source
+  // ---------------------------------------------------------
 
   const handleAddSource = (sourceId) => {
     setError("");
     setSuccessMessage("");
 
     setSelectedSourceIds((prev) => {
-      // Already selected
       if (prev.includes(sourceId)) {
         return prev;
       }
 
-      // Limit
       if (prev.length >= SOURCE_LIMIT) {
         setError(`You can select a maximum of ${SOURCE_LIMIT} sources.`);
 
@@ -201,10 +173,9 @@ const DashSourcesPage = () => {
     });
   };
 
-  /* =========================================================
-     Remove Source
-     ONLY LOCAL STATE
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Remove Source
+  // ---------------------------------------------------------
 
   const handleRemoveSource = (sourceId) => {
     setError("");
@@ -213,9 +184,9 @@ const DashSourcesPage = () => {
     setSelectedSourceIds((prev) => prev.filter((id) => id !== sourceId));
   };
 
-  /* =========================================================
-     Toggle Source
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Toggle Source
+  // ---------------------------------------------------------
 
   const handleToggleSource = (sourceId, isAdded) => {
     if (isAdded) {
@@ -225,10 +196,9 @@ const DashSourcesPage = () => {
     }
   };
 
-  /* =========================================================
-     Save Changes
-     ONE API REQUEST
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Save Sources
+  // ---------------------------------------------------------
 
   const handleSaveChanges = async () => {
     if (!hasUnsavedChanges || saving) {
@@ -237,50 +207,16 @@ const DashSourcesPage = () => {
 
     try {
       setSaving(true);
-
       setError("");
       setSuccessMessage("");
 
+      const response = await updateMySources(selectedSourceIds);
 
-      /*
-       * IMPORTANT:
-       * Your backend updatePreferences currently
-       * expects the complete preference object.
-       */
-
-      const response = await updatePreferences({
-        categories: preferences.categories || [],
-
-        sources: selectedSourceIds,
-
-        language: preferences.language,
-
-        deliveryTime: preferences.deliveryTime,
-
-        phoneNumber: preferences.phoneNumber,
-
-        timezone: preferences.timezone || "Asia/Kolkata",
-
-        telegram: preferences.telegram || {
-          connected: false,
-          chatId: null,
-        },
-      });
       if (!response?.success) {
-        throw new Error(response?.message || "Failed to update preferences.");
+        throw new Error(response?.message || "Failed to update sources.");
       }
 
-      /* -----------------------------------------------------
-         Save successful
-      ----------------------------------------------------- */
-
-      setSavedSourceIds(selectedSourceIds);
-
-      setPreferences((prev) => ({
-        ...prev,
-
-        sources: selectedSourceIds,
-      }));
+      setSavedSourceIds([...selectedSourceIds]);
 
       setSuccessMessage("Sources updated successfully.");
     } catch (error) {
@@ -296,29 +232,24 @@ const DashSourcesPage = () => {
     }
   };
 
-  /* =========================================================
-     Cancel Changes
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Cancel Changes
+  // ---------------------------------------------------------
 
   const handleCancelChanges = () => {
-    if (saving) return;
+    if (saving) {
+      return;
+    }
 
-    setSelectedSourceIds(savedSourceIds);
+    setSelectedSourceIds([...savedSourceIds]);
 
     setError("");
     setSuccessMessage("");
   };
 
-  /* =========================================================
-     Load More
-  ========================================================= */
-
-  const handleLoadMore = () => {
-  };
-
-  /* =========================================================
-     Loading
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Loading
+  // ---------------------------------------------------------
 
   if (loading) {
     return (
@@ -331,9 +262,9 @@ const DashSourcesPage = () => {
     );
   }
 
-  /* =========================================================
-     Error
-  ========================================================= */
+  // ---------------------------------------------------------
+  // Error
+  // ---------------------------------------------------------
 
   if (error && sources.length === 0) {
     return (
@@ -345,9 +276,9 @@ const DashSourcesPage = () => {
     );
   }
 
-  /* =========================================================
-     UI
-  ========================================================= */
+  // ---------------------------------------------------------
+  // UI
+  // ---------------------------------------------------------
 
   return (
     <div className="dash-sources-page">
@@ -370,7 +301,6 @@ const DashSourcesPage = () => {
         />
 
         {/* Messages */}
-
         {error && <p className="dash-sources-page__error">{error}</p>}
 
         {successMessage && (
@@ -382,14 +312,10 @@ const DashSourcesPage = () => {
           sources={filteredSources}
           selectedSourceIds={selectedSourceIds}
           onToggleSource={handleToggleSource}
-          onLoadMore={handleLoadMore}
           actionLoading={false}
         />
 
-        {/* ===================================================
-            Save Bar
-        =================================================== */}
-
+        {/* Save Bar */}
         {hasUnsavedChanges && (
           <div className="dash-sources-page__save-bar">
             <div className="dash-sources-page__save-info">
