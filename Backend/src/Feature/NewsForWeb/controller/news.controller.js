@@ -1,9 +1,4 @@
-import crypto from "node:crypto";
-
-import Preference from "../../Preference/models/Preference.js";
 import NewsArticle from "../../../NewsArticle/models/NewsArticle.js";
-
-import { redisClient } from "../../../config/redis.js";
 
 // ======================================================
 // CONSTANTS
@@ -12,143 +7,35 @@ import { redisClient } from "../../../config/redis.js";
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 10;
 
-const NEWS_CACHE_TTL = 5 * 60;
-
-const PREFERENCE_CACHE_TTL = 30 * 60;
-
-const CACHE_VERSION = "v1";
-
 // ======================================================
 // HELPERS
 // ======================================================
 
-const parseCachedObject = (value) => {
-  if (!value) {
-    return null;
+const parsePage = (value) => {
+  const page = Number.parseInt(value, 10);
+
+  if (!Number.isFinite(page) || page < 1) {
+    return 1;
   }
 
-  if (typeof value !== "string") {
-    return value;
-  }
-
-  try {
-    return JSON.parse(value);
-  } catch {
-    return null;
-  }
+  return page;
 };
 
-// ======================================================
-// RANDOM CACHE TTL
-// Prevent many keys expiring together
-// ======================================================
+const parseLimit = (value) => {
+  const limit = Number.parseInt(value, 10);
 
-const getCacheTTL = (baseTTL) => {
-  const jitter = Math.floor(Math.random() * 60);
-
-  return baseTTL + jitter;
-};
-
-// ======================================================
-// CREATE PREFERENCE SIGNATURE
-// ======================================================
-
-const createPreferenceSignature = ({
-  categories = [],
-  sources = [],
-  language = "English",
-}) => {
-  const normalizedCategories = [...categories].map(String).sort();
-
-  const normalizedSources = [...sources].map(String).sort();
-
-  const rawValue = JSON.stringify({
-    categories: normalizedCategories,
-    sources: normalizedSources,
-    language,
-  });
-
-  return crypto
-    .createHash("sha256")
-    .update(rawValue)
-    .digest("hex")
-    .slice(0, 16);
-};
-
-// ======================================================
-// GET CACHED PREFERENCE
-// ======================================================
-
-const getUserPreference = async (userId) => {
-  const cacheKey = `preference:user:${userId}`;
-
-  const cachedPreference = await redisClient.get(cacheKey);
-
-  if (cachedPreference) {
-    return cachedPreference;
+  if (!Number.isFinite(limit) || limit < 1) {
+    return DEFAULT_LIMIT;
   }
 
-  const preference = await Preference.findOne({
-    userId,
-  })
-    .select("categories sources language updatedAt")
-    .lean();
-
-  if (!preference) {
-    return null;
-  }
-
-  await redisClient.set(cacheKey, preference, {
-    ex: getCacheTTL(PREFERENCE_CACHE_TTL),
-  });
-
-  return preference;
-};
-
-// ======================================================
-// BUILD NEWS QUERY
-// ======================================================
-
-const buildNewsQuery = (preference) => {
-  const { categories = [], sources = [] } = preference;
-
-  const query = {
-    category: {
-      $in: categories,
-    },
-
-    "ai.status": "completed",
-  };
-
-  // ----------------------------------------------------
-  // IMPORTANT
-  //
-  // If user selected sources:
-  //     filter by those sources.
-  //
-  // If user did NOT select sources:
-  //     DON'T restrict to top 5.
-  //
-  // This allows all active/available news matching
-  // the user's categories.
-  // ----------------------------------------------------
-
-  if (sources.length > 0) {
-    query.source = {
-      $in: sources,
-    };
-  }
-
-  return query;
+  return Math.min(limit, MAX_LIMIT);
 };
 
 // ======================================================
 // FORMAT NEWS
 // ======================================================
 
-const formatNews = (articles, language) => {
-  const summaryKey = language === "Hindi" ? "hindi" : "english";
-
+const formatNews = (articles) => {
   return articles.map((article) => ({
     id: article._id,
 
@@ -156,9 +43,17 @@ const formatNews = (articles, language) => {
 
     description: article.description || "",
 
-    summary: article.ai?.summary?.[summaryKey] || "",
+    summary: {
+      english: article.ai?.summary?.english || "",
 
-    keyPoints: article.ai?.keyPoints?.[summaryKey] || [],
+      hindi: article.ai?.summary?.hindi || "",
+    },
+
+    keyPoints: {
+      english: article.ai?.keyPoints?.english || [],
+
+      hindi: article.ai?.keyPoints?.hindi || [],
+    },
 
     image: article.image || "",
 
@@ -170,9 +65,9 @@ const formatNews = (articles, language) => {
 
     tags: article.tags || [],
 
-    publishedAt: article.publishedAt,
+    publishedAt: article.publishedAt || null,
 
-    newsDate: article.newsDate,
+    newsDate: article.newsDate || null,
 
     source: article.source
       ? {
@@ -191,151 +86,101 @@ const formatNews = (articles, language) => {
 };
 
 // ======================================================
-// GET MY NEWS
+// GET CATEGORY NEWS
+// ======================================================
+//
+// GET /category-news
+//
+// Query:
+//
+// category = India
+// page     = 1
+// limit    = 10
+//
 // ======================================================
 
-export const getMyNews = async (req, res) => {
+export const getCategoryNews = async (req, res) => {
   try {
     // ==================================================
-    // 1. USER
+    // 1. CATEGORY
     // ==================================================
 
-    const userId = req.user._id.toString();
+    const category =
+      typeof req.query.category === "string" ? req.query.category.trim() : "";
 
     // ==================================================
-    // 2. PAGINATION
+    // 2. VALIDATE CATEGORY
     // ==================================================
 
-    const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
-
-    const requestedLimit =
-      Number.parseInt(req.query.limit, 10) || DEFAULT_LIMIT;
-
-    const limit = Math.min(Math.max(requestedLimit, 1), MAX_LIMIT);
-
-    // ==================================================
-    // 3. GET USER PREFERENCE
-    // ==================================================
-
-    const preference = await getUserPreference(userId);
-
-    if (!preference) {
-      return res.status(404).json({
+    if (!category) {
+      return res.status(400).json({
         success: false,
 
-        message: "User preferences not found.",
-      });
-    }
-
-    const { categories = [], sources = [], language = "English" } = preference;
-
-    // ==================================================
-    // 4. EMPTY CATEGORY SAFETY
-    // ==================================================
-
-    if (!categories.length) {
-      return res.status(200).json({
-        success: true,
-
-        data: {
-          language,
-
-          categories: [],
-
-          news: [],
-
-          pagination: {
-            page,
-
-            limit,
-
-            hasMore: false,
-
-            nextPage: null,
-          },
-        },
-
-        cached: false,
+        message: "News category is required.",
       });
     }
 
     // ==================================================
-    // 5. CACHE KEY
-    //
-    // Preference signature means if user changes
-    // categories/sources/language, the cache namespace
-    // automatically changes.
+    // 3. PAGINATION
     // ==================================================
 
-    const preferenceSignature = createPreferenceSignature({
-      categories,
+    const page = parsePage(req.query.page);
 
-      sources,
-
-      language,
-    });
-
-    const cacheKey =
-      `news:${CACHE_VERSION}:user:${userId}` +
-      `:pref:${preferenceSignature}` +
-      `:page:${page}`;
-
-    // ==================================================
-    // 6. REDIS CACHE
-    //
-    // Cache only the first few pages.
-    // Don't allow unlimited per-user Redis growth.
-    // ==================================================
-
-    const shouldCache = page <= 3;
-
-    if (shouldCache) {
-      const cachedNews = await redisClient.get(cacheKey);
-
-      if (cachedNews) {
-        return res.status(200).json({
-          success: true,
-
-          data: cachedNews,
-
-          cached: true,
-        });
-      }
-    }
-
-    // ==================================================
-    // 7. BUILD QUERY
-    // ==================================================
-
-    const query = buildNewsQuery(preference);
-
-    // ==================================================
-    // 8. OFFSET PAGINATION
-    //
-    // Current UI uses page numbers.
-    //
-    // Fetch one extra record to determine hasMore.
-    // ==================================================
+    const limit = parseLimit(req.query.limit);
 
     const skip = (page - 1) * limit;
+
+    // ==================================================
+    // 4. QUERY
+    // ==================================================
+    //
+    // IMPORTANT:
+    //
+    // We DON'T lowercase category here.
+    //
+    // If DB contains:
+    //
+    // "India"
+    //
+    // we query:
+    //
+    // category: "India"
+    //
+    // ==================================================
+
+    const query = {
+      category,
+
+      "ai.status": "completed",
+    };
+
+    // ==================================================
+    // 5. FETCH NEWS
+    // ==================================================
+    //
+    // Fetch 11 internally.
+    //
+    // Return maximum 10.
+    //
+    // 11th article is only used for hasMore.
+    //
+    // ==================================================
 
     const articles = await NewsArticle.find(query)
       .sort({
         newsDate: -1,
 
+        publishedAt: -1,
+
         _id: -1,
       })
-
       .skip(skip)
-
       .limit(limit + 1)
-
       .populate("source", "name shortName logo website")
-
       .lean();
 
     // ==================================================
-    // 9. HAS MORE
+    // 6. HAS MORE
     // ==================================================
 
     const hasMore = articles.length > limit;
@@ -343,67 +188,160 @@ export const getMyNews = async (req, res) => {
     const pageArticles = hasMore ? articles.slice(0, limit) : articles;
 
     // ==================================================
-    // 10. FORMAT
+    // 7. FORMAT
     // ==================================================
 
-    const news = formatNews(pageArticles, language);
+    const news = formatNews(pageArticles);
 
     // ==================================================
-    // 11. RESPONSE
-    // ==================================================
-
-    const responseData = {
-      language,
-
-      categories,
-
-      news,
-
-      pagination: {
-        page,
-
-        limit,
-
-        hasMore,
-
-        nextPage: hasMore ? page + 1 : null,
-      },
-    };
-
-    // ==================================================
-    // 12. CACHE
-    // ==================================================
-
-    if (shouldCache) {
-      await redisClient.set(
-        cacheKey,
-
-        responseData,
-
-        {
-          ex: getCacheTTL(NEWS_CACHE_TTL),
-        },
-      );
-    }
-
-    // ==================================================
-    // 13. RESPONSE
+    // 8. RESPONSE
     // ==================================================
 
     return res.status(200).json({
       success: true,
 
-      data: responseData,
+      data: {
+        category,
 
-      cached: false,
+        news,
+
+        pagination: {
+          page,
+
+          limit,
+
+          hasMore,
+
+          nextPage: hasMore ? page + 1 : null,
+        },
+      },
     });
   } catch (error) {
-    console.error("getMyNews error:", error);
+    console.error("getCategoryNews error:", error);
 
     return res.status(500).json({
       success: false,
 
-      message: "Unable to load your news right now.",
+      message: "Unable to load category news right now.",
+    });
+  }
+};
+
+// ======================================================
+// GET TOP NEWS
+// ======================================================
+//
+// GET /top-news
+//
+// Query:
+//
+// page  = 1
+// limit = 10
+//
+// Returns latest news from ALL categories.
+//
+// ======================================================
+
+export const getTopNews = async (req, res) => {
+  try {
+    // ==================================================
+    // 1. PAGINATION
+    // ==================================================
+
+    const page = parsePage(req.query.page);
+
+    const limit = parseLimit(req.query.limit);
+
+    const skip = (page - 1) * limit;
+
+    // ==================================================
+    // 2. QUERY
+    // ==================================================
+    //
+    // No category filter.
+    //
+    // No user preference filter.
+    //
+    // Only fully AI-processed news.
+    //
+    // Old news is already automatically removed
+    // by your 48-hour database TTL.
+    //
+    // ==================================================
+
+    const query = {
+      "ai.status": "completed",
+    };
+
+    // ==================================================
+    // 3. FETCH NEWS
+    // ==================================================
+    //
+    // Fetch 11 internally.
+    //
+    // Return maximum 10.
+    //
+    // 11th article is only used to determine
+    // whether another page exists.
+    //
+    // ==================================================
+
+    const articles = await NewsArticle.find(query)
+      .sort({
+        newsDate: -1,
+
+        publishedAt: -1,
+
+        _id: -1,
+      })
+      .skip(skip)
+      .limit(limit + 1)
+      .populate("source", "name shortName logo website")
+      .lean();
+
+    // ==================================================
+    // 4. HAS MORE
+    // ==================================================
+
+    const hasMore = articles.length > limit;
+
+    // Remove the extra article.
+    const pageArticles = hasMore ? articles.slice(0, limit) : articles;
+
+    // ==================================================
+    // 5. FORMAT
+    // ==================================================
+
+    const news = formatNews(pageArticles);
+
+    // ==================================================
+    // 6. RESPONSE
+    // ==================================================
+
+    return res.status(200).json({
+      success: true,
+
+      data: {
+        news,
+
+        pagination: {
+          page,
+
+          limit,
+
+          hasMore,
+
+          nextPage: hasMore ? page + 1 : null,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("getTopNews error:", error);
+
+    return res.status(500).json({
+      success: false,
+
+      message: "Unable to load top news right now.",
     });
   }
 };
