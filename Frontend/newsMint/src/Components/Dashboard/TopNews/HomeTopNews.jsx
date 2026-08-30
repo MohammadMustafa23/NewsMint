@@ -1,81 +1,184 @@
 import React, { useEffect, useState } from "react";
+
 import DashHeroArticle from "./DashHeroArticle";
 import DashLanguageToggle from "./DashLanguageToggle";
 import DashTrending from "./DashTrending";
-import { getMyNews } from "../../../services/news.service.js";
-import "./style/HomeTopNews.css";
+
+import { getTopNews, getCategoryNews } from "../../../services/news.service.js";
+
 import SpinLoader from "../../../common/SpinLoader.jsx";
+
+import "./style/HomeTopNews.css";
 
 const HomeTopNews = () => {
   // ======================================================
-  // NEWS STATE
+  // CATEGORY BUTTONS
+  // ======================================================
+  //
+  // These are UI categories.
+  //
+  // Backend will handle which news belongs
+  // to the selected category.
+  //
+  // ======================================================
+
+  const categories = [
+    "all",
+    "India",
+    "Technology",
+    "Sports",
+    "Business",
+    "Entertainment",
+    "World",
+  ];
+
+  // ======================================================
+  // NEWS
   // ======================================================
 
   const [news, setNews] = useState([]);
 
+  // ======================================================
+  // LANGUAGE
+  // ======================================================
+
   const [language, setLanguage] = useState("English");
 
-  // Pagination
+  // ======================================================
+  // SELECTED CATEGORY
+  // ======================================================
+
+  const [category, setCategory] = useState("all");
+
+  // ======================================================
+  // PAGINATION
+  // ======================================================
+
   const [page, setPage] = useState(1);
 
   const [hasMore, setHasMore] = useState(false);
 
-  // Initial loading
+  // ======================================================
+  // LOADING
+  // ======================================================
+
   const [loading, setLoading] = useState(true);
 
-  // Load More loading
   const [loadingMore, setLoadingMore] = useState(false);
 
   const [error, setError] = useState("");
 
   // ======================================================
-  // INITIAL NEWS FETCH
+  // FETCH NEWS
+  // ======================================================
+  //
+  // ALL:
+  //   getTopNews()
+  //
+  // CATEGORY:
+  //   getCategoryNews()
+  //
+  // Every first request gets maximum 10.
+  //
   // ======================================================
 
   useEffect(() => {
-    const fetchMyNews = async () => {
+    let cancelled = false;
+
+    const fetchNews = async () => {
       try {
         setLoading(true);
+
         setError("");
 
-        const response = await getMyNews(1, 10);
+        // Clear previous category news.
+        setNews([]);
 
-        if (!response.success) {
-          setError(response.message || "We couldn't load your daily news.");
+        let response;
+
+        // ==================================================
+        // ALL NEWS
+        // ==================================================
+
+        if (category.toLowerCase() === "all") {
+          response = await getTopNews(1, 10);
+        }
+
+        // ==================================================
+        // CATEGORY NEWS
+        // ==================================================
+        else {
+          response = await getCategoryNews(category, 1, 10);
+        }
+
+        if (cancelled) {
+          return;
+        }
+
+        // ==================================================
+        // API ERROR
+        // ==================================================
+
+        if (!response?.success) {
+          setError(response?.message || "We couldn't load the latest news.");
 
           return;
         }
 
-        // First 10 articles
-        setNews(response.data.news || []);
+        // ==================================================
+        // NEWS
+        // ==================================================
 
-        // Language
-        setLanguage(response.data.language || "English");
+        const responseNews = response?.data?.news || [];
 
-        // Pagination
-        setHasMore(response.data.pagination?.hasMore || false);
+        // ==================================================
+        // PAGINATION
+        // ==================================================
 
-        setPage(response.data.pagination?.nextPage || 2);
+        const pagination = response?.data?.pagination || {};
+
+        setNews(responseNews);
+
+        setHasMore(Boolean(pagination.hasMore));
+
+        setPage(pagination.nextPage || 2);
       } catch (error) {
-        console.error("Failed to fetch user news:", error);
+        if (cancelled) {
+          return;
+        }
+
+        console.error("Failed to fetch news:", error);
 
         setError(
-          error.response?.data?.message || "We couldn't load your daily news.",
+          error?.response?.data?.message || "We couldn't load the latest news.",
         );
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchMyNews();
-  }, []);
+    fetchNews();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [category]);
 
   // ======================================================
   // LOAD MORE
   // ======================================================
+  //
+  // ALL:
+  //   /top?page=2
+  //
+  // CATEGORY:
+  //   /category-news?category=India&page=2
+  //
+  // ======================================================
 
   const handleLoadMore = async () => {
-    // Prevent duplicate requests
     if (loadingMore || !hasMore) {
       return;
     }
@@ -83,23 +186,46 @@ const HomeTopNews = () => {
     try {
       setLoadingMore(true);
 
-      const response = await getMyNews(page, 10);
+      let response;
 
-      if (!response.success) {
-        console.error(response.message || "Failed to load more news.");
+      // ==================================================
+      // ALL
+      // ==================================================
+
+      if (category.toLowerCase() === "all") {
+        response = await getTopNews(page, 10);
+      }
+
+      // ==================================================
+      // CATEGORY
+      // ==================================================
+      else {
+        response = await getCategoryNews(category, page, 10);
+      }
+
+      if (!response?.success) {
+        console.error(response?.message || "Failed to load more news.");
 
         return;
       }
 
-      const newNews = response.data.news || [];
+      const newNews = response?.data?.news || [];
 
-      // Append new articles
+      const pagination = response?.data?.pagination || {};
+
+      // ==================================================
+      // APPEND
+      // ==================================================
+
       setNews((previousNews) => [...previousNews, ...newNews]);
 
-      // Update pagination
-      setHasMore(response.data.pagination?.hasMore || false);
+      // ==================================================
+      // PAGINATION
+      // ==================================================
 
-      setPage(response.data.pagination?.nextPage || page + 1);
+      setHasMore(Boolean(pagination.hasMore));
+
+      setPage(pagination.nextPage || page + 1);
     } catch (error) {
       console.error("Failed to load more news:", error);
     } finally {
@@ -108,23 +234,39 @@ const HomeTopNews = () => {
   };
 
   // ======================================================
+  // CATEGORY CHANGE
+  // ======================================================
+
+  const handleCategoryChange = (nextCategory) => {
+    if (typeof nextCategory !== "string") {
+      return;
+    }
+
+    const selectedCategory = nextCategory.trim();
+
+    if (!selectedCategory) {
+      return;
+    }
+
+    console.log("Selected category:", selectedCategory);
+
+    // useEffect will automatically:
+    //
+    // 1. Clear old news
+    // 2. Request page 1
+    // 3. Get maximum 10
+    // 4. Reset pagination
+    //
+
+    setCategory(selectedCategory);
+  };
+
+  // ======================================================
   // LANGUAGE
   // ======================================================
 
   const handleLanguageChange = (lang) => {
-    const nextLanguage = lang === "HIN" ? "Hindi" : "English";
-
-    setLanguage(nextLanguage);
-
-    // Language switching should later
-    // request news in the selected language.
-  };
-
-  // ======================================================
-  // TRENDING
-  // ======================================================
-
-  const handleTopicClick = (topic) => {
+    setLanguage(lang === "HIN" ? "Hindi" : "English");
   };
 
   // ======================================================
@@ -143,10 +285,20 @@ const HomeTopNews = () => {
   // CATEGORY CLASS
   // ======================================================
 
-  const getCategoryClass = (category) => {
-    return String(category || "general")
+  const getCategoryClass = (value) => {
+    return String(value || "general")
       .toLowerCase()
       .replace(/\s+/g, "-");
+  };
+
+  // ======================================================
+  // ACTIVE CATEGORY
+  // ======================================================
+
+  const isCategoryActive = (selectedCategory) => {
+    return (
+      String(category).toLowerCase() === String(selectedCategory).toLowerCase()
+    );
   };
 
   // ======================================================
@@ -154,10 +306,18 @@ const HomeTopNews = () => {
   // ======================================================
 
   const getArticleSummary = (article) => {
+    if (language === "Hindi") {
+      return (
+        article?.summary?.hindi ||
+        article?.description ||
+        "आज की ताज़ा खबरों की एक झलक।"
+      );
+    }
+
     return (
-      article.summary ||
-      article.description ||
-      "A quick look at today's latest developments."
+      article?.summary?.english ||
+      article?.description ||
+      "A quick look at the latest developments."
     );
   };
 
@@ -171,7 +331,7 @@ const HomeTopNews = () => {
         <div className="dash-top-news-page__container dash-top-news-page__container--state">
           <SpinLoader size="medium" />
 
-          <p>Preparing your daily briefing...</p>
+          <p>Preparing the latest news...</p>
         </div>
       </div>
     );
@@ -188,7 +348,7 @@ const HomeTopNews = () => {
           <div className="dash-news-state">
             <span className="dash-news-state__label">NEWSMINT</span>
 
-            <h2>Your briefing couldn't load</h2>
+            <h2>Top News couldn't load</h2>
 
             <p>{error}</p>
           </div>
@@ -198,7 +358,7 @@ const HomeTopNews = () => {
   }
 
   // ======================================================
-  // EMPTY NEWS
+  // EMPTY
   // ======================================================
 
   if (!news.length) {
@@ -208,9 +368,9 @@ const HomeTopNews = () => {
           <div className="dash-news-state">
             <span className="dash-news-state__label">NEWSMINT</span>
 
-            <h2>Nothing new for you yet</h2>
+            <h2>No news available right now</h2>
 
-            <p>We're not seeing stories that match your interests right now.</p>
+            <p>There are no recent stories available for this category.</p>
           </div>
         </div>
       </div>
@@ -234,13 +394,13 @@ const HomeTopNews = () => {
   // ======================================================
 
   const groupedNews = remainingNews.reduce((groups, article) => {
-    const category = article.category || "General";
+    const articleCategory = article?.category || "General";
 
-    if (!groups[category]) {
-      groups[category] = [];
+    if (!groups[articleCategory]) {
+      groups[articleCategory] = [];
     }
 
-    groups[category].push(article);
+    groups[articleCategory].push(article);
 
     return groups;
   }, {});
@@ -252,10 +412,10 @@ const HomeTopNews = () => {
   const trendingTopics = [
     ...new Map(
       news.flatMap((article) =>
-        (article.tags || []).map((tag) => [
+        (article?.tags || []).map((tag) => [
           tag,
           {
-            category: article.category || "General",
+            category: article?.category || "General",
 
             tag: tag.startsWith("#") ? tag : `#${tag}`,
 
@@ -300,7 +460,7 @@ const HomeTopNews = () => {
             <DashTrending
               title="What's Trending"
               topics={trendingTopics}
-              onTopicClick={handleTopicClick}
+              onTopicClick={() => {}}
             />
           </aside>
         </div>
@@ -308,46 +468,65 @@ const HomeTopNews = () => {
         <div className="dash-top-news-page__divider" />
 
         {/* ==================================================
-            USER NEWS
+            TOP NEWS
             ================================================== */}
 
         <section className="dash-user-news">
+          {/* HEADER */}
+
           <header className="dash-user-news__header">
             <div>
-              <span className="dash-user-news__eyebrow">YOUR DAILY BRIEF</span>
+              <span className="dash-user-news__eyebrow">LATEST NEWS</span>
 
-              <h2 className="dash-user-news__title">Stories For You</h2>
+              <h2 className="dash-user-news__title">Top News</h2>
 
               <p className="dash-user-news__subtitle">
-                News selected around your interests
+                Latest stories across all categories
               </p>
             </div>
 
             <div className="dash-user-news__total">
               <strong>{news.length}</strong>
 
-              <span>Stories</span>
+              <span>{news.length === 1 ? "Story" : "Stories"}</span>
             </div>
           </header>
+
+          {/* ==================================================
+              CATEGORY BUTTONS
+              ================================================== */}
+
+          <div className="dash-top-news__filters">
+            {categories.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className={isCategoryActive(item) ? "active" : ""}
+                onClick={() => handleCategoryChange(item)}
+              >
+                {item.toLowerCase() === "all" ? "All" : item}
+              </button>
+            ))}
+          </div>
 
           {/* ==================================================
               CATEGORY NEWS
               ================================================== */}
 
           <div className="dash-user-news__categories">
-            {Object.entries(groupedNews).map(([category, articles]) => {
-              const categoryClass = getCategoryClass(category);
+            {Object.entries(groupedNews).map(([articleCategory, articles]) => {
+              const categoryClass = getCategoryClass(articleCategory);
 
               return (
                 <section
-                  key={category}
+                  key={articleCategory}
                   className={`dash-user-news__category dash-user-news__category--${categoryClass}`}
                 >
                   <div className="dash-user-news__category-header">
                     <div className="dash-user-news__category-title-wrap">
                       <span className="dash-user-news__category-dot" />
 
-                      <h3>{category}</h3>
+                      <h3>{articleCategory}</h3>
                     </div>
 
                     <span className="dash-user-news__category-count">
@@ -359,13 +538,13 @@ const HomeTopNews = () => {
                   <div className="dash-user-news__grid">
                     {articles.map((article, index) => {
                       const source =
-                        article.source?.shortName ||
-                        article.source?.name ||
+                        article?.source?.shortName ||
+                        article?.source?.name ||
                         "NewsMint";
 
                       return (
                         <article
-                          key={article._id || article.id}
+                          key={article.id}
                           className={`dash-user-news__card ${
                             index === 0 ? "dash-user-news__card--featured" : ""
                           }`}
@@ -400,7 +579,7 @@ const HomeTopNews = () => {
                               </span>
 
                               <span className="dash-user-news__category-name">
-                                {category}
+                                {articleCategory}
                               </span>
                             </div>
 
@@ -455,7 +634,7 @@ const HomeTopNews = () => {
               </button>
 
               <p className="dash-user-news__load-more-hint">
-                More stories are waiting for you
+                More latest stories are waiting for you
               </p>
             </div>
           )}

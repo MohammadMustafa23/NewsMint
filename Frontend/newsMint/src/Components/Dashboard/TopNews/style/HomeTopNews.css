@@ -1389,3 +1389,138 @@
     padding: 13px 18px;
   }
 }
+
+.dash-top-news__filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+
+  margin: -18px 0 42px;
+
+  padding: 6px;
+
+  overflow-x: auto;
+
+  scrollbar-width: none;
+}
+
+.dash-top-news__filters::-webkit-scrollbar {
+  display: none;
+}
+
+.dash-top-news__filters button {
+  flex: 0 0 auto;
+
+  padding: 10px 17px;
+
+  border: 1px solid var(--news-border);
+
+  border-radius: 999px;
+
+  background: var(--news-surface);
+
+  color: var(--news-text-soft);
+
+  font-family: "Inter", sans-serif;
+
+  font-size: 11px;
+
+  line-height: 1;
+
+  font-weight: 700;
+
+  letter-spacing: 0.02em;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  box-shadow: var(--news-shadow-soft);
+
+  transition:
+    color 0.22s ease,
+    background 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.dash-top-news__filters button:hover {
+  transform: translateY(-2px);
+
+  border-color: var(--news-gold);
+
+  color: var(--news-gold-dark);
+
+  background: #fffefa;
+
+  box-shadow: var(--news-shadow-soft);
+}
+
+.dash-top-news__filters button.active {
+  border-color: var(--news-gold);
+
+  background: var(--news-gold);
+
+  color: #ffffff;
+
+  box-shadow: 0 8px 20px rgba(199, 131, 24, 0.16);
+}
+
+.dash-top-news__filters button.active:hover {
+  transform: translateY(-2px);
+
+  background: var(--news-gold-dark);
+
+  border-color: var(--news-gold-dark);
+
+  color: #ffffff;
+}
+
+.dash-top-news__filters button:focus-visible {
+  outline: 2px solid var(--news-gold);
+
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   TOP NEWS FILTER — TABLET
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .dash-top-news__filters {
+    margin: -10px 0 34px;
+
+    padding: 4px 2px;
+
+    gap: 8px;
+  }
+
+  .dash-top-news__filters button {
+    padding: 9px 14px;
+
+    font-size: 10px;
+  }
+}
+
+
+/* =========================================================
+   TOP NEWS FILTER — MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .dash-top-news__filters {
+    margin: -4px 0 30px;
+
+    gap: 7px;
+  }
+
+  .dash-top-news__filters button {
+    padding: 9px 13px;
+
+    font-size: 9px;
+  }
+}
