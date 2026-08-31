@@ -1,5 +1,5 @@
 import NewsArticle from "../../../NewsArticle/models/NewsArticle.js";
-
+import { redisClient } from "../../../config/redis.js";
 // ======================================================
 // CONSTANTS
 // ======================================================
@@ -98,7 +98,6 @@ const formatNews = (articles) => {
 // limit    = 10
 //
 // ======================================================
-
 export const getCategoryNews = async (req, res) => {
   try {
     // ==================================================
@@ -115,7 +114,6 @@ export const getCategoryNews = async (req, res) => {
     if (!category) {
       return res.status(400).json({
         success: false,
-
         message: "News category is required.",
       });
     }
@@ -131,21 +129,23 @@ export const getCategoryNews = async (req, res) => {
     const skip = (page - 1) * limit;
 
     // ==================================================
-    // 4. QUERY
+    // 4. REDIS CACHE KEY
     // ==================================================
-    //
-    // IMPORTANT:
-    //
-    // We DON'T lowercase category here.
-    //
-    // If DB contains:
-    //
-    // "India"
-    //
-    // we query:
-    //
-    // category: "India"
-    //
+
+    const cacheKey = `news:category:${category}:${page}:${limit}`;
+
+    // ==================================================
+    // 5. CHECK REDIS CACHE
+    // ==================================================
+
+    const cachedNews = await redisClient.get(cacheKey);
+
+    if (cachedNews) {
+      return res.status(200).json(cachedNews);
+    }
+
+    // ==================================================
+    // 6. QUERY
     // ==================================================
 
     const query = {
@@ -155,15 +155,7 @@ export const getCategoryNews = async (req, res) => {
     };
 
     // ==================================================
-    // 5. FETCH NEWS
-    // ==================================================
-    //
-    // Fetch 11 internally.
-    //
-    // Return maximum 10.
-    //
-    // 11th article is only used for hasMore.
-    //
+    // 7. FETCH NEWS
     // ==================================================
 
     const articles = await NewsArticle.find(query)
@@ -180,7 +172,7 @@ export const getCategoryNews = async (req, res) => {
       .lean();
 
     // ==================================================
-    // 6. HAS MORE
+    // 8. HAS MORE
     // ==================================================
 
     const hasMore = articles.length > limit;
@@ -188,16 +180,16 @@ export const getCategoryNews = async (req, res) => {
     const pageArticles = hasMore ? articles.slice(0, limit) : articles;
 
     // ==================================================
-    // 7. FORMAT
+    // 9. FORMAT
     // ==================================================
 
     const news = formatNews(pageArticles);
 
     // ==================================================
-    // 8. RESPONSE
+    // 10. RESPONSE DATA
     // ==================================================
 
-    return res.status(200).json({
+    const responseData = {
       success: true,
 
       data: {
@@ -215,7 +207,25 @@ export const getCategoryNews = async (req, res) => {
           nextPage: hasMore ? page + 1 : null,
         },
       },
+    };
+
+    // ==================================================
+    // 11. SAVE TO REDIS
+    // ==================================================
+    //
+    // 1800 seconds = 30 minutes
+    //
+    // ==================================================
+
+    await redisClient.set(cacheKey, responseData, {
+      ex: 1800,
     });
+
+    // ==================================================
+    // 12. RESPONSE
+    // ==================================================
+
+    return res.status(200).json(responseData);
   } catch (error) {
     console.error("getCategoryNews error:", error);
 
@@ -226,7 +236,6 @@ export const getCategoryNews = async (req, res) => {
     });
   }
 };
-
 // ======================================================
 // GET TOP NEWS
 // ======================================================
@@ -249,49 +258,42 @@ export const getTopNews = async (req, res) => {
     // ==================================================
 
     const page = parsePage(req.query.page);
-
     const limit = parseLimit(req.query.limit);
 
-    const skip = (page - 1) * limit;
+    // ==================================================
+    // 2. REDIS CACHE KEY
+    // ==================================================
+
+    const cacheKey = `news:top:${page}:${limit}`;
 
     // ==================================================
-    // 2. QUERY
+    // 3. CHECK REDIS
     // ==================================================
-    //
-    // No category filter.
-    //
-    // No user preference filter.
-    //
-    // Only fully AI-processed news.
-    //
-    // Old news is already automatically removed
-    // by your 48-hour database TTL.
-    //
+
+    const cachedData = await redisClient.get(cacheKey);
+
+    if (cachedData) {
+      return res.status(200).json(cachedData);
+    }
+
     // ==================================================
+    // 4. QUERY
+    // ==================================================
+
+    const skip = (page - 1) * limit;
 
     const query = {
       "ai.status": "completed",
     };
 
     // ==================================================
-    // 3. FETCH NEWS
-    // ==================================================
-    //
-    // Fetch 11 internally.
-    //
-    // Return maximum 10.
-    //
-    // 11th article is only used to determine
-    // whether another page exists.
-    //
+    // 5. FETCH NEWS
     // ==================================================
 
     const articles = await NewsArticle.find(query)
       .sort({
         newsDate: -1,
-
         publishedAt: -1,
-
         _id: -1,
       })
       .skip(skip)
@@ -300,25 +302,24 @@ export const getTopNews = async (req, res) => {
       .lean();
 
     // ==================================================
-    // 4. HAS MORE
+    // 6. HAS MORE
     // ==================================================
 
     const hasMore = articles.length > limit;
 
-    // Remove the extra article.
     const pageArticles = hasMore ? articles.slice(0, limit) : articles;
 
     // ==================================================
-    // 5. FORMAT
+    // 7. FORMAT
     // ==================================================
 
     const news = formatNews(pageArticles);
 
     // ==================================================
-    // 6. RESPONSE
+    // 8. RESPONSE DATA
     // ==================================================
 
-    return res.status(200).json({
+    const responseData = {
       success: true,
 
       data: {
@@ -326,21 +327,37 @@ export const getTopNews = async (req, res) => {
 
         pagination: {
           page,
-
           limit,
-
           hasMore,
-
           nextPage: hasMore ? page + 1 : null,
         },
       },
+    };
+
+    // ==================================================
+    // 9. SAVE TO REDIS
+    // ==================================================
+    //
+    // Cache for 30 minutes
+    //
+    // 1800 seconds = 30 minutes
+    //
+    // ==================================================
+
+    await redisClient.set(cacheKey, responseData, {
+      ex: 1800,
     });
+
+    // ==================================================
+    // 10. RESPONSE
+    // ==================================================
+
+    return res.status(200).json(responseData);
   } catch (error) {
     console.error("getTopNews error:", error);
 
     return res.status(500).json({
       success: false,
-
       message: "Unable to load top news right now.",
     });
   }
