@@ -178,7 +178,7 @@ const Register = ({ setPage, setAuthEmail }) => {
 
               <input
                 id="name"
-                name="userName"
+                name="name"
                 type="text"
                 className={`register__input ${
                   errors.name ? "register__input--error" : ""
@@ -303,6 +303,7 @@ const Register = ({ setPage, setAuthEmail }) => {
             type="button"
             className="register__link"
             onClick={() => setPage("login")}
+            disabled={loading}
           >
             Log in
           </a>

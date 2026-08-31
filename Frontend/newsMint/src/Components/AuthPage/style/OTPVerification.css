@@ -1,22 +1,40 @@
 /* ========================================
-   OTPVerification - NewsMint (Light Theme)
+   OTP Verification - NewsMint
+   Premium Editorial Theme
    ======================================== */
 
 .otp-verification {
   min-height: 100vh;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8f9fc;
+
+  padding: 48px 20px;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(184, 117, 9, 0.055),
+      transparent 34%
+    ),
+    #faf9f6;
+
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
-  padding: 40px 20px;
+
+  box-sizing: border-box;
 }
+
+/* ========================================
+   Container
+   ======================================== */
 
 .otp-verification__container {
   width: 100%;
-  max-width: 420px;
+  max-width: 430px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -27,12 +45,19 @@
    ======================================== */
 
 .otp-verification__brand {
+  margin: 0 0 30px;
+
   font-family: Georgia, "Times New Roman", Times, serif;
-  font-size: 32px;
+
+  font-size: 34px;
+  line-height: 1;
+
   font-weight: 700;
-  color: #8b6914;
-  margin: 0 0 32px 0;
-  letter-spacing: -0.01em;
+
+  color: #b87509;
+
+  letter-spacing: -0.03em;
+
   text-align: center;
 }
 
@@ -41,15 +66,47 @@
    ======================================== */
 
 .otp-verification__card {
+  position: relative;
+
   width: 100%;
-  background-color: #eef1ff;
-  border-radius: 16px;
-  padding: 40px 36px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.03);
+
+  padding: 36px 34px;
+
+  background: rgba(255, 255, 255, 0.96);
+
+  border: 1px solid #e7e1d7;
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 20px 50px rgba(39, 34, 26, 0.07),
+    0 3px 12px rgba(39, 34, 26, 0.035);
+
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+}
+
+/* ========================================
+   Small Decorative Accent
+   ======================================== */
+
+.otp-verification__card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 3px;
+
+  background: #b87509;
 }
 
 /* ========================================
@@ -57,31 +114,55 @@
    ======================================== */
 
 .otp-verification__header {
+  width: 100%;
+
   text-align: center;
-  margin-bottom: 28px;
+
+  margin-bottom: 30px;
 }
 
 .otp-verification__title {
+  margin: 0 0 12px;
+
   font-family: Georgia, "Times New Roman", Times, serif;
-  font-size: 36px;
-  font-weight: 700;
-  color: #8b6914;
-  margin: 0 0 16px 0;
+
+  font-size: 32px;
+
   line-height: 1.15;
-  letter-spacing: -0.01em;
+
+  font-weight: 700;
+
+  color: #20252b;
+
+  letter-spacing: -0.025em;
 }
 
 .otp-verification__subtitle {
+  max-width: 330px;
+
+  margin: 0 auto 5px;
+
+  color: #77766f;
+
   font-size: 14px;
-  color: #64748b;
-  margin: 0 0 4px 0;
+
+  line-height: 1.6;
 }
 
 .otp-verification__email {
+  max-width: 100%;
+
+  margin: 0 auto;
+
+  color: #30343a;
+
   font-size: 14px;
-  font-weight: 600;
-  color: #0f172a;
-  margin: 0;
+
+  font-weight: 700;
+
+  line-height: 1.5;
+
+  word-break: break-word;
 }
 
 /* ========================================
@@ -90,52 +171,92 @@
 
 .otp-verification__form {
   width: 100%;
+
   display: flex;
   flex-direction: column;
   align-items: center;
+
   gap: 24px;
 }
 
 /* ========================================
-   OTP Inputs
+   OTP Inputs Wrapper
    ======================================== */
 
 .otp-verification__otp {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
   width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 9px;
 }
+
+/* ========================================
+   OTP Input
+   ======================================== */
 
 .otp-verification__input {
   width: 48px;
   height: 56px;
-  font-size: 22px;
-  font-weight: 600;
-  color: #0f172a;
-  text-align: center;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  outline: none;
-  transition: all 0.2s ease;
+
+  padding: 0;
+
   box-sizing: border-box;
-  caret-color: #8b6914;
+
+  border: 1px solid #ddd7cd;
+
+  border-radius: 11px;
+
+  outline: none;
+
+  background: #fff;
+
+  color: #20252b;
+
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  font-size: 22px;
+
+  font-weight: 700;
+
+  line-height: 1;
+
+  text-align: center;
+
+  caret-color: #b87509;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
-.otp-verification__input::placeholder {
-  color: #cbd5e1;
+.otp-verification__input:hover:not(:disabled) {
+  border-color: #cfc7ba;
 }
 
 .otp-verification__input:focus {
-  border-color: #8b6914;
-  box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.08);
+  border-color: #b87509;
+
+  background: #fffdf9;
+
+  box-shadow: 0 0 0 3px rgba(184, 117, 9, 0.1);
+
+  transform: translateY(-1px);
 }
 
 .otp-verification__input:disabled {
+  background: #f7f5f1;
+
+  color: #999;
+
   cursor: not-allowed;
+
   opacity: 0.65;
-  background-color: #f8fafc;
 }
 
 /* ========================================
@@ -144,32 +265,63 @@
 
 .otp-verification__btn {
   width: 100%;
-  padding: 13px 20px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #ffffff;
-  background-color: #8b6914;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  outline: none;
+
+  min-height: 46px;
+
+  padding: 12px 20px;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+
+  gap: 10px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  outline: none;
+
+  background: #b87509;
+
+  color: #fff;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 6px 16px rgba(184, 117, 9, 0.18);
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .otp-verification__btn:hover:not(:disabled) {
-  background-color: #6b5210;
+  background: #9d6407;
+
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(139, 105, 20, 0.3);
+
+  box-shadow: 0 9px 20px rgba(184, 117, 9, 0.24);
+}
+
+.otp-verification__btn:active:not(:disabled) {
+  transform: translateY(0);
+
+  box-shadow: 0 4px 10px rgba(184, 117, 9, 0.18);
 }
 
 .otp-verification__btn:disabled {
-  cursor: not-allowed;
   opacity: 0.65;
+
+  cursor: not-allowed;
+
+  transform: none;
 }
 
 /* ========================================
@@ -177,64 +329,102 @@
    ======================================== */
 
 .otp-verification__footer {
-  margin-top: 24px;
-  font-size: 14px;
-  color: #64748b;
+  margin: 22px 0 0;
+
+  color: #77766f;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
   text-align: center;
 }
 
+/* ========================================
+   Resend Button
+   ======================================== */
+
 .otp-verification__resend {
-  font-size: 14px;
-  font-weight: 600;
-  color: #8b6914;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: underline;
   padding: 0;
-  transition: color 0.2s ease;
+
+  border: none;
+
+  background: transparent;
+
+  color: #a36a08;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .otp-verification__resend:hover:not(:disabled) {
-  color: #6b5210;
+  color: #7f5206;
+
+  text-decoration: underline;
 }
 
 .otp-verification__resend:disabled {
   cursor: not-allowed;
-  opacity: 0.65;
+
+  opacity: 0.55;
 }
 
 /* ========================================
-   Responsive
+   Loading Spinner Alignment
+   ======================================== */
+
+.otp-verification__btn > span,
+.otp-verification__resend > span {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========================================
+   Responsive - Tablet / Small Desktop
    ======================================== */
 
 @media (max-width: 479px) {
   .otp-verification {
-    padding: 24px 16px;
+    min-height: 100svh;
+
+    padding: 30px 16px;
+  }
+
+  .otp-verification__container {
+    max-width: 100%;
   }
 
   .otp-verification__brand {
-    font-size: 28px;
+    font-size: 30px;
+
     margin-bottom: 24px;
   }
 
   .otp-verification__card {
-    padding: 32px 20px;
-    border-radius: 14px;
+    padding: 30px 20px;
+
+    border-radius: 17px;
+  }
+
+  .otp-verification__header {
+    margin-bottom: 26px;
   }
 
   .otp-verification__title {
-    font-size: 30px;
-  }
-
-  .otp-verification__otp {
-    gap: 6px;
-  }
-
-  .otp-verification__input {
-    width: 42px;
-    height: 50px;
-    font-size: 20px;
+    font-size: 28px;
   }
 
   .otp-verification__subtitle,
@@ -242,13 +432,64 @@
     font-size: 13px;
   }
 
+  .otp-verification__otp {
+    gap: 6px;
+  }
+
+  .otp-verification__input {
+    width: 43px;
+    height: 51px;
+
+    border-radius: 9px;
+
+    font-size: 20px;
+  }
+
+  .otp-verification__form {
+    gap: 22px;
+  }
+
   .otp-verification__btn {
-    padding: 12px 16px;
+    min-height: 45px;
+
     font-size: 14px;
   }
 
   .otp-verification__footer,
   .otp-verification__resend {
     font-size: 13px;
+  }
+}
+
+/* ========================================
+   Very Small Screens
+   ======================================== */
+
+@media (max-width: 360px) {
+  .otp-verification {
+    padding: 24px 12px;
+  }
+
+  .otp-verification__card {
+    padding: 26px 15px;
+  }
+
+  .otp-verification__brand {
+    font-size: 28px;
+  }
+
+  .otp-verification__title {
+    font-size: 26px;
+  }
+
+  .otp-verification__otp {
+    gap: 5px;
+  }
+
+  .otp-verification__input {
+    width: 39px;
+    height: 48px;
+
+    font-size: 19px;
   }
 }

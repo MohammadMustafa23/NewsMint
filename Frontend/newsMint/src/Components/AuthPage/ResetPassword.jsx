@@ -100,10 +100,8 @@ const ResetPassword = ({ setPage, email, clearAuthSession }) => {
           email,
           newPassword: formData.newPassword,
           confirmPassword: formData.confirmPassword,
-        });
-
-      ("Reset Password Response:", data);
-
+        })
+        
       // --------------------------------
       // API Failed
       // --------------------------------
@@ -151,8 +149,7 @@ const ResetPassword = ({ setPage, email, clearAuthSession }) => {
 
       toast.error(message);
 
-      // Backend can return 401/403 when the
-      // 10-minute reset token is expired.
+
       if (error?.response?.status === 401 || error?.response?.status === 403) {
         clearAuthSession();
 
