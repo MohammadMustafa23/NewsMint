@@ -47,16 +47,16 @@ const Register = ({ setPage, setAuthEmail }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    const name = formData.userName.trim();
+    const userName = formData.userName.trim();
     const email = formData.email.trim().toLowerCase();
     const password = formData.password;
     const confirmPassword = formData.confirmPassword;
 
-    // Name
-    if (!name) {
-      newErrors.name = "Name is required.";
-    } else if (name.length < 2) {
-      newErrors.name = "Name must be at least 2 characters.";
+    // User Name
+    if (!userName) {
+      newErrors.userName = "User name is required.";
+    } else if (userName.length < 2) {
+      newErrors.userName = "User name must be at least 2 characters.";
     }
 
     // Email
@@ -170,18 +170,18 @@ const Register = ({ setPage, setAuthEmail }) => {
               </div>
             )}
 
-            {/* Name */}
+            {/* User Name */}
             <div className="register__field">
-              <label htmlFor="name" className="register__label">
-                Name
+              <label htmlFor="userName" className="register__label">
+                User Name
               </label>
 
               <input
-                id="name"
-                name="name"
+                id="userName"
+                name="userName"
                 type="text"
                 className={`register__input ${
-                  errors.name ? "register__input--error" : ""
+                  errors.userName ? "register__input--error" : ""
                 }`}
                 placeholder="Full Name"
                 value={formData.userName}
@@ -190,8 +190,8 @@ const Register = ({ setPage, setAuthEmail }) => {
                 disabled={loading}
               />
 
-              {errors.name && (
-                <span className="register__error">{errors.name}</span>
+              {errors.userName && (
+                <span className="register__error">{errors.userName}</span>
               )}
             </div>
 
