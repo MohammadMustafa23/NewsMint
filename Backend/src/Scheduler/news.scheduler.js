@@ -10,32 +10,85 @@ import NewsArticle from "../NewsArticle/models/NewsArticle.js";
 // ======================================================
 
 export const processNewsFetchScheduler = async () => {
-  console.log("News Fetch scheduler Start ✅");
   const startedAt = new Date();
+  const jobStarted = Date.now();
+
+  console.log(`[NEWS_FETCH] Job started | ${startedAt.toISOString()}`);
+
   try {
+    // --------------------------------------------------
+    // FETCH NEWS
+    // --------------------------------------------------
+
+    console.log("[NEWS_FETCH] Fetching news from sources...");
+
     const newsResult = await fetchAllNews();
-    
+
+    console.log(
+      `[NEWS_FETCH] Fetch completed | ` +
+        `categories=${newsResult.categories || 0} | ` +
+        `candidates=${newsResult.totalCandidates || 0} | ` +
+        `selected=${newsResult.totalSelected || 0} | ` +
+        `saved=${newsResult.totalSaved || 0}`,
+    );
+
+    // --------------------------------------------------
+    // AI PROCESSING
+    // --------------------------------------------------
+
     if (newsResult.totalSaved > 0) {
+      console.log(
+        `[NEWS_FETCH] ${newsResult.totalSaved} new articles saved | Starting AI worker...`,
+      );
+
       try {
+        const aiStartedAt = Date.now();
+
         const result = await startAINewsWorker();
+
+        console.log(
+          `[AI_WORKER] Completed successfully | duration=${Date.now() - aiStartedAt}ms`,
+        );
+
+        if (result) {
+          console.log("[AI_WORKER] Result:", result);
+        }
       } catch (error) {
-        console.error("❌ AI Worker Error:", error.message);
+        console.error(`[AI_WORKER] Failed | message="${error.message}"`, error);
       }
     } else {
+      console.log("[NEWS_FETCH] No new articles saved | AI worker skipped");
     }
 
-    // ==================================================
+    // --------------------------------------------------
     // CLEAN OLD NEWS
-    // ==================================================
+    // --------------------------------------------------
 
-    await cleanupOldNews();
+    console.log("[NEWS_CLEANUP] Starting old news cleanup...");
 
+    const cleanupStartedAt = Date.now();
 
-    // ==================================================
+    const cleanupResult = await cleanupOldNews();
+
+    console.log(
+      `[NEWS_CLEANUP] Completed | duration=${Date.now() - cleanupStartedAt}ms`,
+    );
+
+    if (cleanupResult) {
+      console.log("[NEWS_CLEANUP] Result:", cleanupResult);
+    }
+
+    // --------------------------------------------------
     // COMPLETION
-    // ==================================================
+    // --------------------------------------------------
 
     const completedAt = new Date();
+    const duration = Date.now() - jobStarted;
+
+    console.log(
+      `[NEWS_FETCH] Job completed successfully | duration=${duration}ms | completedAt=${completedAt.toISOString()}`,
+    );
+
     return {
       success: true,
 
@@ -53,7 +106,12 @@ export const processNewsFetchScheduler = async () => {
       completedAt,
     };
   } catch (error) {
-    console.error("❌ Daily News Fetch Error:", error.message);
+    const duration = Date.now() - jobStarted;
+
+    console.error(
+      `[NEWS_FETCH] Job failed | duration=${duration}ms | message="${error.message}"`,
+      error,
+    );
 
     throw error;
   }
@@ -64,6 +122,8 @@ export const processNewsFetchScheduler = async () => {
 // ======================================================
 
 export const processAIRetryScheduler = async () => {
+  const startedAt = Date.now();
+
   try {
     const now = new Date();
 
@@ -99,10 +159,21 @@ export const processAIRetryScheduler = async () => {
     // Retry is ready
     // --------------------------------------------------
 
+    console.log(`[AI_RETRY] Retry ready | articleId=${retryArticle._id}`);
+
     const result = await startAINewsWorker();
+
+    console.log(
+      `[AI_RETRY] Retry worker completed | duration=${Date.now() - startedAt}ms`,
+    );
+
     return result;
   } catch (error) {
-    console.error("❌ AI Retry Scheduler Error:", error.message);
+    console.error(
+      `[AI_RETRY] Scheduler failed | duration=${Date.now() - startedAt}ms | message="${error.message}"`,
+      error,
+    );
+
     throw error;
   }
 };
@@ -112,22 +183,34 @@ export const processAIRetryScheduler = async () => {
 // ======================================================
 
 const startNewsScheduler = () => {
+  console.log("[SCHEDULER] Starting NewsMint schedulers...");
+
   // ====================================================
   // DAILY NEWS FETCH
   // ====================================================
 
-  cron.schedule("36 18 * * *", async () => {
+  // 6:30 PM
+  cron.schedule("0 6,18 * * *", async () => {
+    const triggeredAt = new Date();
+
+    console.log(`[CRON][NEWS_FETCH] Triggered | ${triggeredAt.toISOString()}`);
+
     try {
       await processNewsFetchScheduler();
+
+      console.log("[CRON][NEWS_FETCH] Execution completed");
     } catch (error) {
-      console.error("❌ Daily News Job Failed:", error.message);
+      console.error(
+        `[CRON][NEWS_FETCH] Execution failed | message="${error.message}"`,
+        error,
+      );
     }
   });
 
   // ====================================================
   // AI RETRY CHECK
   //
-  // This is NOT the AI worker.
+  // Runs every minute.
   //
   // It only checks whether a failed batch
   // has reached nextRetryAt.
@@ -135,12 +218,20 @@ const startNewsScheduler = () => {
 
   cron.schedule("* * * * *", async () => {
     try {
-      await processAIRetryScheduler();
+      const result = await processAIRetryScheduler();
+
+      if (result?.started) {
+        console.log("[CRON][AI_RETRY] Retry worker started");
+      }
     } catch (error) {
-      console.error("❌ AI Retry Job Failed:", error.message);
+      console.error(`[CRON][AI_RETRY] Execution failed | message="${error.message}"`,error,
+      );
     }
   });
 
+  console.log("[SCHEDULER] NewsMint schedulers started successfully");
+  console.log("[SCHEDULER] News fetch: Daily at 18:30");
+  console.log("[SCHEDULER] AI retry check: Every minute");
 };
 
 export default startNewsScheduler;

@@ -144,7 +144,7 @@ const fetchSourceForCategory = async (sourceKey, category) => {
   const fetcher = SOURCE_FETCHERS[sourceKey];
 
   if (!fetcher) {
-    console.warn(`⚠️ No fetcher configured for: ${sourceKey}`);
+    console.warn(`[NEWS_SOURCE] No fetcher configured | source=${sourceKey}`);
 
     return [];
   }
@@ -172,6 +172,10 @@ const fetchSourceForCategory = async (sourceKey, category) => {
   });
 
   if (!source) {
+    console.warn(
+      `[NEWS_SOURCE] Active source not found | source=${sourceKey} | category=${category}`,
+    );
+
     return [];
   }
 
@@ -185,7 +189,9 @@ const fetchSourceForCategory = async (sourceKey, category) => {
    */
 
   if (!source.categories?.includes(category)) {
-    console.warn(`⚠️ ${source.name} is not configured for ${category}`);
+    console.warn(
+      `[NEWS_SOURCE] Category not configured | source=${source.name} | category=${category}`,
+    );
 
     return [];
   }
@@ -207,6 +213,12 @@ const fetchSourceForCategory = async (sourceKey, category) => {
      * articles[]
      */
 
+    const startedAt = Date.now();
+
+    console.log(
+      `[NEWS_SOURCE] Fetch started | source=${source.name} | category=${category}`,
+    );
+
     const articles = await fetcher(category, source);
 
     /*
@@ -214,18 +226,28 @@ const fetchSourceForCategory = async (sourceKey, category) => {
      */
 
     if (!Array.isArray(articles)) {
-      console.warn(`⚠️ ${source.name} returned invalid data`);
+      console.warn(
+        `[NEWS_SOURCE] Invalid response | source=${source.name} | category=${category}`,
+      );
 
       return [];
     }
 
+    console.log(
+      `[NEWS_SOURCE] Fetch completed | source=${source.name} | category=${category} | articles=${articles.length} | duration=${Date.now() - startedAt}ms`,
+    );
+
     return articles;
   } catch (error) {
-    console.error(`❌ ${source.name} → ${category}:`, error.message);
+    console.error(
+      `[NEWS_SOURCE] Fetch failed | source=${source.name} | category=${category} | message="${error.message}"`,
+      error,
+    );
 
     return [];
   }
 };
+
 /*
  * ==========================================
  * STORE ONE ARTICLE
@@ -315,33 +337,9 @@ const storeArticle = async (article) => {
   };
 };
 
-/*
- * ==========================================
- * FETCH ONE CATEGORY
- * ==========================================
- *
- * Example:
- *
- * fetchCategoryNews("Technology")
- *
- * Result:
- *
- * GNews       → candidates
- * Guardian    → candidates
- * NewsData    → candidates
- *                    ↓
- *                 merge
- *                    ↓
- *               deduplicate
- *                    ↓
- *                newest first
- *                    ↓
- *                  top 10
- *                    ↓
- *                 MongoDB
- */
-
 export const fetchCategoryNews = async (category) => {
+  const startedAt = Date.now();
+
   /*
    * Validate category.
    */
@@ -356,8 +354,14 @@ export const fetchCategoryNews = async (category) => {
 
   const configuredSources = CATEGORY_SOURCES[category] || [];
 
+  console.log(
+    `[NEWS_CATEGORY] Started | category=${category} | sources=${configuredSources.length}`,
+  );
+
   if (!configuredSources.length) {
-    console.warn(`⚠️ No sources configured for ${category}`);
+    console.warn(
+      `[NEWS_CATEGORY] No sources configured | category=${category}`,
+    );
 
     return {
       success: true,
@@ -375,6 +379,7 @@ export const fetchCategoryNews = async (category) => {
       duplicates: 0,
     };
   }
+
   let candidates = [];
 
   /*
@@ -396,6 +401,10 @@ export const fetchCategoryNews = async (category) => {
 
     await sleep(SOURCE_DELAY);
   }
+
+  console.log(
+    `[NEWS_CATEGORY] Sources completed | category=${category} | candidates=${candidates.length}`,
+  );
 
   /*
    * ==========================================
@@ -419,6 +428,10 @@ export const fetchCategoryNews = async (category) => {
 
   const uniqueArticles = deduplicateArticles(candidates);
 
+  console.log(
+    `[NEWS_CATEGORY] Deduplication completed | category=${category} | candidates=${candidates.length} | unique=${uniqueArticles.length} | removed=${candidates.length - uniqueArticles.length}`,
+  );
+
   /*
    * ==========================================
    * SELECT TOP 10
@@ -426,6 +439,10 @@ export const fetchCategoryNews = async (category) => {
    */
 
   const selectedArticles = uniqueArticles.slice(0, ARTICLES_PER_CATEGORY);
+
+  console.log(
+    `[NEWS_CATEGORY] Articles selected | category=${category} | selected=${selectedArticles.length}`,
+  );
 
   /*
    * ==========================================
@@ -446,6 +463,10 @@ export const fetchCategoryNews = async (category) => {
       duplicates++;
     }
   }
+
+  console.log(
+    `[NEWS_CATEGORY] Completed | category=${category} | candidates=${candidates.length} | unique=${uniqueArticles.length} | selected=${selectedArticles.length} | saved=${saved} | duplicates=${duplicates} | duration=${Date.now() - startedAt}ms`,
+  );
 
   return {
     success: true,
@@ -477,7 +498,11 @@ export const fetchCategoryNews = async (category) => {
  */
 
 export const fetchAllNews = async () => {
+  const startedAt = Date.now();
+
   const results = [];
+
+  console.log(`[NEWS_FETCH] Started | categories=${ALLOWED_CATEGORIES.length}`);
 
   for (const category of ALLOWED_CATEGORIES) {
     try {
@@ -485,7 +510,10 @@ export const fetchAllNews = async () => {
 
       results.push(result);
     } catch (error) {
-      console.error(`❌ Category failed: ${category}`, error.message);
+      console.error(
+        `[NEWS_FETCH] Category failed | category=${category} | message="${error.message}"`,
+        error,
+      );
 
       results.push({
         success: false,
@@ -523,6 +551,15 @@ export const fetchAllNews = async () => {
     (total, result) => total + (result.saved || 0),
     0,
   );
+
+  const failedCategories = results.filter(
+    (result) => result.success === false,
+  ).length;
+
+  console.log(
+    `[NEWS_FETCH] Completed | categories=${results.length} | failed=${failedCategories} | candidates=${totalCandidates} | selected=${totalSelected} | saved=${totalSaved} | duration=${Date.now() - startedAt}ms`,
+  );
+
   return {
     success: true,
 

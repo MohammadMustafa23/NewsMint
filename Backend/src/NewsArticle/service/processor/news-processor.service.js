@@ -7,11 +7,19 @@ const PROCESSING_TIMEOUT = 15 * 60 * 1000;
 const MAX_AI_ATTEMPTS = 3;
 
 export const processNewsBatch = async () => {
+  const startedAt = Date.now();
+
+  console.log("[AI_BATCH] Batch processing started");
+
   try {
     const now = new Date();
     const staleProcessingBefore = new Date(now.getTime() - PROCESSING_TIMEOUT);
 
-    await NewsArticle.updateMany(
+    // ==================================================
+    // RECOVER STALE PROCESSING ARTICLES
+    // ==================================================
+
+    const staleResult = await NewsArticle.updateMany(
       {
         "ai.processed": false,
         "ai.status": "processing",
@@ -26,6 +34,16 @@ export const processNewsBatch = async () => {
         },
       },
     );
+
+    if (staleResult.modifiedCount > 0) {
+      console.warn(
+        `[AI_BATCH] Stale processing articles recovered | count=${staleResult.modifiedCount}`,
+      );
+    }
+
+    // ==================================================
+    // FIND PENDING ARTICLES
+    // ==================================================
 
     const articles = await NewsArticle.find({
       "ai.processed": false,
@@ -83,7 +101,19 @@ export const processNewsBatch = async () => {
       })
       .limit(BATCH_SIZE);
 
+    console.log(
+      `[AI_BATCH] Articles selected | count=${articles.length} | batchSize=${BATCH_SIZE}`,
+    );
+
+    // ==================================================
+    // NOTHING TO PROCESS
+    // ==================================================
+
     if (!articles.length) {
+      console.log(
+        `[AI_BATCH] No pending news found | duration=${Date.now() - startedAt}ms`,
+      );
+
       return {
         success: true,
         requested: 0,
@@ -93,6 +123,10 @@ export const processNewsBatch = async () => {
     }
 
     const articleIds = articles.map((article) => article._id);
+
+    console.log(
+      `[AI_BATCH] Marking articles as processing | count=${articleIds.length}`,
+    );
 
     await NewsArticle.updateMany(
       {
@@ -110,12 +144,29 @@ export const processNewsBatch = async () => {
       },
     );
 
+    // ==================================================
+    // AI SUMMARIZATION
+    // ==================================================
+
     let results;
 
     try {
+      const aiStartedAt = Date.now();
+
+      console.log(
+        `[AI_BATCH] Sending batch to AI | articles=${articles.length}`,
+      );
+
       results = await summarizeNewsBatch(articles);
+
+      console.log(
+        `[AI_BATCH] AI response received | results=${Array.isArray(results) ? results.length : 0} | duration=${Date.now() - aiStartedAt}ms`,
+      );
     } catch (error) {
-      console.error("❌ AI batch failed:", error.message);
+      console.error(
+        `[AI_BATCH] AI batch failed | retryable=${Boolean(error.retryable)} | message="${error.message}"`,
+        error,
+      );
 
       if (error.retryable) {
         const nextRetryAt = new Date(Date.now() + RETRY_DELAY);
@@ -132,6 +183,10 @@ export const processNewsBatch = async () => {
               "ai.nextRetryAt": nextRetryAt,
             },
           },
+        );
+
+        console.warn(
+          `[AI_BATCH] Retry scheduled | articles=${articleIds.length} | nextRetryAt=${nextRetryAt.toISOString()}`,
         );
 
         return {
@@ -157,10 +212,22 @@ export const processNewsBatch = async () => {
         },
       );
 
+      console.error(
+        `[AI_BATCH] Non-retryable AI error | articles=${articleIds.length}`,
+      );
+
       throw error;
     }
 
+    // ==================================================
+    // VALIDATE AI RESULT
+    // ==================================================
+
     if (!Array.isArray(results) || results.length !== articles.length) {
+      console.error(
+        `[AI_BATCH] Invalid AI result count | expected=${articles.length} | received=${results?.length || 0}`,
+      );
+
       await NewsArticle.updateMany(
         {
           _id: {
@@ -190,13 +257,17 @@ export const processNewsBatch = async () => {
 
     let processed = 0;
 
+    // ==================================================
+    // SAVE AI RESULTS
+    // ==================================================
+
     for (const article of articles) {
       const articleId = article._id.toString();
 
       const result = resultMap.get(articleId);
 
       if (!result) {
-        console.error(`⚠️ Missing AI result: ${articleId}`);
+        console.error(`[AI_BATCH] Missing AI result | articleId=${articleId}`);
 
         await NewsArticle.updateOne(
           {
@@ -230,6 +301,13 @@ export const processNewsBatch = async () => {
       processed++;
     }
 
+    // ==================================================
+    // BATCH COMPLETION
+    // ==================================================
+
+    console.log(
+      `[AI_BATCH] Batch completed | requested=${articles.length} | received=${results.length} | processed=${processed} | missing=${articles.length - processed} | duration=${Date.now() - startedAt}ms`,
+    );
 
     return {
       success: true,
@@ -238,20 +316,32 @@ export const processNewsBatch = async () => {
       processed,
     };
   } catch (error) {
-    console.error("❌ News Batch Processing Error:", error.message);
+    console.error(
+      `[AI_BATCH] Processing error | duration=${Date.now() - startedAt}ms | message="${error.message}"`,
+      error,
+    );
 
     throw error;
   }
 };
 
 export const processAllPendingNews = async () => {
+  const startedAt = Date.now();
+
   let totalProcessed = 0;
   let batchNumber = 0;
 
+  console.log("[AI_WORKER] Processing all pending news started");
+
   while (true) {
+    console.log(`[AI_WORKER] Starting batch | batch=${batchNumber + 1}`);
+
     const result = await processNewsBatch();
 
     if (result.retryable && result.nextRetryAt) {
+      console.warn(
+        `[AI_WORKER] Processing paused for retry | batches=${batchNumber} | processed=${totalProcessed} | nextRetryAt=${result.nextRetryAt.toISOString()} | duration=${Date.now() - startedAt}ms`,
+      );
 
       return {
         success: false,
@@ -264,17 +354,34 @@ export const processAllPendingNews = async () => {
     }
 
     if (!result.success) {
+      console.error(
+        `[AI_WORKER] Batch processing failed | batch=${batchNumber + 1} | message="${result.message || "AI batch processing failed"}"`,
+      );
+
       throw new Error(result.message || "AI batch processing failed");
     }
 
     if (!result.processed) {
+      console.log(
+        `[AI_WORKER] No more pending articles | batches=${batchNumber} | processed=${totalProcessed}`,
+      );
+
       break;
     }
 
     batchNumber++;
 
     totalProcessed += result.processed;
+
+    console.log(
+      `[AI_WORKER] Batch completed | batch=${batchNumber} | processed=${result.processed} | totalProcessed=${totalProcessed}`,
+    );
   }
+
+  console.log(
+    `[AI_WORKER] Processing completed successfully | batches=${batchNumber} | processed=${totalProcessed} | duration=${Date.now() - startedAt}ms`,
+  );
+
   return {
     success: true,
     processed: totalProcessed,
