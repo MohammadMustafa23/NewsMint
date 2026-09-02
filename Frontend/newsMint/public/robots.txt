@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://news-mint.vercel.app/sitemap.xml
