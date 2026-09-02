@@ -2,7 +2,7 @@ import React, { lazy, Suspense } from "react";
 import "./App.css";
 
 import ProtectedRoute from "./security/ProtectedRoute";
-
+import AuthRedirectRoute from "./security/AuthRedirectRoute";
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 
@@ -97,7 +97,14 @@ function App() {
 
           <Route path="/" element={<LandingPage />} />
 
-          <Route path="/authentication-page" element={<AuthPages />} />
+          <Route
+            path="/authentication-page"
+            element={
+              <AuthRedirectRoute>
+                <AuthPages />
+              </AuthRedirectRoute>
+            }
+          />
 
           {/* =================================================
               USER SETUP
