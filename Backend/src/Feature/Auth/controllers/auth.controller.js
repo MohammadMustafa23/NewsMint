@@ -58,21 +58,30 @@ const LoginUser = async (req, res) => {
     const { email, password } = req.body;
 
     // Find User
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      email: email.trim().toLowerCase(),
+    });
+
+    console.log("USER FOUND:", !!user);
 
     if (!user) {
+      console.log("❌ USER NOT FOUND:", email);
       return res.status(401).json({
         success: false,
         message: "Invalid email or password",
       });
     }
 
-    // 2. Hash Password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    // Password Check
-    const isMatch = await bcrypt.compare(hashedPassword, user.password);
+    console.log("Stored password:", user.password);
+    console.log("Password length:", user.password?.length);
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    console.log("Password match:", isMatch);
 
     if (!isMatch) {
+      console.log("❌ PASSWORD DOES NOT MATCH");
+
       return res.status(401).json({
         success: false,
         message: "Invalid email or password",
@@ -104,7 +113,6 @@ const LoginUser = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
