@@ -67,8 +67,10 @@ const LoginUser = async (req, res) => {
       });
     }
 
+    // 2. Hash Password
+    const hashedPassword = await bcrypt.hash(password, 10);
     // Password Check
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(hashedPassword, user.password);
 
     if (!isMatch) {
       return res.status(401).json({
@@ -202,7 +204,6 @@ async function ForgotPassword(req, res) {
       success: true,
       message: "If an account exists, a password reset OTP has been sent.",
     });
-    
   } catch (error) {
     console.log(error);
 
