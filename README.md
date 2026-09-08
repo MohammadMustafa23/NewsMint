@@ -226,9 +226,5 @@ Protected route guards keep unauthenticated users out of the dashboard and guide
 
 NewsMint is actively under development. Before production deployment, the project should add a complete automated backend test suite, formal API documentation, stronger centralized error handling and observability, production-ready webhook configuration, and deployment-specific scheduler configuration. The current backend package still contains a placeholder `npm test` script, so tests should be run from the individual test files or wired into a proper test runner.
 
-## Recruiter Summary
-
-NewsMint is a full-stack portfolio project focused on building a reliable personalized content pipeline. It combines a React dashboard with an Express/MongoDB API, secure multi-step authentication, multiple external news integrations, AI summarization, Redis-backed Telegram account linking, and scheduled delivery. The strongest engineering challenge is coordinating unreliable external services and asynchronous processing while keeping the user experience personalized, deduplicated, language-aware, and time-zone aware.
-
 
 
