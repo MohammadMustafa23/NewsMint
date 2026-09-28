@@ -20,38 +20,6 @@ Get the news that matters to you — summarized, personalized, and delivered whe
 
 </div>
 
----
-
-<details>
-<summary>📋 <strong>Table of Contents</strong> (click to expand/collapse)</summary>
-
-* [📖 About the Project](#-about-the-project)
-* [❗ Problem Statement](#-problem-statement)
-* [💡 Solution](#-solution)
-* [✨ Key Features](#-key-features)
-* [⚙ How It Works](#-how-it-works)
-* [🏗 System Architecture](#-system-architecture)
-* [🤖 AI News Processing Workflow](#-ai-news-processing-workflow)
-* [🔐 Authentication Flow](#-authentication-flow)
-* [📱 Telegram Integration](#-telegram-integration)
-* [🗄 Database Design](#-database-design)
-* [⚡ Performance Optimizations](#-performance-optimizations)
-* [📂 Project Structure](#-project-structure)
-* [⚙ Installation Guide](#-installation-guide)
-* [🔑 Environment Variables](#-environment-variables)
-* [🌐 API Overview](#-api-overview)
-* [🔒 Security](#-security)
-* [🚀 Deployment](#-deployment)
-* [📈 Future Improvements](#-future-improvements)
-* [📚 Challenges & Learnings](#-challenges--learnings)
-* [👨‍💻 Developer](#-developer)
-* [📄 License](#-license)
-* [⭐ Support](#-support)
-
-</details>
-
----
-
 ## 📖 About the Project
 
 **NewsMint** is a full-stack AI-powered news aggregation and personalization platform that collects articles from multiple news providers and RSS feeds, processes them using Google Gemini, and delivers a personalized news experience through a web dashboard and Telegram.
@@ -62,25 +30,44 @@ Instead of forcing users to manually search through different news platforms, Ne
 
 ## ❗ Problem Statement
 
-* News is distributed across **multiple APIs, RSS feeds, and different providers**, making discovery fragmented.
-* Users often receive **more information than they actually need**, making it difficult to quickly understand important stories.
-* The same story can appear through **multiple providers**, creating duplicate content.
-* Users have different preferences for **topics, sources, language, delivery time, and timezone**.
-* Reading every article manually takes time, while raw article feeds often lack concise summaries and key points.
-* Scheduled news delivery becomes more complex when users are located in **different timezones**.
+* People often want to **read the latest news**, but finding the news they actually care about can take unnecessary effort.
+* Searching for news **category by category** is inconvenient when a user regularly follows specific topics.
+* Normal news websites and apps provide a large amount of content, but users may not want to repeatedly open different platforms and **search for the stories that interest them**.
+* A user may be free to read news at a particular time, but the news they want is not automatically waiting for them in one place.
+* Users may prefer receiving news directly through platforms they already use, such as **Telegram**, instead of opening a separate news application every time.
+* After reading a summary, users may still want to read the **original article**, but switching between platforms and finding the original source adds another step.
 
 ## 💡 Solution
 
-NewsMint brings the complete process into one personalized system:
+NewsMint changes the experience from **"search for news when you need it"** to **"receive your personalized news when you are ready to read it."**
 
-1. User creates an account and completes authentication.
-2. User selects preferred categories, sources, language, delivery time, and timezone.
-3. NewsMint fetches articles from configured **News APIs and RSS feeds**.
-4. Articles are normalized and checked for duplicates before being stored.
-5. New articles are processed using **Google Gemini** to generate summaries and key points.
-6. The web application displays a personalized feed based on the user's preferences.
-7. Users can connect Telegram with the NewsMint bot.
-8. The scheduler automatically sends recent matching news through Telegram at the user's configured delivery time.
+1. User selects the **categories and news sources** they are interested in.
+2. User selects their preferred **language, delivery time, and timezone**.
+3. NewsMint collects relevant articles from configured news APIs and RSS feeds.
+4. The system removes duplicate stories and processes new articles using **Google Gemini** to generate concise summaries and key points.
+5. At the user's selected delivery time, NewsMint prepares a personalized digest containing the news that matches their preferences.
+6. The digest is delivered directly to the user's **Telegram**, so the user can simply open Telegram and start reading instead of searching across other platforms.
+7. Each news item can lead the user to the **original article**, allowing them to read the complete story from the actual source.
+8. Users can also read their personalized news directly through the **NewsMint web application**.
+9. **WhatsApp delivery is planned as a future feature**, depending on the availability of the required WhatsApp API access.
+
+```text
+Choose Interests
+      ↓
+NewsMint Collects Relevant News
+      ↓
+Remove Duplicates
+      ↓
+Gemini Summarizes News
+      ↓
+User's Selected Delivery Time
+      ↓
+Personalized Digest
+      ↓
+Telegram
+      ↓
+Read News → Open Original Article
+```
 
 ## ✨ Key Features
 
