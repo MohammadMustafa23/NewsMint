@@ -1,10 +1,10 @@
 import transporter from "../../../config/mail.js";
-import { SMTP_USER } from "../../../config/env.js";
+import { SMTP_USER,SMTP_FROM } from "../../../config/env.js";
 
 const sendOTPEmail = async (email, otp) => {
   try {
     await transporter.sendMail({
-      from: `"NewsMint" <${SMTP_USER}>`,
+      from: `"NewsMint" <${SMTP_FROM}>`,
       to: email,
       subject: "Your NewsMint Verification Code",
 
