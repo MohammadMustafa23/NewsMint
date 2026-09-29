@@ -1,160 +1,572 @@
-/* ============================================ */
-/* DashSourcesPage — Layout & Responsive       */
-/* ============================================ */
+/* =========================================================
+   NEWSMINT — SOURCES PAGE
+   Premium Editorial / AI News Dashboard
+   ========================================================= */
 
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap");
 
-/* ============================================ */
-/* Root Page                                    */
-/* ============================================ */
+/* =========================================================
+   DESIGN TOKENS
+   ========================================================= */
+
+:root {
+  --sources-bg: #faf9f6;
+  --sources-bg-2: #f5f1e8;
+  --sources-white: #ffffff;
+
+  --sources-text: #171512;
+  --sources-text-secondary: #68625a;
+  --sources-text-muted: #999188;
+
+  --sources-gold: #c48727;
+  --sources-gold-dark: #8f5c15;
+  --sources-gold-deep: #74480d;
+
+  --sources-gold-soft: #fbf0dc;
+  --sources-gold-pale: #fffaf1;
+
+  --sources-green: #3d8061;
+  --sources-green-soft: #eef8f1;
+
+  --sources-red: #a24e46;
+  --sources-red-soft: #fff3f1;
+
+  --sources-border: rgba(42, 32, 20, 0.08);
+  --sources-border-light: rgba(42, 32, 20, 0.055);
+
+  --sources-shadow: 0 12px 35px rgba(54, 41, 22, 0.055);
+
+  --sources-shadow-hover: 0 18px 44px rgba(54, 41, 22, 0.09);
+
+  --sources-radius-xl: 22px;
+  --sources-radius-lg: 18px;
+  --sources-radius-md: 14px;
+  --sources-radius-sm: 11px;
+
+  --sources-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+.dash-sources-page,
+.dash-sources-page * {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   ROOT PAGE
+   ========================================================= */
 
 .dash-sources-page {
+  position: relative;
+
   width: 100%;
   min-height: 100vh;
 
-  padding: 40px 32px;
+  overflow: hidden;
 
-  box-sizing: border-box;
+  padding: 42px 30px 70px;
 
-  background: #faf8f4;
+  background: linear-gradient(180deg, #fcfbf8 0%, #faf8f4 48%, #f5f1e9 100%);
+
+  color: var(--sources-text);
 
   font-family:
-    "Inter",
+    "DM Sans",
+    Inter,
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
-    Roboto,
     sans-serif;
-
-  color: #1e293b;
 }
 
-.dash-sources-page *,
-.dash-sources-page *::before,
-.dash-sources-page *::after {
-  box-sizing: border-box;
+/* =========================================================
+   AMBIENT PAGE LIGHT
+   ========================================================= */
+
+.dash-sources-page::before {
+  content: "";
+
+  position: absolute;
+
+  width: 520px;
+  height: 330px;
+
+  top: -150px;
+  left: 12%;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(203, 155, 77, 0.12) 0%,
+    rgba(203, 155, 77, 0.05) 35%,
+    transparent 72%
+  );
+
+  filter: blur(20px);
+
+  pointer-events: none;
 }
 
-/* ============================================ */
-/* Main Container                               */
-/* ============================================ */
+.dash-sources-page::after {
+  content: "";
+
+  position: absolute;
+
+  width: 420px;
+  height: 300px;
+
+  right: -160px;
+  top: 260px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(211, 178, 125, 0.085) 0%,
+    transparent 70%
+  );
+
+  filter: blur(24px);
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
 
 .dash-sources-page__container {
-  width: 100%;
-  max-width: 1400px;
+  position: relative;
+  z-index: 1;
+
+  width: min(100%, 1420px);
 
   margin: 0 auto;
-
-  position: relative;
 }
 
-/* ============================================ */
-/* Loading                                      */
-/* ============================================ */
+/* =========================================================
+   OPTIONAL PAGE INTRO SUPPORT
+   Works when JSX contains these classes.
+   ========================================================= */
+
+.dash-sources-page__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 30px;
+
+  margin-bottom: 25px;
+
+  animation: sourcesFadeUp 520ms var(--sources-ease) both;
+}
+
+.dash-sources-page__header-copy {
+  max-width: 760px;
+}
+
+.dash-sources-page__eyebrow {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 12px;
+
+  padding: 7px 10px;
+
+  border: 1px solid rgba(196, 135, 39, 0.12);
+
+  border-radius: 999px;
+
+  background: rgba(255, 250, 240, 0.8);
+
+  color: var(--sources-gold-dark);
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.9px;
+
+  text-transform: uppercase;
+}
+
+.dash-sources-page__eyebrow::before {
+  content: "";
+
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: var(--sources-gold);
+
+  box-shadow: 0 0 0 4px rgba(196, 135, 39, 0.09);
+}
+
+.dash-sources-page__title {
+  margin: 0;
+
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+
+  font-size: clamp(34px, 4vw, 52px);
+
+  line-height: 1.04;
+
+  letter-spacing: -1.3px;
+
+  font-weight: 700;
+
+  color: var(--sources-text);
+}
+
+.dash-sources-page__subtitle {
+  max-width: 660px;
+
+  margin: 12px 0 0;
+
+  color: var(--sources-text-secondary);
+
+  font-size: 13px;
+
+  line-height: 1.7;
+}
+
+/* =========================================================
+   GENERIC ANIMATION
+   ========================================================= */
+
+@keyframes sourcesFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(13px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   LOADING
+   ========================================================= */
 
 .dash-sources-page__container--loading {
-  min-height: 60vh;
+  min-height: 68vh;
 
   display: flex;
+
   flex-direction: column;
 
   align-items: center;
+
   justify-content: center;
 
   gap: 14px;
 
   text-align: center;
+
+  animation: sourcesFadeUp 450ms var(--sources-ease) both;
+}
+
+.dash-sources-page__container--loading::before {
+  content: "";
+
+  position: absolute;
+
+  width: 130px;
+  height: 130px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(196, 135, 39, 0.11),
+    transparent 70%
+  );
+
+  filter: blur(10px);
+
+  animation: sourcesLoadingGlow 2s ease-in-out infinite;
+}
+
+@keyframes sourcesLoadingGlow {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
 }
 
 .dash-sources-page__container--loading p {
-  margin: 0;
+  position: relative;
+  z-index: 2;
 
-  color: #8d89a5;
+  margin: 2px 0 0;
 
-  font-size: 13px;
-  font-weight: 500;
+  color: var(--sources-text-muted);
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.05px;
 }
 
-/* ============================================ */
-/* Error Message                                */
-/* ============================================ */
+/* =========================================================
+   ERROR MESSAGE
+   ========================================================= */
 
 .dash-sources-page__error {
+  position: relative;
+
   width: 100%;
 
   margin: 18px 0 20px;
-  padding: 12px 16px;
+
+  padding: 13px 15px;
 
   display: flex;
   align-items: center;
 
-  border: 1px solid #f1c7c7;
-  border-radius: 10px;
+  gap: 10px;
 
-  background: #fff5f5;
+  border: 1px solid rgba(162, 78, 70, 0.12);
 
-  color: #b42318;
+  border-radius: var(--sources-radius-md);
 
-  font-size: 13px;
-  font-weight: 500;
+  background: rgba(255, 245, 243, 0.88);
 
-  line-height: 1.5;
-}
+  color: var(--sources-red);
 
-/* ============================================ */
-/* Success Message                              */
-/* ============================================ */
+  font-size: 12px;
 
-.dash-sources-page__success {
-  width: 100%;
-
-  margin: 18px 0 20px;
-  padding: 12px 16px;
-
-  display: flex;
-  align-items: center;
-
-  border: 1px solid #b7e2c2;
-  border-radius: 10px;
-
-  background: #f1fbf4;
-
-  color: #18733b;
-
-  font-size: 13px;
   font-weight: 600;
 
   line-height: 1.5;
+
+  box-shadow: 0 4px 16px rgba(78, 42, 36, 0.035);
+
+  animation: sourcesMessageIn 320ms var(--sources-ease) both;
 }
 
-/* ============================================ */
-/* Save Bar                                     */
-/* ============================================ */
+.dash-sources-page__error::before {
+  content: "!";
 
-.dash-sources-page__save-bar {
-  width: 100%;
+  width: 26px;
+  height: 26px;
 
-  margin-top: 28px;
-  padding: 14px 16px;
+  flex: 0 0 26px;
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 
-  gap: 20px;
+  border-radius: 8px;
 
-  border: 1px solid #e7e1d7;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.65);
 
-  background: #ffffff;
+  font-size: 12px;
 
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  font-weight: 800;
 }
 
-/* ============================================ */
-/* Save Information                             */
-/* ============================================ */
+.dash-sources-page__error::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 15px;
+  right: 15px;
+
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(162, 78, 70, 0.2),
+    transparent
+  );
+}
+
+/* =========================================================
+   SUCCESS MESSAGE
+   ========================================================= */
+
+.dash-sources-page__success {
+  position: relative;
+
+  width: 100%;
+
+  margin: 18px 0 20px;
+
+  padding: 13px 15px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  border: 1px solid rgba(61, 128, 97, 0.12);
+
+  border-radius: var(--sources-radius-md);
+
+  background: rgba(240, 249, 243, 0.9);
+
+  color: var(--sources-green);
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  line-height: 1.5;
+
+  box-shadow: 0 4px 16px rgba(42, 76, 57, 0.035);
+
+  animation: sourcesMessageIn 320ms var(--sources-ease) both;
+}
+
+.dash-sources-page__success::before {
+  content: "✓";
+
+  width: 26px;
+  height: 26px;
+
+  flex: 0 0 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.72);
+
+  font-size: 12px;
+
+  font-weight: 900;
+}
+
+.dash-sources-page__success::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 15px;
+  right: 15px;
+
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(61, 128, 97, 0.18),
+    transparent
+  );
+}
+
+@keyframes sourcesMessageIn {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   SAVE BAR
+   ========================================================= */
+
+.dash-sources-page__save-bar {
+  position: sticky;
+
+  bottom: 18px;
+
+  z-index: 30;
+
+  width: 100%;
+
+  margin-top: 30px;
+
+  padding: 12px 13px 12px 15px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 22px;
+
+  border: 1px solid rgba(56, 44, 27, 0.09);
+
+  border-radius: 17px;
+
+  background: rgba(255, 253, 249, 0.87);
+
+  box-shadow:
+    0 15px 40px rgba(43, 33, 20, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  animation: sourcesSaveBarIn 560ms 160ms var(--sources-ease) both;
+}
+
+@keyframes sourcesSaveBarIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gold top edge */
+.dash-sources-page__save-bar::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 18px;
+  right: 18px;
+
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(196, 135, 39, 0.32),
+    transparent
+  );
+}
+
+/* =========================================================
+   SAVE INFORMATION
+   ========================================================= */
 
 .dash-sources-page__save-info {
   min-width: 0;
@@ -162,30 +574,32 @@
   display: flex;
   flex-direction: column;
 
-  gap: 3px;
+  gap: 4px;
 }
 
 .dash-sources-page__save-info strong {
-  color: #1e293b;
+  color: var(--sources-text);
 
-  font-size: 13px;
+  font-size: 12px;
+
   font-weight: 700;
 
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
 .dash-sources-page__save-info span {
-  color: #8d89a5;
+  color: var(--sources-text-muted);
 
-  font-size: 11px;
+  font-size: 10.5px;
+
   font-weight: 500;
 
   line-height: 1.4;
 }
 
-/* ============================================ */
-/* Save Actions                                 */
-/* ============================================ */
+/* =========================================================
+   SAVE ACTIONS
+   ========================================================= */
 
 .dash-sources-page__save-actions {
   flex-shrink: 0;
@@ -193,101 +607,168 @@
   display: flex;
   align-items: center;
 
-  gap: 8px;
+  gap: 7px;
 }
 
-/* ============================================ */
-/* Cancel Button                                */
-/* ============================================ */
+/* =========================================================
+   BUTTON BASE
+   ========================================================= */
 
 .dash-sources-page__cancel-button,
 .dash-sources-page__save-button {
-  min-height: 40px;
+  min-height: 41px;
 
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
 
-  border-radius: 9px;
+  border-radius: 10px;
 
   font-family: inherit;
 
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+
+  font-weight: 700;
 
   line-height: 1;
 
   cursor: pointer;
 
   transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease,
-    color 0.15s ease,
-    opacity 0.15s ease;
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms var(--sources-ease),
+    opacity 180ms ease;
 }
 
-/* ============================================ */
-/* Cancel                                       */
-/* ============================================ */
+.dash-sources-page__cancel-button:focus-visible,
+.dash-sources-page__save-button:focus-visible {
+  outline: 3px solid rgba(196, 135, 39, 0.14);
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   CANCEL
+   ========================================================= */
 
 .dash-sources-page__cancel-button {
   padding: 0 15px;
 
-  border: 1px solid #ddd8cf;
+  border: 1px solid rgba(50, 39, 27, 0.11);
 
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.78);
 
-  color: #64748b;
+  color: var(--sources-text-secondary);
+
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 .dash-sources-page__cancel-button:hover:not(:disabled) {
-  border-color: #cfc8bd;
+  color: var(--sources-text);
 
-  background: #faf9f7;
+  background: #ffffff;
 
-  color: #334155;
+  border-color: rgba(50, 39, 27, 0.16);
+
+  box-shadow: 0 5px 14px rgba(43, 33, 21, 0.05);
+
+  transform: translateY(-1px);
 }
 
-/* ============================================ */
-/* Save                                         */
-/* ============================================ */
+.dash-sources-page__cancel-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   SAVE
+   ========================================================= */
 
 .dash-sources-page__save-button {
-  min-width: 112px;
+  position: relative;
 
-  padding: 0 17px;
+  min-width: 116px;
 
-  border: 1px solid #d18b12;
+  padding: 0 18px;
 
-  background: #d8911d;
+  overflow: hidden;
+
+  border: 1px solid #c27d16;
+
+  background: linear-gradient(135deg, #d99a3d 0%, #c7831e 52%, #ae6b12 100%);
 
   color: #ffffff;
 
-  box-shadow: 0 3px 8px rgba(216, 145, 29, 0.18);
+  box-shadow:
+    0 6px 15px rgba(179, 115, 22, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.23);
+}
+
+.dash-sources-page__save-button::before {
+  content: "";
+
+  position: absolute;
+
+  top: -90%;
+  left: -30%;
+
+  width: 45%;
+  height: 280%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+
+  transform: rotate(20deg) translateX(-90px);
+
+  transition: transform 500ms ease;
 }
 
 .dash-sources-page__save-button:hover:not(:disabled) {
-  background: #c98212;
+  background: linear-gradient(135deg, #dda04a 0%, #ca8620 52%, #b06f15 100%);
 
-  border-color: #c98212;
+  border-color: #bd7715;
+
+  box-shadow:
+    0 9px 20px rgba(179, 115, 22, 0.23),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+  transform: translateY(-1px);
 }
 
-/* ============================================ */
-/* Disabled Buttons                             */
-/* ============================================ */
+.dash-sources-page__save-button:hover:not(:disabled)::before {
+  transform: rotate(20deg) translateX(260px);
+}
+
+.dash-sources-page__save-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   DISABLED
+   ========================================================= */
 
 .dash-sources-page__cancel-button:disabled,
 .dash-sources-page__save-button:disabled {
-  opacity: 0.55;
+  opacity: 0.56;
 
   cursor: not-allowed;
+
+  transform: none;
 
   box-shadow: none;
 }
 
-/* ============================================ */
-/* Save Button Spinner                          */
-/* ============================================ */
+/* =========================================================
+   BUTTON SPINNER
+   ========================================================= */
 
 .dash-sources-page__button-spinner {
   width: 14px;
@@ -295,12 +776,15 @@
 
   margin-right: 7px;
 
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.38);
+
   border-top-color: #ffffff;
+
+  border-right-color: rgba(255, 255, 255, 0.85);
 
   border-radius: 50%;
 
-  animation: dash-sources-spin 0.7s linear infinite;
+  animation: dash-sources-spin 0.68s linear infinite;
 }
 
 @keyframes dash-sources-spin {
@@ -309,37 +793,177 @@
   }
 }
 
-/* ============================================ */
-/* Tablet                                       */
-/* ============================================ */
+/* =========================================================
+   OPTIONAL SOURCE GRID SUPPORT
+   If your source cards use common naming, this gives them
+   the same visual system.
+   ========================================================= */
 
-@media (max-width: 1024px) {
+.dash-sources-page__content {
+  animation: sourcesFadeUp 600ms 80ms var(--sources-ease) both;
+}
+
+.dash-sources-page__grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 16px;
+}
+
+.dash-sources-page__card {
+  position: relative;
+
+  padding: 18px;
+
+  overflow: hidden;
+
+  border: 1px solid var(--sources-border);
+
+  border-radius: var(--sources-radius-lg);
+
+  background: rgba(255, 255, 255, 0.78);
+
+  box-shadow: var(--sources-shadow);
+
+  transition:
+    transform 220ms var(--sources-ease),
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.dash-sources-page__card::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 2px;
+  height: 100%;
+
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(196, 135, 39, 0.42),
+    transparent
+  );
+
+  opacity: 0;
+
+  transition: opacity 220ms ease;
+}
+
+.dash-sources-page__card:hover {
+  transform: translateY(-3px);
+
+  border-color: rgba(196, 135, 39, 0.12);
+
+  box-shadow: var(--sources-shadow-hover);
+}
+
+.dash-sources-page__card:hover::before {
+  opacity: 1;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
   .dash-sources-page {
-    padding: 34px 24px;
+    padding: 36px 24px 60px;
+  }
+
+  .dash-sources-page__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .dash-sources-page__save-bar {
-    margin-top: 24px;
+    bottom: 14px;
   }
 }
 
-/* ============================================ */
-/* Mobile                                       */
-/* ============================================ */
+/* =========================================================
+   SMALL TABLET
+   ========================================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 850px) {
   .dash-sources-page {
-    padding: 32px 20px;
+    padding: 32px 21px 55px;
   }
 
-  .dash-sources-page__save-bar {
-    padding: 14px;
+  .dash-sources-page__header {
+    flex-direction: column;
 
     align-items: flex-start;
 
+    gap: 17px;
+  }
+
+  .dash-sources-page__title {
+    font-size: 39px;
+  }
+
+  .dash-sources-page__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-sources-page__save-bar {
+    position: relative;
+
+    bottom: auto;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .dash-sources-page {
+    min-height: 100vh;
+
+    padding: 28px 18px 35px;
+  }
+
+  .dash-sources-page__title {
+    font-size: 35px;
+
+    letter-spacing: -0.9px;
+  }
+
+  .dash-sources-page__subtitle {
+    font-size: 12px;
+
+    line-height: 1.65;
+  }
+
+  .dash-sources-page__error,
+  .dash-sources-page__success {
+    margin-top: 15px;
+    margin-bottom: 16px;
+
+    padding: 11px 12px;
+
+    border-radius: 11px;
+
+    font-size: 11.5px;
+  }
+
+  .dash-sources-page__save-bar {
+    margin-top: 23px;
+
+    padding: 13px;
+
     flex-direction: column;
 
-    gap: 14px;
+    align-items: stretch;
+
+    gap: 13px;
+
+    border-radius: 15px;
   }
 
   .dash-sources-page__save-info {
@@ -359,38 +983,44 @@
   .dash-sources-page__cancel-button,
   .dash-sources-page__save-button {
     width: 100%;
-  }
 
-  .dash-sources-page__error,
-  .dash-sources-page__success {
-    margin-top: 14px;
-    margin-bottom: 16px;
-
-    padding: 11px 13px;
-
-    font-size: 12px;
+    min-height: 43px;
   }
 }
 
-/* ============================================ */
-/* Small Mobile                                */
-/* ============================================ */
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
 
 @media (max-width: 480px) {
   .dash-sources-page {
-    padding: 24px 16px;
+    padding: 24px 14px 28px;
+  }
+
+  .dash-sources-page__title {
+    font-size: 31px;
+
+    letter-spacing: -0.75px;
+  }
+
+  .dash-sources-page__eyebrow {
+    font-size: 8px;
+
+    padding: 6px 9px;
+  }
+
+  .dash-sources-page__subtitle {
+    font-size: 11.5px;
   }
 
   .dash-sources-page__save-bar {
-    margin-top: 20px;
+    padding: 11px;
 
-    padding: 12px;
-
-    border-radius: 10px;
+    border-radius: 13px;
   }
 
   .dash-sources-page__save-info strong {
-    font-size: 12px;
+    font-size: 11.5px;
   }
 
   .dash-sources-page__save-info span {
@@ -401,26 +1031,28 @@
   .dash-sources-page__save-button {
     min-height: 42px;
 
-    font-size: 11px;
+    font-size: 10.5px;
   }
 
   .dash-sources-page__error,
   .dash-sources-page__success {
-    padding: 10px 12px;
-
-    border-radius: 9px;
+    padding: 10px 11px;
 
     font-size: 11px;
   }
 }
 
-/* ============================================ */
-/* Extra Small Mobile                           */
-/* ============================================ */
+/* =========================================================
+   EXTRA SMALL
+   ========================================================= */
 
 @media (max-width: 360px) {
   .dash-sources-page {
-    padding: 20px 12px;
+    padding: 20px 11px 26px;
+  }
+
+  .dash-sources-page__title {
+    font-size: 28px;
   }
 
   .dash-sources-page__save-actions {
@@ -432,17 +1064,22 @@
   }
 }
 
-/* ============================================ */
-/* Reduced Motion                               */
-/* ============================================ */
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .dash-sources-page__button-spinner {
-    animation: none;
+  .dash-sources-page *,
+  .dash-sources-page *::before,
+  .dash-sources-page *::after {
+    animation-duration: 0.01ms !important;
+
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
   }
 
-  .dash-sources-page__cancel-button,
-  .dash-sources-page__save-button {
-    transition: none;
+  .dash-sources-page__button-spinner {
+    animation: none;
   }
 }

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "./style/DashNav.css";
 import { NavLink, useNavigate } from "react-router-dom";
-
 import ConfirmModal from "../../../common/ConfirmModal";
 import { logOutUser } from "../../../services/auth.service";
 
@@ -9,62 +8,72 @@ const NAV_LINKS = [
   {
     id: "digest",
     label: "Digest",
+    mobileDescription: "Your personalized news digest",
     path: "/home-page",
     icon: (
       <svg
-        width="14"
-        height="14"
+        width="18"
+        height="18"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.9"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
       >
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+        <rect x="3" y="4" width="18" height="18" rx="2.5" />
         <line x1="16" y1="2" x2="16" y2="6" />
         <line x1="8" y1="2" x2="8" y2="6" />
         <line x1="3" y1="10" x2="21" y2="10" />
+        <line x1="8" y1="14" x2="10" y2="14" />
+        <line x1="14" y1="14" x2="16" y2="14" />
+        <line x1="8" y1="18" x2="10" y2="18" />
+        <line x1="14" y1="18" x2="16" y2="18" />
       </svg>
     ),
   },
   {
     id: "sources",
     label: "Sources",
+    mobileDescription: "Manage your news sources",
     path: "/home-page/source",
     icon: (
       <svg
-        width="14"
-        height="14"
+        width="18"
+        height="18"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.9"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
       >
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
         <polyline points="14 2 14 8 20 8" />
         <line x1="16" y1="13" x2="8" y2="13" />
         <line x1="16" y1="17" x2="8" y2="17" />
-        <polyline points="10 9 9 9 8 9" />
+        <line x1="11" y1="9" x2="8" y2="9" />
       </svg>
     ),
   },
   {
     id: "today-top-news",
-    label: "Today Top News",
+    label: "Top News",
+    mobileDescription: "See today's trending stories",
     path: "/home-page/top-news",
     icon: (
       <svg
-        width="14"
-        height="14"
+        width="18"
+        height="18"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.9"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
       >
         <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
         <polyline points="16 7 22 7 22 13" />
@@ -91,6 +100,7 @@ const DashNav = ({
       await logOutUser();
 
       setShowLogoutModal(false);
+      setMobileMenuOpen(false);
 
       navigate("/authentication-page");
     } catch (error) {
@@ -100,53 +110,58 @@ const DashNav = ({
     }
   };
 
+  const handleLogoClick = () => {
+    setMobileMenuOpen(false);
+    navigate("/home-page");
+  };
+
+  const handleMobileLinkClick = () => {
+    setMobileMenuOpen(false);
+  };
+
+  const handleMobileLogoutClick = () => {
+    setMobileMenuOpen(false);
+    setShowLogoutModal(true);
+  };
+
   return (
     <>
-      <nav className="dash-nav">
+      <header className="dash-nav">
+        {/* Ambient decorative glow */}
+        <div className="dash-nav__ambient dash-nav__ambient--one" />
+        <div className="dash-nav__ambient dash-nav__ambient--two" />
+
         <div className="dash-nav__inner">
-          {/* LEFT */}
+          {/* ================= LEFT ================= */}
           <div className="dash-nav__left">
-            {/* Logo */}
-            <div className="dash-nav__logo">
-              <svg
-                className="dash-nav__logo-icon"
-                viewBox="0 0 24 24"
-                fill="#8B5E1A"
-                aria-hidden="true"
-              >
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                <line
-                  x1="8"
-                  y1="7"
-                  x2="16"
-                  y2="7"
-                  stroke="#faf8f4"
-                  strokeWidth="1.5"
-                />
-                <line
-                  x1="8"
-                  y1="11"
-                  x2="14"
-                  y2="11"
-                  stroke="#faf8f4"
-                  strokeWidth="1.5"
-                />
-                <line
-                  x1="8"
-                  y1="15"
-                  x2="12"
-                  y2="15"
-                  stroke="#faf8f4"
-                  strokeWidth="1.5"
-                />
-              </svg>
+            {/* ================= BRAND ================= */}
+            <button
+              type="button"
+              className="dash-nav__brand"
+              onClick={handleLogoClick}
+              aria-label={`Go to ${brandName} home`}
+            >
+              <span className="dash-nav__logo-frame">
+                <span className="dash-nav__logo-glow" />
 
-              <span className="dash-nav__logo-text">{brandName}</span>
-            </div>
+                <img
+                  src="/newMintLogo2.0.png"
+                  alt={brandName}
+                  className="dash-nav__logo-image"
+                />
+              </span>
 
-            {/* Desktop Navigation */}
-            <div className="dash-nav__links">
+              <span className="dash-nav__brand-copy">
+                <span className="dash-nav__brand-name">{brandName}</span>
+
+                <span className="dash-nav__brand-tagline">
+                  AI-powered news intelligence
+                </span>
+              </span>
+            </button>
+
+            {/* ================= DESKTOP NAV ================= */}
+            <nav className="dash-nav__links" aria-label="Primary navigation">
               {NAV_LINKS.map((link) => (
                 <NavLink
                   key={link.id}
@@ -156,55 +171,66 @@ const DashNav = ({
                     `dash-nav__link ${isActive ? "dash-nav__link--active" : ""}`
                   }
                 >
-                  {link.icon}
-                  <span>{link.label}</span>
+                  <span className="dash-nav__link-icon">{link.icon}</span>
+
+                  <span className="dash-nav__link-label">{link.label}</span>
+
+                  <span className="dash-nav__active-indicator" />
                 </NavLink>
               ))}
-            </div>
+            </nav>
           </div>
 
-          {/* RIGHT */}
+          {/* ================= RIGHT ================= */}
           <div className="dash-nav__right">
-            {/* User */}
-            <div className="dash-nav__user">
-              <div className="dash-nav__avatar">{userInitials}</div>
+            {/* ================= USER ================= */}
+            <div className="dash-nav__user" title={`Signed in as ${userName}`}>
+              <div className="dash-nav__avatar">
+                <span>{userInitials}</span>
+              </div>
 
-              <span className="dash-nav__user-name">{userName}</span>
+              <div className="dash-nav__user-info">
+                <span className="dash-nav__user-label">Welcome back</span>
+
+                <span className="dash-nav__user-name">{userName}</span>
+              </div>
             </div>
 
-            {/* Logout */}
+            {/* ================= DESKTOP LOGOUT ================= */}
             <button
               type="button"
               className="dash-nav__logout"
               onClick={() => setShowLogoutModal(true)}
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
+              <span className="dash-nav__logout-icon">
+                <svg
+                  width="17"
+                  height="17"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.9"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </span>
 
               <span>Log out</span>
             </button>
 
-            {/* Mobile Toggle */}
+            {/* ================= MOBILE MENU BUTTON ================= */}
             <button
               type="button"
               className={`dash-nav__menu-toggle ${
                 mobileMenuOpen ? "dash-nav__menu-toggle--open" : ""
               }`}
-              onClick={() => setMobileMenuOpen((prev) => !prev)}
-              aria-label="Toggle menu"
+              onClick={() => setMobileMenuOpen((previous) => !previous)}
+              aria-label="Toggle navigation menu"
               aria-expanded={mobileMenuOpen}
             >
               <span />
@@ -214,33 +240,86 @@ const DashNav = ({
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* ================= MOBILE MENU ================= */}
         <div
           className={`dash-nav__mobile-menu ${
             mobileMenuOpen ? "dash-nav__mobile-menu--open" : ""
           }`}
         >
-          {NAV_LINKS.map((link) => (
-            <NavLink
-              key={link.id}
-              to={link.path}
-              end={link.id === "digest"}
-              className={({ isActive }) =>
-                `dash-nav__mobile-link ${
-                  isActive ? "dash-nav__mobile-link--active" : ""
-                }`
-              }
-              onClick={() => setMobileMenuOpen(false)}
+          <div className="dash-nav__mobile-menu-inner">
+            <div className="dash-nav__mobile-heading">
+              <span>Navigation</span>
+              <span className="dash-nav__mobile-heading-line" />
+            </div>
+
+            {NAV_LINKS.map((link) => (
+              <NavLink
+                key={link.id}
+                to={link.path}
+                end={link.id === "digest"}
+                className={({ isActive }) =>
+                  `dash-nav__mobile-link ${
+                    isActive ? "dash-nav__mobile-link--active" : ""
+                  }`
+                }
+                onClick={handleMobileLinkClick}
+              >
+                <span className="dash-nav__mobile-icon">{link.icon}</span>
+
+                <span className="dash-nav__mobile-copy">
+                  <span>{link.label}</span>
+                  <small>{link.mobileDescription}</small>
+                </span>
+
+                <svg
+                  className="dash-nav__mobile-arrow"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </NavLink>
+            ))}
+
+            {/* Mobile logout */}
+            <button
+              type="button"
+              className="dash-nav__mobile-logout"
+              onClick={handleMobileLogoutClick}
             >
-              {link.icon}
-              <span>{link.label}</span>
-            </NavLink>
-          ))}
+              <span className="dash-nav__mobile-logout-icon">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.9"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </span>
+
+              <span>Log out</span>
+            </button>
+          </div>
         </div>
-      </nav>
+      </header>
 
       {/* ================= LOGOUT CONFIRMATION ================= */}
-
       <ConfirmModal
         isOpen={showLogoutModal}
         onClose={() => {

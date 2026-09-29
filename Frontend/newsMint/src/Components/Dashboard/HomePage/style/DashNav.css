@@ -1,313 +1,1201 @@
-/* ============================================ */
-/* DashNav — Complete Styles                    */
-/* ============================================ */
+/* =========================================================
+   NEWSMINT DASH NAV
+   Premium AI News Product Navigation
+   ========================================================= */
 
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap");
+
+/* =========================================================
+   DESIGN TOKENS
+   ========================================================= */
+
+:root {
+  --news-bg: #fbfaf7;
+  --news-bg-soft: #f7f3ec;
+  --news-white: #ffffff;
+
+  --news-text: #181613;
+  --news-text-secondary: #6f6a62;
+  --news-text-muted: #9b948a;
+
+  --news-gold: #c48727;
+  --news-gold-dark: #936017;
+  --news-gold-light: #fbefd9;
+  --news-gold-soft: #fff8eb;
+
+  --news-red: #a34e45;
+
+  --news-border: rgba(37, 29, 20, 0.08);
+  --news-border-light: rgba(37, 29, 20, 0.05);
+
+  --news-shadow: 0 8px 30px rgba(50, 37, 21, 0.06);
+
+  --news-shadow-hover: 0 12px 35px rgba(50, 37, 21, 0.1);
+
+  --news-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* =========================================================
+   RESET FOR THIS COMPONENT
+   ========================================================= */
+
+.dash-nav,
+.dash-nav * {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   MAIN NAVIGATION
+   ========================================================= */
 
 .dash-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  width: 100%;
+
   font-family:
-    "Inter",
+    "DM Sans",
+    Inter,
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
-    Roboto,
     sans-serif;
-  background: #faf8f4;
-  border-bottom: 1px solid #e8e4dc;
-  width: 100%;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+
+  background: linear-gradient(
+    180deg,
+    rgba(253, 252, 249, 0.96) 0%,
+    rgba(250, 249, 246, 0.9) 100%
+  );
+
+  border-bottom: 1px solid var(--news-border);
+
+  box-shadow: 0 3px 18px rgba(45, 35, 23, 0.035);
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  isolation: isolate;
 }
 
+/* =========================================================
+   AMBIENT BACKGROUND
+   ========================================================= */
+
+.dash-nav__ambient {
+  position: absolute;
+
+  pointer-events: none;
+
+  z-index: -1;
+
+  border-radius: 999px;
+
+  filter: blur(25px);
+
+  opacity: 0.6;
+}
+
+.dash-nav__ambient--one {
+  top: -85px;
+  left: 15%;
+
+  width: 310px;
+  height: 150px;
+
+  background: radial-gradient(
+    circle,
+    rgba(206, 157, 76, 0.11) 0%,
+    transparent 70%
+  );
+}
+
+.dash-nav__ambient--two {
+  top: -100px;
+  right: 15%;
+
+  width: 260px;
+  height: 150px;
+
+  background: radial-gradient(
+    circle,
+    rgba(218, 181, 119, 0.07) 0%,
+    transparent 70%
+  );
+}
+
+/* =========================================================
+   INNER
+   ========================================================= */
+
 .dash-nav__inner {
+  width: min(100%, 1500px);
+
+  min-height: 74px;
+
+  padding: 10px 30px;
+
+  margin: 0 auto;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 40px;
-  max-width: 1400px;
-  margin: 0 auto;
-  box-sizing: border-box;
+
+  gap: 30px;
 }
 
-/* ---------- Left Side: Logo + Links ---------- */
+/* =========================================================
+   LEFT
+   ========================================================= */
+
 .dash-nav__left {
   display: flex;
   align-items: center;
-  gap: 32px;
+
+  min-width: 0;
+
+  gap: 38px;
 }
 
-/* Logo */
-.dash-nav__logo {
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.dash-nav__brand {
+  appearance: none;
+
+  border: none;
+
+  background: transparent;
+
   display: flex;
   align-items: center;
-  gap: 8px;
+
+  gap: 11px;
+
+  padding: 3px;
+
+  margin: 0;
+
+  color: inherit;
+
   cursor: pointer;
-  user-select: none;
-  text-decoration: none;
+
+  text-align: left;
+
+  border-radius: 14px;
+
+  transition:
+    transform 220ms var(--news-ease),
+    opacity 180ms ease;
 }
 
-.dash-nav__logo-icon {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
+.dash-nav__brand:hover {
+  transform: translateY(-1px);
 }
 
-.dash-nav__logo-text {
+.dash-nav__brand:active {
+  transform: scale(0.985);
+}
+
+.dash-nav__brand:focus-visible {
+  outline: 3px solid rgba(196, 135, 39, 0.18);
+
+  outline-offset: 4px;
+}
+
+/* =========================================================
+   LOGO FRAME
+   ========================================================= */
+
+.dash-nav__logo-frame {
+  position: relative;
+
+  width: 47px;
+  height: 47px;
+
+  flex: 0 0 47px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+
+  background: linear-gradient(145deg, #fffefb 0%, #f9f2e7 100%);
+
+  border: 1px solid rgba(196, 135, 39, 0.13);
+
+  box-shadow:
+    0 5px 16px rgba(80, 57, 28, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+
+  transition:
+    transform 280ms var(--news-ease),
+    box-shadow 280ms ease,
+    border-color 280ms ease;
+}
+
+/* Subtle gold atmosphere */
+.dash-nav__logo-glow {
+  position: absolute;
+
+  width: 33px;
+  height: 33px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(222, 169, 69, 0.18),
+    transparent 70%
+  );
+
+  filter: blur(4px);
+
+  opacity: 0.85;
+
+  transition:
+    transform 320ms ease,
+    opacity 320ms ease;
+}
+
+/* =========================================================
+   ACTUAL NEWSMINT LOGO
+   ========================================================= */
+
+.dash-nav__logo-image {
+  position: relative;
+
+  z-index: 2;
+
+  display: block;
+
+  width: 43px;
+  height: 43px;
+
+  object-fit: contain;
+
+  transform: scale(1.03);
+
+  filter: drop-shadow(0 3px 4px rgba(120, 77, 9, 0.11));
+
+  transition:
+    transform 320ms var(--news-ease),
+    filter 320ms ease;
+}
+
+/* =========================================================
+   LOGO HOVER
+   ========================================================= */
+
+.dash-nav__brand:hover .dash-nav__logo-frame {
+  transform: translateY(-2px) rotate(-1deg);
+
+  border-color: rgba(196, 135, 39, 0.25);
+
+  box-shadow:
+    0 10px 24px rgba(80, 57, 28, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.dash-nav__brand:hover .dash-nav__logo-image {
+  transform: scale(1.1);
+
+  filter: drop-shadow(0 5px 7px rgba(120, 77, 9, 0.2));
+}
+
+.dash-nav__brand:hover .dash-nav__logo-glow {
+  transform: scale(1.3);
+
+  opacity: 1;
+}
+
+/* =========================================================
+   BRAND COPY
+   ========================================================= */
+
+.dash-nav__brand-copy {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dash-nav__brand-name {
   font-family: "Playfair Display", Georgia, "Times New Roman", serif;
-  font-size: 20px;
+
+  font-size: 22px;
+
+  line-height: 1;
+
   font-weight: 700;
-  color: #8b5e1a;
-  letter-spacing: -0.3px;
+
+  letter-spacing: -0.55px;
+
+  color: var(--news-text);
 }
 
-/* Nav Links */
+.dash-nav__brand-tagline {
+  margin-top: 4px;
+
+  font-size: 8.5px;
+
+  line-height: 1;
+
+  font-weight: 700;
+
+  letter-spacing: 0.78px;
+
+  text-transform: uppercase;
+
+  color: var(--news-text-muted);
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   DESKTOP NAVIGATION
+   ========================================================= */
+
 .dash-nav__links {
   display: flex;
   align-items: center;
+
   gap: 4px;
+
+  padding: 4px;
+
+  border: 1px solid var(--news-border-light);
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.54);
+
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
+/* =========================================================
+   NAV LINK
+   ========================================================= */
+
 .dash-nav__link {
-  display: flex;
+  position: relative;
+
+  min-width: 40px;
+  min-height: 40px;
+
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #666;
-  background: transparent;
-  border: none;
-  cursor: pointer;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 0 14px;
+
+  border-radius: 10px;
+
+  color: var(--news-text-secondary);
+
   text-decoration: none;
-  transition: all 0.2s ease;
-  font-family: inherit;
+
+  font-size: 12.5px;
+
+  font-weight: 600;
+
   white-space: nowrap;
+
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    transform 180ms var(--news-ease),
+    box-shadow 180ms ease;
 }
 
 .dash-nav__link:hover {
-  color: #8b5e1a;
-  background: #f5efe4;
+  color: var(--news-gold-dark);
+
+  background: rgba(251, 239, 217, 0.66);
+
+  transform: translateY(-1px);
 }
+
+.dash-nav__link:active {
+  transform: translateY(0);
+}
+
+.dash-nav__link:focus-visible {
+  outline: 3px solid rgba(196, 135, 39, 0.15);
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   ACTIVE NAV LINK
+   ========================================================= */
 
 .dash-nav__link--active {
-  background: #f5efe4;
-  color: #8b5e1a;
-  font-weight: 600;
+  color: var(--news-gold-dark);
+
+  background: linear-gradient(180deg, #fffdf9 0%, #faf0df 100%);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(196, 135, 39, 0.08),
+    0 3px 11px rgba(90, 63, 28, 0.045);
 }
 
-.dash-nav__link svg {
+.dash-nav__link--active .dash-nav__link-icon {
+  color: var(--news-gold);
+}
+
+/* =========================================================
+   NAV ICON
+   ========================================================= */
+
+.dash-nav__link-icon {
+  width: 18px;
+  height: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   flex-shrink: 0;
+
+  transition:
+    transform 180ms var(--news-ease),
+    color 180ms ease;
 }
 
-/* ---------- Right Side: User + Logout ---------- */
+.dash-nav__link:hover .dash-nav__link-icon {
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   ACTIVE INDICATOR
+   ========================================================= */
+
+.dash-nav__active-indicator {
+  position: absolute;
+
+  left: 50%;
+
+  bottom: 4px;
+
+  width: 14px;
+  height: 2px;
+
+  border-radius: 999px;
+
+  background: var(--news-gold);
+
+  opacity: 0;
+
+  transform: translateX(-50%) scaleX(0.2);
+
+  transition:
+    opacity 180ms ease,
+    transform 220ms var(--news-ease);
+}
+
+.dash-nav__link--active .dash-nav__active-indicator {
+  opacity: 1;
+
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* =========================================================
+   RIGHT
+   ========================================================= */
+
 .dash-nav__right {
   display: flex;
   align-items: center;
-  gap: 12px;
+
+  gap: 9px;
+
+  flex-shrink: 0;
 }
 
-/* User Badge */
+/* =========================================================
+   USER
+   ========================================================= */
+
 .dash-nav__user {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: #f5efe4;
-  border-radius: 20px;
+
+  gap: 9px;
+
   padding: 4px 12px 4px 4px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.74);
+
+  border: 1px solid var(--news-border);
+
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+  transition:
+    background 180ms ease,
+    transform 180ms var(--news-ease),
+    box-shadow 180ms ease,
+    border-color 180ms ease;
 }
 
 .dash-nav__user:hover {
-  background: #ede6d8;
+  background: var(--news-white);
+
+  transform: translateY(-1px);
+
+  border-color: rgba(196, 135, 39, 0.12);
+
+  box-shadow: var(--news-shadow);
 }
 
+/* =========================================================
+   AVATAR
+   ========================================================= */
+
 .dash-nav__avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #c8902e;
+  position: relative;
+
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 34px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  background: linear-gradient(145deg, #d8a14e 0%, #ae711c 100%);
+
+  color: white;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 3px 10px rgba(176, 111, 25, 0.16);
+}
+
+.dash-nav__avatar::before {
+  content: "";
+
+  position: absolute;
+
+  width: 22px;
+  height: 22px;
+
+  top: -7px;
+  right: -5px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.12);
+
+  filter: blur(2px);
+}
+
+.dash-nav__avatar span {
+  position: relative;
+
+  z-index: 1;
+
   font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.3px;
+}
+
+/* =========================================================
+   USER TEXT
+   ========================================================= */
+
+.dash-nav__user-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.dash-nav__user-label {
+  font-size: 8px;
+
+  line-height: 1;
+
   font-weight: 700;
-  flex-shrink: 0;
-  user-select: none;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.7px;
+
+  color: var(--news-text-muted);
 }
 
 .dash-nav__user-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
+  max-width: 125px;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
   white-space: nowrap;
+
+  font-size: 12px;
+
+  line-height: 1.1;
+
+  font-weight: 700;
+
+  color: var(--news-text);
 }
 
-/* Logout Button */
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
 .dash-nav__logout {
-  display: flex;
+  appearance: none;
+
+  min-height: 40px;
+
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 12px;
+
+  border: 1px solid transparent;
+
+  border-radius: 10px;
+
   background: transparent;
-  border: none;
-  color: #666;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+
+  color: var(--news-text-secondary);
+
   font-family: inherit;
-  white-space: nowrap;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms var(--news-ease);
 }
 
 .dash-nav__logout:hover {
-  color: #8b5e1a;
-  background: #f5efe4;
+  color: var(--news-red);
+
+  background: #fff5f3;
+
+  border-color: rgba(163, 78, 69, 0.1);
+
+  transform: translateY(-1px);
 }
 
-.dash-nav__logout svg {
-  flex-shrink: 0;
+.dash-nav__logout:active {
+  transform: translateY(0);
 }
 
-/* ---------- Mobile Menu Toggle ---------- */
+.dash-nav__logout:focus-visible {
+  outline: 3px solid rgba(163, 78, 69, 0.12);
+
+  outline-offset: 2px;
+}
+
+.dash-nav__logout-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: transform 180ms var(--news-ease);
+}
+
+.dash-nav__logout:hover .dash-nav__logout-icon {
+  transform: translateX(2px);
+}
+
+/* =========================================================
+   MOBILE TOGGLE
+   ========================================================= */
+
 .dash-nav__menu-toggle {
   display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 36px;
-  height: 36px;
-  gap: 5px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
+
+  width: 40px;
+  height: 40px;
+
   padding: 0;
-  border-radius: 8px;
-  transition: background 0.2s ease;
+
+  border: 1px solid var(--news-border);
+
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.76);
+
+  cursor: pointer;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms var(--news-ease);
 }
 
 .dash-nav__menu-toggle:hover {
-  background: #f5efe4;
+  background: white;
+
+  border-color: rgba(196, 135, 39, 0.15);
+
+  box-shadow: 0 5px 16px rgba(45, 35, 22, 0.07);
+
+  transform: translateY(-1px);
+}
+
+.dash-nav__menu-toggle:active {
+  transform: translateY(0);
+}
+
+.dash-nav__menu-toggle:focus-visible {
+  outline: 3px solid rgba(196, 135, 39, 0.16);
+
+  outline-offset: 2px;
 }
 
 .dash-nav__menu-toggle span {
+  width: 17px;
+  height: 1.8px;
+
   display: block;
-  width: 20px;
-  height: 2px;
-  background: #8b5e1a;
-  border-radius: 2px;
-  transition: all 0.3s ease;
-  transform-origin: center;
+
+  border-radius: 999px;
+
+  background: var(--news-text);
+
+  transition:
+    transform 260ms var(--news-ease),
+    opacity 180ms ease,
+    width 180ms ease;
 }
 
+/* =========================================================
+   HAMBURGER -> X
+   ========================================================= */
+
 .dash-nav__menu-toggle--open span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
+  transform: translateY(5.8px) rotate(45deg);
 }
 
 .dash-nav__menu-toggle--open span:nth-child(2) {
+  width: 0;
+
   opacity: 0;
 }
 
 .dash-nav__menu-toggle--open span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
+  transform: translateY(-5.8px) rotate(-45deg);
 }
 
-/* ---------- Mobile Menu Dropdown ---------- */
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
 .dash-nav__mobile-menu {
   display: none;
-  flex-direction: column;
-  padding: 8px 20px 16px;
-  gap: 4px;
-  border-top: 1px solid transparent;
+
   max-height: 0;
+
   overflow: hidden;
+
   opacity: 0;
-  transition: all 0.3s ease;
+
+  transform: translateY(-8px);
+
+  border-top: 1px solid transparent;
+
+  background: linear-gradient(
+    180deg,
+    rgba(251, 250, 247, 0.98),
+    rgba(247, 244, 238, 0.98)
+  );
+
+  transition:
+    max-height 360ms var(--news-ease),
+    opacity 200ms ease,
+    transform 300ms var(--news-ease),
+    border-color 200ms ease;
 }
 
 .dash-nav__mobile-menu--open {
-  max-height: 300px;
+  max-height: 520px;
+
   opacity: 1;
-  border-top-color: #e8e4dc;
+
+  transform: translateY(0);
+
+  border-top-color: var(--news-border);
 }
 
-.dash-nav__mobile-link {
+/* =========================================================
+   MOBILE MENU INNER
+   ========================================================= */
+
+.dash-nav__mobile-menu-inner {
+  width: min(100%, 1500px);
+
+  margin: 0 auto;
+
+  padding: 12px 20px 20px;
+}
+
+/* =========================================================
+   MOBILE HEADING
+   ========================================================= */
+
+.dash-nav__mobile-heading {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #666;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.2s ease;
-  font-family: inherit;
+
+  gap: 9px;
+
+  margin: 4px 2px 10px;
+
+  font-size: 9px;
+
+  line-height: 1;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+
+  color: var(--news-text-muted);
+}
+
+.dash-nav__mobile-heading-line {
+  flex: 1;
+
+  height: 1px;
+
+  background: rgba(37, 29, 20, 0.07);
+}
+
+/* =========================================================
+   MOBILE LINK
+   ========================================================= */
+
+.dash-nav__mobile-link {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 10px 11px;
+
+  margin-bottom: 5px;
+
+  border-radius: 13px;
+
+  text-decoration: none;
+
+  color: var(--news-text-secondary);
+
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 180ms var(--news-ease),
+    box-shadow 180ms ease;
 }
 
 .dash-nav__mobile-link:hover {
-  color: #8b5e1a;
-  background: #f5efe4;
+  color: var(--news-gold-dark);
+
+  background: rgba(255, 255, 255, 0.78);
+
+  transform: translateX(2px);
 }
 
 .dash-nav__mobile-link--active {
-  background: #f5efe4;
-  color: #8b5e1a;
-  font-weight: 600;
+  color: var(--news-gold-dark);
+
+  background: linear-gradient(
+    90deg,
+    rgba(251, 239, 217, 0.9),
+    rgba(255, 250, 243, 0.72)
+  );
+
+  box-shadow: inset 0 0 0 1px rgba(196, 135, 39, 0.07);
 }
 
-/* ============================================ */
-/* Responsive Breakpoints                       */
-/* ============================================ */
+/* =========================================================
+   MOBILE ICON
+   ========================================================= */
 
-/* Tablet: hide nav link text, show icons only */
-@media (max-width: 900px) {
+.dash-nav__mobile-icon {
+  width: 38px;
+  height: 38px;
+
+  flex: 0 0 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.72);
+
+  border: 1px solid var(--news-border-light);
+
+  transition:
+    transform 180ms var(--news-ease),
+    background 180ms ease;
+}
+
+.dash-nav__mobile-link--active .dash-nav__mobile-icon {
+  color: var(--news-gold);
+
+  background: #fffaf2;
+}
+
+.dash-nav__mobile-link:hover .dash-nav__mobile-icon {
+  transform: scale(1.035);
+}
+
+/* =========================================================
+   MOBILE LINK TEXT
+   ========================================================= */
+
+.dash-nav__mobile-copy {
+  min-width: 0;
+
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.dash-nav__mobile-copy > span {
+  font-size: 12.5px;
+
+  line-height: 1.15;
+
+  font-weight: 700;
+}
+
+.dash-nav__mobile-copy small {
+  font-size: 10px;
+
+  line-height: 1.3;
+
+  color: var(--news-text-muted);
+}
+
+/* =========================================================
+   MOBILE ARROW
+   ========================================================= */
+
+.dash-nav__mobile-arrow {
+  flex-shrink: 0;
+
+  color: var(--news-text-muted);
+
+  transition:
+    transform 180ms var(--news-ease),
+    color 180ms ease;
+}
+
+.dash-nav__mobile-link:hover .dash-nav__mobile-arrow {
+  color: var(--news-gold);
+
+  transform: translateX(2px);
+}
+
+/* =========================================================
+   MOBILE LOGOUT
+   ========================================================= */
+
+.dash-nav__mobile-logout {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  margin-top: 10px;
+
+  padding: 11px;
+
+  border: 1px solid rgba(163, 78, 69, 0.09);
+
+  border-radius: 13px;
+
+  background: rgba(255, 245, 243, 0.68);
+
+  color: var(--news-red);
+
+  font-family: inherit;
+
+  font-size: 12.5px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  text-align: left;
+
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms var(--news-ease);
+}
+
+.dash-nav__mobile-logout:hover {
+  background: #fff5f3;
+
+  border-color: rgba(163, 78, 69, 0.15);
+
+  transform: translateY(-1px);
+}
+
+.dash-nav__mobile-logout:active {
+  transform: translateY(0);
+}
+
+.dash-nav__mobile-logout-icon {
+  width: 38px;
+  height: 38px;
+
+  flex: 0 0 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.55);
+
+  border: 1px solid rgba(163, 78, 69, 0.07);
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1080px) {
   .dash-nav__inner {
-    padding: 10px 24px;
+    padding-left: 22px;
+    padding-right: 22px;
   }
 
   .dash-nav__left {
-    gap: 20px;
+    gap: 22px;
   }
 
-  .dash-nav__link span {
+  .dash-nav__brand-tagline {
     display: none;
   }
 
-  .dash-nav__link {
-    padding: 8px;
-  }
-
-  .dash-nav__user-name {
+  .dash-nav__user-info {
     display: none;
   }
 
   .dash-nav__user {
-    padding: 4px;
+    padding-right: 4px;
+  }
+
+  .dash-nav__link {
+    padding-left: 11px;
+    padding-right: 11px;
   }
 }
 
-/* Mobile: hamburger menu */
-@media (max-width: 640px) {
+/* =========================================================
+   SMALL TABLET
+   ========================================================= */
+
+@media (max-width: 850px) {
+  .dash-nav__links {
+    gap: 2px;
+  }
+
+  .dash-nav__link-label {
+    display: none;
+  }
+
+  .dash-nav__link {
+    width: 42px;
+
+    padding-left: 0;
+    padding-right: 0;
+
+    gap: 0;
+  }
+
+  .dash-nav__active-indicator {
+    display: none;
+  }
+
+  .dash-nav__link-icon {
+    width: 19px;
+    height: 19px;
+  }
+
+  .dash-nav__logout > span:last-child {
+    display: none;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
   .dash-nav__inner {
-    padding: 10px 16px;
+    min-height: 68px;
+
+    padding: 9px 16px;
   }
 
   .dash-nav__links {
     display: none;
   }
 
-  .dash-nav__logout span {
+  .dash-nav__logout {
     display: none;
   }
 
@@ -316,17 +1204,107 @@
   }
 
   .dash-nav__mobile-menu {
-    display: flex;
+    display: block;
+  }
+
+  .dash-nav__logo-frame {
+    width: 43px;
+    height: 43px;
+
+    flex-basis: 43px;
+  }
+
+  .dash-nav__logo-image {
+    width: 40px;
+    height: 40px;
+  }
+
+  .dash-nav__brand-name {
+    font-size: 20px;
   }
 }
 
-@media (max-width: 380px) {
-  .dash-nav__logo-text {
-    font-size: 18px;
+/* =========================================================
+   MOBILE SMALL
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .dash-nav__inner {
+    padding-left: 13px;
+    padding-right: 13px;
   }
 
-  .dash-nav__logo-icon {
-    width: 20px;
-    height: 20px;
+  .dash-nav__brand {
+    gap: 9px;
+  }
+
+  .dash-nav__logo-frame {
+    width: 41px;
+    height: 41px;
+
+    flex-basis: 41px;
+
+    border-radius: 12px;
+  }
+
+  .dash-nav__logo-image {
+    width: 38px;
+    height: 38px;
+  }
+
+  .dash-nav__brand-name {
+    font-size: 19px;
+  }
+
+  .dash-nav__user {
+    display: none;
+  }
+
+  .dash-nav__right {
+    margin-left: auto;
+  }
+
+  .dash-nav__mobile-menu-inner {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 360px) {
+  .dash-nav__brand-copy {
+    display: none;
+  }
+
+  .dash-nav__logo-frame {
+    width: 40px;
+    height: 40px;
+
+    flex-basis: 40px;
+  }
+
+  .dash-nav__logo-image {
+    width: 37px;
+    height: 37px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-nav *,
+  .dash-nav *::before,
+  .dash-nav *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+
+    scroll-behavior: auto !important;
   }
 }
