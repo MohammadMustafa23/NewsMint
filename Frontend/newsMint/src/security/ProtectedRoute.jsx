@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 
 import { getCurrentUser } from "../services/auth.service.js";
 import { checkMyPreferences } from "../services/preference.service.js";
+
 import SpinLoader from "../common/SpinLoader";
 
 const ProtectedRoute = ({
@@ -29,10 +30,10 @@ const ProtectedRoute = ({
 
         // Save user
         setUser(userResponse.user);
-
         setIsAuthenticated(true);
 
         const preferenceResponse = await checkMyPreferences();
+
         setHasPreferences(Boolean(preferenceResponse?.hasPreferences));
       } catch (error) {
         console.error("Protected Route Error:", error);
@@ -49,7 +50,19 @@ const ProtectedRoute = ({
 
   // Loading
   if (loading) {
-    return <SpinLoader />;
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <SpinLoader />
+      </div>
+    );
   }
 
   // Not authenticated
