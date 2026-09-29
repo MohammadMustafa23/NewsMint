@@ -26,6 +26,7 @@ const requiredEnv = [
   "SMTP_PORT",
   "SMTP_USER",
   "SMTP_PASS",
+  "SMTP_FROM",
 
   // News APIs
   "MEDIASTACK_API_KEY",
@@ -85,6 +86,7 @@ export const SMTP_PORT = process.env.SMTP_PORT;
 export const SMTP_USER = process.env.SMTP_USER;
 export const SMTP_PASS = process.env.SMTP_PASS;
 export const EMAIL_USER = process.env.EMAIL_USER;
+export const SMTP_FROM = process.env.SMTP_FROM;
 
 // ======================================================
 // NEWS APIs
