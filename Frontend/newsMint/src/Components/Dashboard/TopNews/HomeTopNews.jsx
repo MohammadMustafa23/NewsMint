@@ -327,11 +327,38 @@ const HomeTopNews = () => {
 
   if (loading) {
     return (
-      <div className="dash-top-news-page">
-        <div className="dash-top-news-page__container dash-top-news-page__container--state">
+      <div
+        className="dash-top-news-page"
+        style={{
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "12px",
+            textAlign: "center",
+          }}
+        >
           <SpinLoader size="medium" />
 
-          <p>Preparing the latest news...</p>
+          <p
+            style={{
+              margin: 0,
+              color: "#8a8a8a",
+              fontSize: "14px",
+              fontWeight: 500,
+            }}
+          >
+            Preparing the latest news...
+          </p>
         </div>
       </div>
     );
